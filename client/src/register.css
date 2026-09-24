@@ -1,0 +1,79 @@
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 10% 20%, rgba(232, 168, 124, 0.18), transparent 300px),
+              radial-gradient(circle at 90% 80%, rgba(216, 151, 108, 0.15), transparent 300px),
+              var(--bg-cream);
+  padding: 24px;
+}
+
+.register-card {
+  background: var(--card-bg);
+  border: 1px solid var(--soft-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  max-width: 460px;
+  padding: 36px 32px;
+}
+
+.register-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.register-brand h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.role-notice-box {
+  background: var(--warm-peach-light);
+  border: 1px dashed var(--terracotta);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  color: var(--text-dark);
+}
+
+.register-button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--warm-peach), var(--terracotta));
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.98rem;
+  box-shadow: 0 4px 14px rgba(216, 151, 108, 0.35);
+  transition: var(--transition);
+  margin-top: 6px;
+}
+
+.register-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--terracotta), var(--terracotta-dark));
+  transform: translateY(-1px);
+}
+
+.register-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.login-text {
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-top: 20px;
+}

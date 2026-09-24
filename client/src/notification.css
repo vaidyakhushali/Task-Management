@@ -1,0 +1,414 @@
+/* Remove transform-based animation from parent so position:fixed works properly */
+.notification-page {
+  /* Changed from animation to opacity transition to prevent breaking fixed overlays */
+  animation: settings-fade-in .35s ease both;
+  max-width: 800px;
+}
+
+@keyframes settings-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.notification-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.notification-heading .dashboard-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #bd7950;
+  margin: 0 0 4px 0;
+}
+
+.notification-heading h2 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.notification-heading p:last-child {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.notification-clear-button {
+  border: none;
+  border-radius: 6px;
+  background: #2a5b55;
+  color: #ffffff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 14px;
+  transition: background 0.2s ease, transform 0.1s ease;
+  white-space: nowrap;
+}
+
+.notification-clear-button:hover {
+  background: #214a45;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Notification List & Cards
+   ========================================================================== */
+.notification-list {
+  display: grid;
+  gap: 12px;
+}
+
+.notification-empty {
+  color: #94a3b8;
+  font-size: 13px;
+  padding: 16px 0;
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.notification-item[role='button'] {
+  cursor: pointer;
+}
+
+.notification-item[role='button']:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+.notification-item.unread {
+  border-left: 4px solid #bd7950;
+  background: #fffcf9;
+}
+
+.notification-type {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.notification-type.task {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.notification-type.info {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.notification-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.notification-copy h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.notification-copy p {
+  margin: 3px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.notification-copy small {
+  display: block;
+  margin-top: 6px;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.notification-read-button {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: transparent;
+  color: #475569;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 10px;
+  transition: all 0.2s ease;
+}
+
+.notification-read-button:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* ==========================================================================
+   Modal Layout Fixes (Centers & Keeps Within Screen Height)
+   ========================================================================== */
+.notification-modal-backdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.notification-modal {
+  position: relative;
+  width: min(580px, 100%);
+  max-height: 88vh; /* Keeps modal inside viewport */
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto; /* Clean internal scroll */
+}
+
+/* Custom Scrollbar for Modal */
+.notification-modal::-webkit-scrollbar {
+  width: 6px;
+}
+.notification-modal::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.notification-modal-heading {
+  padding-right: 40px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.notification-modal-heading .dashboard-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #bd7950;
+  margin: 0 0 2px;
+}
+
+.notification-modal-heading h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.notification-close-button {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.notification-close-button:hover {
+  border-color: #cbd5e1;
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+/* ==========================================================================
+   Details Grid Inside Modal
+   ========================================================================== */
+.notification-detail-list {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0 0;
+}
+
+.notification-detail-list div {
+  padding: 10px 14px;
+  border: 1px solid #f1f5f9;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.notification-detail-list dt {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.notification-detail-list dd {
+  margin: 3px 0 0;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   Chat Section Inside Modal
+   ========================================================================== */
+.notification-chat {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.notification-chat h3 {
+  margin: 0 0 12px;
+  color: #1e293b;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.notification-chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  padding-right: 4px;
+}
+
+.notification-chat-message {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: fit-content;
+  max-width: 80%;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.notification-chat-message strong {
+  color: #bd7950;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.notification-chat-form {
+  display: flex;
+  gap: 8px;
+}
+
+.notification-chat-form input {
+  min-width: 0;
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #1e293b;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.notification-chat-form input:focus {
+  border-color: #2a5b55;
+  box-shadow: 0 0 0 3px rgba(42, 91, 85, 0.12);
+}
+
+.notification-chat-form button {
+  padding: 0 16px;
+  border: none;
+  border-radius: 6px;
+  background: #2a5b55;
+  color: #ffffff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.notification-chat-form button:hover {
+  background: #214a45;
+}
+
+@media (max-width: 600px) {
+  .notification-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .notification-modal {
+    padding: 18px;
+    max-height: 92vh;
+  }
+
+  .notification-modal-heading h2 {
+    font-size: 18px;
+  }
+}/* Modal Backdrop - Uses Portal-like fixed positioning */
+.notification-modal-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 999999 !important;
+  
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  background: rgba(15, 23, 42, 0.55) !important;
+  backdrop-filter: blur(4px) !important;
+  box-sizing: border-box !important;
+}
+
+/* Modal content sizing & alignment */
+.notification-modal {
+  position: relative !important;
+  width: min(580px, 100%) !important;
+  max-height: 85vh !important;
+  margin: 0 auto !important;
+  overflow-y: auto !important;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}

@@ -1,0 +1,62 @@
+/* ==========================================================================
+   Print Optimization Styles (@media print)
+   ========================================================================== */
+@media print {
+  /* 1. Hide unwanted UI elements during export/print */
+  sidebar,
+  nav,
+  header,
+  .sidebar,
+  .top-navbar,
+  .header-actions,
+  .btn-secondary,
+  .notification-page,
+  button {
+    display: none !important;
+  }
+
+  /* 2. Reset backgrounds and layout for crisp printing */
+  body, 
+  #root, 
+  main, 
+  .panel {
+    /* background removed to preserve metric card backgrounds */
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+  }
+
+  /* 3. Optimize grid layout for PDF page bounds */
+  .metric-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .metric-card {
+    border: 1px solid #d1d5db !important;
+    /* background preserved */
+    padding: 12px !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  .panel-heading h2 {
+    font-size: 20pt !important;
+    color: #111827 !important;
+  }
+
+  /* Force print color backgrounds if desired */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}@media print {
+  .no-print {
+    display: none !important;
+  }
+}

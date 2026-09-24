@@ -1,0 +1,414 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  font-family: 'Manrope', 'Outfit', system-ui, -apple-system, sans-serif;
+  
+  /* Default Light Theme Variables */
+  --bg-cream: #fdf8f4;
+  --warm-peach: #e8a87c;
+  --warm-peach-light: #fae8dc;
+  --terracotta: #d8976c;
+  --terracotta-dark: #c07a4e;
+  --card-bg: #ffffff;
+  --soft-border: #f0e6dd;
+  --text-dark: #2d241e;
+  --text-muted: #8a7a70;
+  
+  /* Status & Helper Colors */
+  --status-pending-color: #d8976c;
+  --status-pending-bg: #fcf1e8;
+  --status-progress-color: #d9822b;
+  --status-progress-bg: #fef5ea;
+  --status-completed-color: #48996b;
+  --status-completed-bg: #eaf6f0;
+  
+  --priority-high: #e05d52;
+  --priority-medium: #e69a3a;
+  --priority-low: #6aa877;
+  
+  /* Shadows & Transitions */
+  --shadow-sm: 0 2px 8px rgba(216, 151, 108, 0.06);
+  --shadow-md: 0 8px 24px rgba(216, 151, 108, 0.10);
+  --shadow-lg: 0 16px 36px rgba(216, 151, 108, 0.14);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-full: 9999px;
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Mode Theme Variables & Component Overrides */
+[data-theme="dark"], html[data-theme="dark"] body {
+  --bg-cream: #121519;
+  --warm-peach: #d8976c;
+  --warm-peach-light: #2c221b;
+  --terracotta: #e09b70;
+  --terracotta-dark: #f2a97c;
+  --card-bg: #1a1e24;
+  --soft-border: #2c323c;
+  --text-dark: #f0f3f8;
+  --text-muted: #9aa5b5;
+  
+  --status-pending-color: #f0a87c;
+  --status-pending-bg: #33241b;
+  --status-progress-color: #f3b04c;
+  --status-progress-bg: #382c18;
+  --status-completed-color: #5ecb91;
+  --status-completed-bg: #173827;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] body,
+[data-theme="dark"] .dashboard-page {
+  background-color: var(--bg-cream) !important;
+  color: var(--text-dark) !important;
+}
+
+[data-theme="dark"] .dashboard-sidebar,
+[data-theme="dark"] .panel,
+[data-theme="dark"] .metric-card,
+[data-theme="dark"] .settings-card,
+[data-theme="dark"] .task-create-card,
+[data-theme="dark"] .tasks-list-card,
+[data-theme="dark"] .project-board,
+[data-theme="dark"] .admin-user-card,
+[data-theme="dark"] .comments-modal,
+[data-theme="dark"] .toast-card,
+[data-theme="dark"] .tasks-page-header,
+[data-theme="dark"] .reports-page,
+[data-theme="dark"] .help-card,
+[data-theme="dark"] .search-box,
+[data-theme="dark"] .notification-button,
+[data-theme="dark"] .account-box,
+[data-theme="dark"] .topbar-theme-btn,
+[data-theme="dark"] .topbar-fontsize-select {
+  background-color: var(--card-bg) !important;
+  border-color: var(--soft-border) !important;
+  color: var(--text-dark) !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: #121519 !important;
+  border-color: var(--soft-border) !important;
+  color: var(--text-dark) !important;
+}
+
+[data-theme="dark"] .status-card,
+[data-theme="dark"] .workload-row,
+[data-theme="dark"] .task-row,
+[data-theme="dark"] .project-board-row,
+[data-theme="dark"] .nav-item:not(.active) {
+  background-color: #21262e !important;
+  color: var(--text-dark) !important;
+}
+
+[data-theme="dark"] .nav-item:not(.active):hover {
+  background-color: var(--warm-peach-light) !important;
+  color: var(--terracotta-dark) !important;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] strong {
+  color: var(--text-dark) !important;
+}
+
+[data-theme="dark"] p,
+[data-theme="dark"] small,
+[data-theme="dark"] label {
+  color: var(--text-muted);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Font Size Adjustments */
+html {
+  font-size: 13px; /* Default medium */
+}
+
+html[data-font-size="small"] {
+  font-size: 11.5px;
+}
+
+html[data-font-size="medium"] {
+  font-size: 13px;
+}
+
+html[data-font-size="large"] {
+  font-size: 14.5px;
+}
+
+html[data-font-size="xlarge"] {
+  font-size: 16px;
+}
+
+body {
+  background-color: var(--bg-cream);
+  color: var(--text-dark);
+  font-family: 'Manrope', sans-serif;
+  min-height: 100vh;
+  line-height: 1.4;
+  font-size: 0.85rem;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+  font-size: 0.82rem;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Page Headings Utility */
+.dashboard-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--terracotta);
+  letter-spacing: 0.6px;
+  margin-bottom: 2px;
+}
+
+.projects-heading,
+.settings-heading,
+.notification-heading,
+.admin-overview-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.projects-heading h2,
+.settings-heading h2,
+.notification-heading h2,
+.admin-overview-heading h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.projects-heading p,
+.settings-heading p,
+.notification-heading p,
+.admin-overview-heading p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.password-hint.warning {
+  font-size: 0.72rem;
+  color: #c0392b;
+  margin-top: 3px;
+  display: block;
+  font-weight: 600;
+}
+
+/* Toast Notifications Container */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 320px;
+  width: calc(100% - 40px);
+}
+
+.toast-card {
+  background: var(--card-bg);
+  border: 1px solid var(--warm-peach);
+  border-left: 4px solid var(--terracotta);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--warm-peach-light);
+  color: var(--terracotta-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+}
+
+.toast-content strong {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-dark);
+}
+
+.toast-content p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-left: auto;
+  line-height: 1;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Aesthetic Soft Pastel Pill Badges */
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.74rem;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+/* Task Type Pills */
+.pill-type-internal {
+  background: #ede9fe;
+  color: #5b21b6;
+  border: 1px solid #ddd6fe;
+}
+
+.pill-type-standard {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+.pill-type-payment {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+/* Priority Pills */
+.pill-priority-low {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.pill-priority-medium {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.pill-priority-high {
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+
+/* Status Pills */
+.pill-status-pending {
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
+.pill-status-in-progress {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #ffedd5;
+}
+
+.pill-status-complete {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.pill-status-overdue {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+/* Timeline Pill */
+.pill-timeline {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-full);
+  padding: 4px 10px;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+/* View Mode Switch Button Group */
+.view-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-cream);
+  border: 1px solid var(--soft-border);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  gap: 3px;
+}
+
+.view-mode-btn {
+  padding: 5px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.view-mode-btn.active {
+  background: var(--card-bg);
+  color: var(--terracotta-dark);
+  box-shadow: var(--shadow-sm);
+}
+
