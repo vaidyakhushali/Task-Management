@@ -14,8 +14,6 @@ const taskSchema = new mongoose.Schema({
     trim: true 
   },
   taskType: { type: String, default: 'Standard', trim: true, maxlength: 40 },
-  budget: { type: Number, default: 0, min: 0 },
-  cost: { type: Number, default: 0, min: 0 },
   completed: 
   { 
     type: Boolean, 

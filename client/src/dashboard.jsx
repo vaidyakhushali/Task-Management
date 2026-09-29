@@ -12,7 +12,7 @@ import Chatbot from './chatbot';
 import Settings from './settings';
 import Notification from './notification';
 
-const menuItems = ['Dashboard', 'Tasks', 'Projects', 'Analytics', 'Calendar', 'Team Members', 'Reports'];
+const menuItems = ['Dashboard', 'Tasks', 'Projects', 'Analytics', 'Calendar', 'Chatbot','Team Members', 'Reports'];
 const generalItems = ['Settings'];
 
 function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {

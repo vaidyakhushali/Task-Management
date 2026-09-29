@@ -1,20 +1,3 @@
-# Dependencies
 node_modules/
 client/node_modules/
 server/node_modules/
-
-# React build
-client/build/
-client/dist/
-
-# Environment files
-.env
-client/.env
-server/.env
-
-# Logs
-*.log
-
-# OS files
-.DS_Store
-Thumbs.db

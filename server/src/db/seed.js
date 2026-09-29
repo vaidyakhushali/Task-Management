@@ -12,7 +12,7 @@ dotenv.config({ path: './.env' });
 async function seedData() {
   try {
     await connectDB();
-    console.log('🌱 Connected to MongoDB for seeding...');
+    console.log(' Connected to MongoDB for seeding...');
 
     const admin = await ensureAdminUser();
 
@@ -108,14 +108,14 @@ async function seedData() {
           user: users[0]._id,
           message: 'Sure! Working on the card layouts now.',
         });
-        console.log('💬 Added initial comments for sample task.');
+        console.log(' Added initial comments for sample task.');
       }
     }
 
-    console.log('✨ Database seeding complete!');
+    console.log(' Database seeding complete!');
     process.exit(0);
   } catch (error) {
-    console.error('❌ Seeding failed:', error);
+    console.error('Seeding failed:', error);
     process.exit(1);
   }
 }
