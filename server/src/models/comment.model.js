@@ -1,25 +1,25 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const commentSchema = new mongoose.Schema({
-  task: 
+const commentSchema = new mongoose.Schema(
   {
-     type: mongoose.Schema.Types.ObjectId, 
-     ref: 'Task', 
-     required: true, 
-     index: true 
+    task: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Task",
+      required: true,
+      index: true,
     },
-  user: 
-  { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
-    required: true 
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    message: {
+      type: String,
+      required: true,
+      trim: true,
+    },
   },
-  message: 
-  { 
-    type: String, 
-    required: true, 
-    trim: true 
-  },
-}, { timestamps: true });
+  { timestamps: true },
+);
 
-export const Comment = mongoose.model('Comment', commentSchema);
+export const Comment = mongoose.model("Comment", commentSchema);

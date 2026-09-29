@@ -1,20 +1,19 @@
-import { useState } from 'react';
-import { loginUser } from './api';
-import './login.css';
+import { useState } from "react";
+import { loginUser } from "./api";
+import "./login.css";
 
 function Login({ onRegister, onSuccess }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('User');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("User");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setError('');
+    setError("");
     setIsSubmitting(true);
 
     try {
@@ -27,10 +26,15 @@ function Login({ onRegister, onSuccess }) {
       if (response.success && response.data?.user) {
         onSuccess(response.data.user, rememberMe);
       } else {
-        setError(response.message || 'Login failed. Please check your credentials.');
+        setError(
+          response.message || "Login failed. Please check your credentials.",
+        );
       }
     } catch (submitError) {
-      setError(submitError.message || 'Unable to sign in. Please ensure server is running.');
+      setError(
+        submitError.message ||
+          "Unable to sign in. Please ensure server is running.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -43,8 +47,9 @@ function Login({ onRegister, onSuccess }) {
           <div className="brand-logo">TM</div>
           <h1 id="login-title">Task Management</h1>
         </div>
-        <p className="subtitle">Welcome back! Sign in to access your dashboard</p>
-
+        <p className="subtitle">
+          Welcome back! Sign in to access your dashboard
+        </p>
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
@@ -67,7 +72,7 @@ function Login({ onRegister, onSuccess }) {
               <input
                 id="password"
                 name="password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
@@ -78,9 +83,9 @@ function Login({ onRegister, onSuccess }) {
                 type="button"
                 className="toggle-password-btn"
                 onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? 'Hide' : 'Show'}
+                {showPassword ? "Hide" : "Show"}
               </button>
             </div>
           </div>
@@ -109,15 +114,23 @@ function Login({ onRegister, onSuccess }) {
             </label>
           </div>
 
-          {error && <p className="message error-message" role="alert">{error}</p>}
+          {error && (
+            <p className="message error-message" role="alert">
+              {error}
+            </p>
+          )}
 
-          <button className="login-button" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Signing in...' : `Login as ${role}`}
+          <button
+            className="login-button"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Signing in..." : `Login as ${role}`}
           </button>
         </form>
 
         <p className="register-text">
-          Don&apos;t have an account?{' '}
+          Don&apos;t have an account?{" "}
           <button className="link-button" type="button" onClick={onRegister}>
             Register here
           </button>

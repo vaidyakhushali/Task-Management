@@ -1,78 +1,101 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import './dashboard.css';
-import { getNotifications, getProjects, getTasks, markNotificationRead } from './api';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import "./dashboard.css";
+import {
+  getNotifications,
+  getProjects,
+  getTasks,
+  markNotificationRead,
+} from "./api";
 
-import Tasks from './task';
-import Projects from './projects';
-import Analytics from './analytics';
-import CalendarView from './calendar';
-import TeamMembers from './team-members';
-import Reports from './reports';
-import Chatbot from './chatbot';
-import Settings from './settings';
-import Notification from './notification';
+import Tasks from "./task";
+import Projects from "./projects";
+import Analytics from "./analytics";
+import CalendarView from "./calendar";
+import TeamMembers from "./team-members";
+import Reports from "./reports";
+import Chatbot from "./chatbot";
+import Settings from "./settings";
+import Notification from "./notification";
 
-const menuItems = ['Dashboard', 'Tasks', 'Projects', 'Analytics', 'Calendar', 'Chatbot','Team Members', 'Reports'];
-const generalItems = ['Settings'];
+const menuItems = [
+  "Dashboard",
+  "Tasks",
+  "Projects",
+  "Analytics",
+  "Calendar",
+  "Chatbot",
+  "Team Members",
+  "Reports",
+];
+const generalItems = ["Settings"];
 
-function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
-  const [activeTab, setActiveTab] = useState('Dashboard');
+function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
+  const [activeTab, setActiveTab] = useState("Dashboard");
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [toastAlert, setToastAlert] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [search, setSearch] = useState('');
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [displayName, setDisplayName] = useState(userName);
-  const [taskStatusFilter, setTaskStatusFilter] = useState('all');
+  const [taskStatusFilter, setTaskStatusFilter] = useState("all");
 
   function openStatusTab(statusKey) {
     setTaskStatusFilter(statusKey);
-    setActiveTab('Tasks');
+    setActiveTab("Tasks");
   }
 
-  const [theme, setTheme] = useState(() => localStorage.getItem('taskmanagement_theme') || 'light');
-  const [fontSize, setFontSize] = useState(() => localStorage.getItem('taskmanagement_fontSize') || 'medium');
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("taskmanagement_theme") || "light",
+  );
+  const [fontSize, setFontSize] = useState(
+    () => localStorage.getItem("taskmanagement_fontSize") || "medium",
+  );
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('taskmanagement_theme', theme);
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("taskmanagement_theme", theme);
   }, [theme]);
 
-  useEffect(() => { 
-    document.documentElement.setAttribute('data-font-size', fontSize);
-    localStorage.setItem('taskmanagement_fontSize', fontSize);
+  useEffect(() => {
+    document.documentElement.setAttribute("data-font-size", fontSize);
+    localStorage.setItem("taskmanagement_fontSize", fontSize);
   }, [fontSize]);
 
-  const isAdmin = userRole === 'Admin';
+  const isAdmin = userRole === "Admin";
 
   async function loadDashboard() {
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const [taskResponse, projectResponse, notificationResponse] = await Promise.all([
-        getTasks(),
-        getProjects(),
-        getNotifications(),
-      ]);
+      const [taskResponse, projectResponse, notificationResponse] =
+        await Promise.all([getTasks(), getProjects(), getNotifications()]);
 
-      const fetchedTasks = Array.isArray(taskResponse?.data) ? taskResponse.data : [];
-      const fetchedProjects = Array.isArray(projectResponse?.data) ? projectResponse.data : [];
-      const fetchedNotifications = Array.isArray(notificationResponse?.data) ? notificationResponse.data : [];
+      const fetchedTasks = Array.isArray(taskResponse?.data)
+        ? taskResponse.data
+        : [];
+      const fetchedProjects = Array.isArray(projectResponse?.data)
+        ? projectResponse.data
+        : [];
+      const fetchedNotifications = Array.isArray(notificationResponse?.data)
+        ? notificationResponse.data
+        : [];
 
       setTasks(fetchedTasks);
       setProjects(fetchedProjects);
       setNotifications(fetchedNotifications);
 
-      const unreadTaskNotice = fetchedNotifications.find(n => !n.read && n.type === 'task');
+      const unreadTaskNotice = fetchedNotifications.find(
+        (n) => !n.read && n.type === "task",
+      );
       if (unreadTaskNotice) {
         setToastAlert(unreadTaskNotice);
       }
     } catch (err) {
-      setError(err.message || 'Unable to load dashboard data.');
+      setError(err.message || "Unable to load dashboard data.");
     } finally {
       setLoading(false);
     }
@@ -98,18 +121,29 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
   const dashboard = useMemo(() => {
     const totalTasks = tasks.length;
     const completed = tasks.filter(isCompleted).length;
-    const inProgress = tasks.filter((task) => task.status === 'in-progress').length;
+    const inProgress = tasks.filter(
+      (task) => task.status === "in-progress",
+    ).length;
     const pending = Math.max(totalTasks - completed - inProgress, 0);
     const overdue = tasks.filter(isOverdue).length;
-    const totalBudget = tasks.reduce((sum, task) => sum + Number(task.budget || 0), 0);
-    const totalCost = tasks.reduce((sum, task) => sum + Number(task.cost || 0), 0);
-    const utilization = totalBudget > 0 ? Math.round((totalCost / totalBudget) * 100) : Math.round((completed / (totalTasks || 1)) * 100);
+    const totalBudget = tasks.reduce(
+      (sum, task) => sum + Number(task.budget || 0),
+      0,
+    );
+    const totalCost = tasks.reduce(
+      (sum, task) => sum + Number(task.cost || 0),
+      0,
+    );
+    const utilization =
+      totalBudget > 0
+        ? Math.round((totalCost / totalBudget) * 100)
+        : Math.round((completed / (totalTasks || 1)) * 100);
     const averageDays = getAverageDaysToDue(tasks);
 
     const priority = {
-      high: tasks.filter((task) => task.priority === 'high').length,
-      medium: tasks.filter((task) => task.priority === 'medium').length,
-      low: tasks.filter((task) => task.priority === 'low').length,
+      high: tasks.filter((task) => task.priority === "high").length,
+      medium: tasks.filter((task) => task.priority === "medium").length,
+      low: tasks.filter((task) => task.priority === "low").length,
     };
 
     return {
@@ -127,25 +161,25 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
 
   const statusCards = [
     {
-      label: 'In Progress',
+      label: "In Progress",
       value: dashboard.inProgress,
-      color: 'orange',
+      color: "orange",
       percent: percentOf(dashboard.inProgress, dashboard.totalTasks),
-      statusKey: 'in-progress'
+      statusKey: "in-progress",
     },
     {
-      label: 'Completed',
+      label: "Completed",
       value: dashboard.completed,
-      color: 'green',
+      color: "green",
       percent: percentOf(dashboard.completed, dashboard.totalTasks),
-      statusKey: 'completed'
+      statusKey: "completed",
     },
     {
-      label: 'Overdue',
+      label: "Overdue",
       value: dashboard.overdue,
-      color: 'red',
+      color: "red",
       percent: percentOf(dashboard.overdue, dashboard.totalTasks),
-      statusKey: 'pending'
+      statusKey: "pending",
     },
   ];
 
@@ -160,55 +194,83 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
         task.status,
         task.assignedUser?.fullname,
         task.assignedUser?.username,
-      ].filter(Boolean).join(' ').toLowerCase();
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
       return haystack.includes(query);
     });
   }, [search, tasks]);
 
   const workloadRows = buildWorkloadRows(tasks, displayName);
-  const unreadNotificationsCount = notifications.filter((item) => !item.read).length;
-  const firstName = String(displayName || 'Admin').split(' ')[0];
+  const unreadNotificationsCount = notifications.filter(
+    (item) => !item.read,
+  ).length;
+  const firstName = String(displayName || "Admin").split(" ")[0];
 
   return (
     <div className="dashboard-page">
-
       {toastAlert && (
         <div className="toast-container">
           <div className="toast-card">
             <div className="toast-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                 <path d="M13.73 21a2 2 0 0 1-3.46 0" />
               </svg>
             </div>
             <div className="toast-content">
-              <strong>{toastAlert.title || 'New Task Assigned!'}</strong>
-              <p>{toastAlert.message || 'An Admin assigned a task to you.'}</p>
+              <strong>{toastAlert.title || "New Task Assigned!"}</strong>
+              <p>{toastAlert.message || "An Admin assigned a task to you."}</p>
             </div>
-            <button className="toast-close" onClick={closeToast}>✕</button>
+            <button className="toast-close" onClick={closeToast}>
+              ✕
+            </button>
           </div>
         </div>
       )}
 
       <div className="dashboard-shell">
+        {sidebarOpen && (
+          <div
+            className="sidebar-backdrop"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
 
-        {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
-
-        <aside className={`dashboard-sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <aside className={`dashboard-sidebar ${sidebarOpen ? "open" : ""}`}>
           <div className="brand-card">
             <div className="brand-mark">T</div>
             <strong>TaskFlow</strong>
-            <button className="sidebar-close-btn" type="button" onClick={() => setSidebarOpen(false)}>✕</button>
+            <button
+              className="sidebar-close-btn"
+              type="button"
+              onClick={() => setSidebarOpen(false)}
+            >
+              ✕
+            </button>
           </div>
 
           <nav className="side-nav" aria-label="Main navigation">
             <p>Menu</p>
             {menuItems.map((item) => (
               <button
-                className={`nav-item ${activeTab === item ? 'active' : ''}`}
+                className={`nav-item ${activeTab === item ? "active" : ""}`}
                 type="button"
                 key={item}
-                onClick={() => { setActiveTab(item); setSidebarOpen(false); }}
+                onClick={() => {
+                  setActiveTab(item);
+                  setSidebarOpen(false);
+                }}
               >
                 <span>{getMenuIcon(item)}</span>
                 {item}
@@ -220,17 +282,33 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
             <p>General</p>
             {generalItems.map((item) => (
               <button
-                className={`nav-item ${activeTab === item ? 'active' : ''}`}
+                className={`nav-item ${activeTab === item ? "active" : ""}`}
                 type="button"
                 key={item}
-                onClick={() => { setActiveTab(item); setSidebarOpen(false); }}
+                onClick={() => {
+                  setActiveTab(item);
+                  setSidebarOpen(false);
+                }}
               >
                 <span>{getMenuIcon(item)}</span>
                 {item}
               </button>
             ))}
-            <button className="nav-item logout-nav-item" type="button" onClick={onLogout}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <button
+              className="nav-item logout-nav-item"
+              type="button"
+              onClick={onLogout}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />
@@ -241,16 +319,24 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
         </aside>
 
         <main className="dashboard-main">
-
           <header className="dashboard-topbar">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <button
                 className="mobile-hamburger-btn"
                 type="button"
                 onClick={() => setSidebarOpen((prev) => !prev)}
                 aria-label="Toggle Navigation Menu"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <line x1="3" y1="12" x2="21" y2="12" />
                   <line x1="3" y1="6" x2="21" y2="6" />
                   <line x1="3" y1="18" x2="21" y2="18" />
@@ -263,7 +349,16 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
             </div>
 
             <label className="search-box">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
@@ -279,21 +374,45 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
               <button
                 className="topbar-theme-btn"
                 type="button"
-                onClick={() => setTheme((prev) => (prev === 'light' ? 'dark' : 'light'))}
-                title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+                onClick={() =>
+                  setTheme((prev) => (prev === "light" ? "dark" : "light"))
+                }
+                title={
+                  theme === "light"
+                    ? "Switch to Dark Mode"
+                    : "Switch to Light Mode"
+                }
                 aria-label="Toggle Dark/Light Mode"
-                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                style={{ display: "flex", alignItems: "center", gap: "6px" }}
               >
-                {theme === 'light' ? (
+                {theme === "light" ? (
                   <>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#6366f1" stroke="#4f46e5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="#6366f1"
+                      stroke="#4f46e5"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                     </svg>
                     Night
                   </>
                 ) : (
                   <>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#facc15" stroke="#eab308" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="#facc15"
+                      stroke="#eab308"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <circle cx="12" cy="12" r="5" />
                       <line x1="12" y1="1" x2="12" y2="3" />
                       <line x1="12" y1="21" x2="12" y2="23" />
@@ -327,19 +446,34 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
             <button
               className="notification-button"
               type="button"
-              onClick={() => setActiveTab('Notifications')}
+              onClick={() => setActiveTab("Notifications")}
               aria-label="Notifications"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                 <path d="M13.73 21a2 2 0 0 1-3.46 0" />
               </svg>
-              {unreadNotificationsCount > 0 && <b>{unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}</b>}
+              {unreadNotificationsCount > 0 && (
+                <b>
+                  {unreadNotificationsCount > 9
+                    ? "9+"
+                    : unreadNotificationsCount}
+                </b>
+              )}
             </button>
 
             <div
               className="account-box"
-              onClick={() => setActiveTab('Settings')}
+              onClick={() => setActiveTab("Settings")}
               role="button"
               tabIndex="0"
               title="Click to open Settings"
@@ -354,18 +488,47 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
 
           {error && <div className="dashboard-alert">{error}</div>}
 
-          {activeTab === 'Dashboard' && (
+          {activeTab === "Dashboard" && (
             <>
               <section className="metric-grid">
-                <MetricCard title="Active Projects" value={dashboard.activeProjects} helper="Projects in workspace" tone="sand" loading={loading} />
-                <MetricCard title="Utilization Rate" value={`${dashboard.utilization}%`} helper="Budget or completion usage" tone="peach" loading={loading} />
-                <MetricCard title="Average Time" value={`${dashboard.averageDays}`} suffix=" Days" helper="Average days until due" tone="mint" loading={loading} />
-                <MetricCard title="At Risk Projects" value={dashboard.overdue} helper="Tasks currently overdue" tone="blush" loading={loading} />
+                <MetricCard
+                  title="Active Projects"
+                  value={dashboard.activeProjects}
+                  helper="Projects in workspace"
+                  tone="sand"
+                  loading={loading}
+                />
+                <MetricCard
+                  title="Utilization Rate"
+                  value={`${dashboard.utilization}%`}
+                  helper="Budget or completion usage"
+                  tone="peach"
+                  loading={loading}
+                />
+                <MetricCard
+                  title="Average Time"
+                  value={`${dashboard.averageDays}`}
+                  suffix=" Days"
+                  helper="Average days until due"
+                  tone="mint"
+                  loading={loading}
+                />
+                <MetricCard
+                  title="At Risk Projects"
+                  value={dashboard.overdue}
+                  helper="Tasks currently overdue"
+                  tone="blush"
+                  loading={loading}
+                />
               </section>
 
               <div className="dashboard-grid">
                 <section className="panel status-panel">
-                  <PanelHeader title="Task Status Distribution" helper="Click any card to filter tasks" hideMenu={true} />
+                  <PanelHeader
+                    title="Task Status Distribution"
+                    helper="Click any card to filter tasks"
+                    hideMenu={true}
+                  />
                   <div className="status-bars">
                     {statusCards.map((item) => (
                       <div
@@ -378,35 +541,65 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
                       >
                         <span>{item.label}</span>
                         <strong>{item.percent}%</strong>
-                        <div><i style={{ width: `${item.percent}%` }} /></div>
+                        <div>
+                          <i style={{ width: `${item.percent}%` }} />
+                        </div>
                       </div>
                     ))}
                   </div>
                 </section>
 
                 <section className="panel priority-panel">
-                  <PanelHeader title="Task Priority" helper="Distribution by priority level" hideMenu={true} />
-                  <PriorityDonut priority={dashboard.priority} total={dashboard.totalTasks} />
+                  <PanelHeader
+                    title="Task Priority"
+                    helper="Distribution by priority level"
+                    hideMenu={true}
+                  />
+                  <PriorityDonut
+                    priority={dashboard.priority}
+                    total={dashboard.totalTasks}
+                  />
                 </section>
               </div>
 
               {/* WORK PROGRESS & WORKING STATUS ROW */}
-              <div className="dashboard-grid" style={{ marginTop: '16px' }}>
+              <div className="dashboard-grid" style={{ marginTop: "16px" }}>
                 <section className="panel work-progress-panel">
-                  <PanelHeader title="Work Progress" action="See All" onActionClick={() => setActiveTab('Projects')} />
+                  <PanelHeader
+                    title="Work Progress"
+                    action="See All"
+                    onActionClick={() => setActiveTab("Projects")}
+                  />
                   <div className="work-progress-cards">
                     {projects.length > 0 ? (
                       projects.slice(0, 2).map((proj) => {
-                        const projTasks = tasks.filter((t) => String(t.project?._id || t.project) === String(proj._id));
-                        const done = projTasks.filter((t) => t.status === 'completed').length;
-                        const pct = projTasks.length > 0 ? Math.round((done / projTasks.length) * 100) : 50;
+                        const projTasks = tasks.filter(
+                          (t) =>
+                            String(t.project?._id || t.project) ===
+                            String(proj._id),
+                        );
+                        const done = projTasks.filter(
+                          (t) => t.status === "completed",
+                        ).length;
+                        const pct =
+                          projTasks.length > 0
+                            ? Math.round((done / projTasks.length) * 100)
+                            : 50;
 
                         return (
-                          <div className="work-progress-card" key={proj._id || proj.name}>
-                            <span className="work-progress-type">Ongoing Project</span>
+                          <div
+                            className="work-progress-card"
+                            key={proj._id || proj.name}
+                          >
+                            <span className="work-progress-type">
+                              Ongoing Project
+                            </span>
                             <strong>{proj.name}</strong>
                             <div className="progress-bar-wrap">
-                              <div className="progress-bar-fill" style={{ width: `${pct}%` }} />
+                              <div
+                                className="progress-bar-fill"
+                                style={{ width: `${pct}%` }}
+                              />
                             </div>
                             <small>{pct}% Complete</small>
                             <div className="work-progress-dates">
@@ -423,7 +616,11 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
                 </section>
 
                 <section className="panel working-status-panel">
-                  <PanelHeader title="Working Status" helper="Active team capacity" hideMenu={true} />
+                  <PanelHeader
+                    title="Working Status"
+                    helper="Active team capacity"
+                    hideMenu={true}
+                  />
                   <div className="working-status-ring-container">
                     <div className="working-status-ring">
                       <div className="working-status-center">
@@ -438,7 +635,11 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
               {/* THIRD ROW: TEAM WORKLOAD */}
               <div className="dashboard-grid bottom-grid">
                 <section className="panel workload-panel full-width-panel">
-                  <PanelHeader title="Team Workload" action="See All" onActionClick={() => setActiveTab('Team Members')} />
+                  <PanelHeader
+                    title="Team Workload"
+                    action="See All"
+                    onActionClick={() => setActiveTab("Team Members")}
+                  />
                   <div className="workload-table">
                     <div className="workload-head">
                       <span>Name</span>
@@ -449,20 +650,26 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
 
                     {loading ? (
                       <LoadingRows />
-                    ) : workloadRows.length ? workloadRows.map((row) => (
-                      <div className="workload-row" key={row.name}>
-                        <div className="person-cell">
-                          <div className="person-avatar">{getInitials(row.name)}</div>
-                          <div>
-                            <strong>{row.name}</strong>
-                            <small>{row.role}</small>
+                    ) : workloadRows.length ? (
+                      workloadRows.map((row) => (
+                        <div className="workload-row" key={row.name}>
+                          <div className="person-cell">
+                            <div className="person-avatar">
+                              {getInitials(row.name)}
+                            </div>
+                            <div>
+                              <strong>{row.name}</strong>
+                              <small>{row.role}</small>
+                            </div>
                           </div>
+                          <span>{row.active}</span>
+                          <span>{row.overdue}</span>
+                          <span className={`workload-status ${row.tone}`}>
+                            {row.status}
+                          </span>
                         </div>
-                        <span>{row.active}</span>
-                        <span>{row.overdue}</span>
-                        <span className={`workload-status ${row.tone}`}>{row.status}</span>
-                      </div>
-                    )) : (
+                      ))
+                    ) : (
                       <div className="empty-state">No workload data yet.</div>
                     )}
                   </div>
@@ -471,29 +678,50 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
 
               {/* FOURTH ROW: RECENT TASKS PANEL */}
               <section className="panel task-panel">
-                <PanelHeader title="Recent Tasks" action="See All" onActionClick={() => setActiveTab('Tasks')} helper="Live from your backend task list" />
+                <PanelHeader
+                  title="Recent Tasks"
+                  action="See All"
+                  onActionClick={() => setActiveTab("Tasks")}
+                  helper="Live from your backend task list"
+                />
                 <div className="task-list">
                   {loading ? (
                     <LoadingRows />
-                  ) : visibleTasks.length ? visibleTasks.slice(0, 6).map((task) => (
-                    <TaskRow task={task} key={task._id || task.id || task.title} onStatusClick={(st) => openStatusTab(st || 'all')} />
-                  )) : (
-                    <div className="empty-state">{search ? 'No tasks match your search.' : 'No tasks found yet.'}</div>
+                  ) : visibleTasks.length ? (
+                    visibleTasks
+                      .slice(0, 6)
+                      .map((task) => (
+                        <TaskRow
+                          task={task}
+                          key={task._id || task.id || task.title}
+                          onStatusClick={(st) => openStatusTab(st || "all")}
+                        />
+                      ))
+                  ) : (
+                    <div className="empty-state">
+                      {search
+                        ? "No tasks match your search."
+                        : "No tasks found yet."}
+                    </div>
                   )}
                 </div>
               </section>
             </>
           )}
 
-          {activeTab === 'Tasks' && (
-            <Tasks user={user} onTaskAssigned={loadDashboard} initialStatusFilter={taskStatusFilter} />
+          {activeTab === "Tasks" && (
+            <Tasks
+              user={user}
+              onTaskAssigned={loadDashboard}
+              initialStatusFilter={taskStatusFilter}
+            />
           )}
 
-          {activeTab === 'Projects' && (
+          {activeTab === "Projects" && (
             <Projects search={search} userRole={userRole} />
           )}
 
-          {activeTab === 'Analytics' && (
+          {activeTab === "Analytics" && (
             <Analytics
               stats={{
                 total: dashboard.totalTasks,
@@ -503,17 +731,17 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
               userRole={userRole}
             />
           )}
-          {activeTab === 'Calendar' && (
-            <CalendarView user={user} userName={displayName} userRole={userRole} />
+          {activeTab === "Calendar" && (
+            <CalendarView
+              user={user}
+              userName={displayName}
+              userRole={userRole}
+            />
           )}
 
-          {activeTab === 'Team Members' && (
-            <TeamMembers search={search} />
-          )}
-          {activeTab === 'Reports' && (
-            <Reports userRole={userRole} />
-          )}
-          {activeTab === 'Settings' && (
+          {activeTab === "Team Members" && <TeamMembers search={search} />}
+          {activeTab === "Reports" && <Reports userRole={userRole} />}
+          {activeTab === "Settings" && (
             <Settings
               user={user}
               userName={displayName}
@@ -522,12 +750,12 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
               onThemeChange={setTheme}
               fontSize={fontSize}
               onFontSizeChange={setFontSize}
-              onWorkspaceNameChange={() => { }}
+              onWorkspaceNameChange={() => {}}
               onProfileNameChange={(newName) => setDisplayName(newName)}
             />
           )}
-          {activeTab === 'Notifications' && (
-            <Notification onUnreadChange={() => { }} />
+          {activeTab === "Notifications" && (
+            <Notification onUnreadChange={() => {}} />
           )}
           <Chatbot />
         </main>
@@ -536,17 +764,26 @@ function Dashboard({ user, userName = 'Admin', userRole = 'User', onLogout }) {
   );
 }
 
-function MetricCard({ title, value, helper, suffix = '', tone, loading }) {
+function MetricCard({ title, value, helper, suffix = "", tone, loading }) {
   return (
     <article className={`metric-card ${tone}`}>
       <span>{title}</span>
-      <strong>{loading ? '--' : value}<small>{loading ? '' : suffix}</small></strong>
+      <strong>
+        {loading ? "--" : value}
+        <small>{loading ? "" : suffix}</small>
+      </strong>
       <p>{helper}</p>
     </article>
   );
 }
 
-function PanelHeader({ title, helper, action, onActionClick, hideMenu = false }) {
+function PanelHeader({
+  title,
+  helper,
+  action,
+  onActionClick,
+  hideMenu = false,
+}) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
 
@@ -556,8 +793,8 @@ function PanelHeader({ title, helper, action, onActionClick, hideMenu = false })
         setShowMenu(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   function handleButtonClick(e) {
@@ -576,9 +813,17 @@ function PanelHeader({ title, helper, action, onActionClick, hideMenu = false })
       </div>
 
       {!hideMenu && (
-        <div className="panel-more-container" ref={menuRef} style={{ position: 'relative' }}>
-          <button className="more-button" type="button" onClick={handleButtonClick}>
-            {action || '...'}
+        <div
+          className="panel-more-container"
+          ref={menuRef}
+          style={{ position: "relative" }}
+        >
+          <button
+            className="more-button"
+            type="button"
+            onClick={handleButtonClick}
+          >
+            {action || "..."}
           </button>
 
           {showMenu && (
@@ -612,16 +857,25 @@ function PriorityDonut({ priority, total }) {
       <div
         className="priority-donut"
         style={{
-          '--high': `${high}%`,
-          '--medium': `${high + medium}%`,
+          "--high": `${high}%`,
+          "--medium": `${high + medium}%`,
         }}
       >
         <span />
       </div>
       <div className="priority-legend">
-        <span><i className="high" />High Priority: {priority.high}</span>
-        <span><i className="medium" />Medium Priority: {priority.medium}</span>
-        <span><i className="low" />Low Priority: {priority.low}</span>
+        <span>
+          <i className="high" />
+          High Priority: {priority.high}
+        </span>
+        <span>
+          <i className="medium" />
+          Medium Priority: {priority.medium}
+        </span>
+        <span>
+          <i className="low" />
+          Low Priority: {priority.low}
+        </span>
       </div>
     </div>
   );
@@ -630,16 +884,16 @@ function PriorityDonut({ priority, total }) {
 function TaskRow({ task, onStatusClick }) {
   return (
     <div className="task-row">
-      <span className={`task-dot ${task.priority || 'medium'}`} />
+      <span className={`task-dot ${task.priority || "medium"}`} />
       <div className="task-info">
-        <strong>{task.title || 'Untitled task'}</strong>
-        <small>{task.project?.name || task.taskType || 'General task'}</small>
+        <strong>{task.title || "Untitled task"}</strong>
+        <small>{task.project?.name || task.taskType || "General task"}</small>
       </div>
       <span>{formatDate(task.dueDate)}</span>
       <span
-        className={`task-badge ${task.status || 'pending'}`}
+        className={`task-badge ${task.status || "pending"}`}
         onClick={() => onStatusClick?.(task.status)}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: "pointer" }}
         title="Click to filter by this status"
       >
         {formatStatus(task.status)}
@@ -663,10 +917,11 @@ function buildWorkloadRows(tasks, fallbackName) {
 
   tasks.forEach((task) => {
     const person = task.assignedUser || task.creator || {};
-    const name = person.fullname || person.username || fallbackName || 'Team Member';
+    const name =
+      person.fullname || person.username || fallbackName || "Team Member";
     const current = grouped.get(name) || {
       name,
-      role: person.role || 'Team Member',
+      role: person.role || "Team Member",
       active: 0,
       overdue: 0,
     };
@@ -677,15 +932,17 @@ function buildWorkloadRows(tasks, fallbackName) {
   });
 
   return Array.from(grouped.values()).map((row) => {
-    if (row.overdue >= 3) return { ...row, status: 'Overloaded', tone: 'danger' };
-    if (row.overdue > 0) return { ...row, status: 'On Track', tone: 'warning' };
-    if (row.active >= 6) return { ...row, status: 'Under Pressure', tone: 'busy' };
-    return { ...row, status: 'Balanced', tone: 'good' };
+    if (row.overdue >= 3)
+      return { ...row, status: "Overloaded", tone: "danger" };
+    if (row.overdue > 0) return { ...row, status: "On Track", tone: "warning" };
+    if (row.active >= 6)
+      return { ...row, status: "Under Pressure", tone: "busy" };
+    return { ...row, status: "Balanced", tone: "good" };
   });
 }
 
 function isCompleted(task) {
-  return Boolean(task.completed || task.status === 'completed');
+  return Boolean(task.completed || task.status === "completed");
 }
 
 function isOverdue(task) {
@@ -703,11 +960,15 @@ function getAverageDaysToDue(tasks) {
   today.setHours(0, 0, 0, 0);
   const dayCounts = tasks
     .filter((task) => task.dueDate && !isCompleted(task))
-    .map((task) => Math.max(0, Math.ceil((new Date(task.dueDate) - today) / 86400000)))
+    .map((task) =>
+      Math.max(0, Math.ceil((new Date(task.dueDate) - today) / 86400000)),
+    )
     .filter((value) => Number.isFinite(value));
 
   if (!dayCounts.length) return 0;
-  return (dayCounts.reduce((sum, value) => sum + value, 0) / dayCounts.length).toFixed(1);
+  return (
+    dayCounts.reduce((sum, value) => sum + value, 0) / dayCounts.length
+  ).toFixed(1);
 }
 
 function percentOf(value, total) {
@@ -719,31 +980,40 @@ function clamp(value, min, max) {
 }
 
 function formatDate(date) {
-  if (!date) return 'No due date';
+  if (!date) return "No due date";
   const value = new Date(date);
-  if (Number.isNaN(value.getTime())) return 'No due date';
-  return value.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+  if (Number.isNaN(value.getTime())) return "No due date";
+  return value.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
 }
 
-function formatStatus(status = 'pending') {
-  if (status === 'in-progress') return 'In Progress';
+function formatStatus(status = "pending") {
+  if (status === "in-progress") return "In Progress";
   return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
 function getInitials(name) {
-  return String(name || 'U')
-    .split(' ')
+  return String(name || "U")
+    .split(" ")
     .filter(Boolean)
     .slice(0, 2)
     .map((part) => part[0])
-    .join('')
+    .join("")
     .toUpperCase();
 }
 
 function getMenuIcon(item) {
   const icons = {
     Dashboard: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#6366f1"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <rect x="3" y="3" width="7" height="9" rx="1" fill="#e0e7ff" />
         <rect x="14" y="3" width="7" height="5" rx="1" fill="#e0e7ff" />
         <rect x="14" y="12" width="7" height="9" rx="1" fill="#e0e7ff" />
@@ -751,34 +1021,82 @@ function getMenuIcon(item) {
       </svg>
     ),
     Tasks: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#3b82f6"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
         <rect x="8" y="2" width="8" height="4" rx="1" fill="#dbeafe" />
         <path d="m9 14 2 2 4-4" />
       </svg>
     ),
     Projects: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill="#fef3c7" />
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#f59e0b"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path
+          d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+          fill="#fef3c7"
+        />
       </svg>
     ),
     Analytics: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#10b981"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <line x1="18" y1="20" x2="18" y2="10" />
         <line x1="12" y1="20" x2="12" y2="4" />
         <line x1="6" y1="20" x2="6" y2="14" />
       </svg>
     ),
     Calendar: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ec4899" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#ec4899"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2" fill="#fce7f3" />
         <line x1="16" y1="2" x2="16" y2="6" />
         <line x1="8" y1="2" x2="8" y2="6" />
         <line x1="3" y1="10" x2="21" y2="10" />
       </svg>
     ),
-    'Team Members': (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    "Team Members": (
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#8b5cf6"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
         <circle cx="9" cy="7" r="4" fill="#ede9fe" />
         <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -786,8 +1104,20 @@ function getMenuIcon(item) {
       </svg>
     ),
     Reports: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="#cffaffe" />
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#06b6d4"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path
+          d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+          fill="#cffaffe"
+        />
         <polyline points="14 2 14 8 20 8" />
         <line x1="16" y1="13" x2="8" y2="13" />
         <line x1="16" y1="17" x2="8" y2="17" />
@@ -795,17 +1125,35 @@ function getMenuIcon(item) {
       </svg>
     ),
     Settings: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#64748b"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <circle cx="12" cy="12" r="3" fill="#cbd5e1" />
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
       </svg>
-    )
+    ),
   };
 
-  return icons[item] || (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
-      <circle cx="12" cy="12" r="8" />
-    </svg>
+  return (
+    icons[item] || (
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#94a3b8"
+        strokeWidth="2"
+      >
+        <circle cx="12" cy="12" r="8" />
+      </svg>
+    )
   );
 }
 export default Dashboard;

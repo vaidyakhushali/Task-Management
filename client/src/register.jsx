@@ -1,31 +1,34 @@
-import { useState } from 'react';
-import { registerUser } from './api';
-import './register.css';
+import { useState } from "react";
+import { registerUser } from "./api";
+import "./register.css";
 
 function validatePassword(password) {
   if (!password || password.length < 6) {
-    return 'Password must be at least 6 characters long';
+    return "Password must be at least 6 characters long";
   }
   if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
-    return 'Password must contain at least one letter and one number';
+    return "Password must contain at least one letter and one number";
   }
   return null;
 }
 
 function Register({ onLogin, onSuccess }) {
   const [showPasswords, setShowPasswords] = useState(false);
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Real-time password validation indicator
   const pwdValidationError = password ? validatePassword(password) : null;
-  const pwdMatchError = confirmPassword && password !== confirmPassword ? 'Passwords do not match' : null;
+  const pwdMatchError =
+    confirmPassword && password !== confirmPassword
+      ? "Passwords do not match"
+      : null;
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setError('');
+    setError("");
 
     const form = event.currentTarget;
     const pwd = form.password.value;
@@ -38,7 +41,7 @@ function Register({ onLogin, onSuccess }) {
     }
 
     if (pwd !== confirmPwd) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
@@ -54,10 +57,10 @@ function Register({ onLogin, onSuccess }) {
       if (response.success && response.data?.user) {
         onSuccess(response.data.user);
       } else {
-        setError(response.message || 'Registration failed');
+        setError(response.message || "Registration failed");
       }
     } catch (submitError) {
-      setError(submitError.message || 'Error creating account');
+      setError(submitError.message || "Error creating account");
     } finally {
       setIsSubmitting(false);
     }
@@ -115,7 +118,7 @@ function Register({ onLogin, onSuccess }) {
               <input
                 id="register-password"
                 name="password"
-                type={showPasswords ? 'text' : 'password'}
+                type={showPasswords ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Min 6 chars (letter & number)"
@@ -127,11 +130,13 @@ function Register({ onLogin, onSuccess }) {
                 className="toggle-password-btn"
                 onClick={() => setShowPasswords(!showPasswords)}
               >
-                {showPasswords ? 'Hide' : 'Show'}
+                {showPasswords ? "Hide" : "Show"}
               </button>
             </div>
             {pwdValidationError && (
-              <span className="password-hint warning">{pwdValidationError}</span>
+              <span className="password-hint warning">
+                {pwdValidationError}
+              </span>
             )}
           </div>
 
@@ -140,7 +145,7 @@ function Register({ onLogin, onSuccess }) {
             <input
               id="confirm-password"
               name="confirmPassword"
-              type={showPasswords ? 'text' : 'password'}
+              type={showPasswords ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Re-enter password"
@@ -152,20 +157,25 @@ function Register({ onLogin, onSuccess }) {
             )}
           </div>
 
-
-          {error && <p className="message error-message" role="alert">{error}</p>}
+          {error && (
+            <p className="message error-message" role="alert">
+              {error}
+            </p>
+          )}
 
           <button
             className="register-button"
             type="submit"
-            disabled={isSubmitting || Boolean(pwdValidationError || pwdMatchError)}
+            disabled={
+              isSubmitting || Boolean(pwdValidationError || pwdMatchError)
+            }
           >
-            {isSubmitting ? 'Creating account...' : 'Create Account'}
+            {isSubmitting ? "Creating account..." : "Create Account"}
           </button>
         </form>
 
         <p className="login-text">
-          Already have an account?{' '}
+          Already have an account?{" "}
           <button className="link-button" type="button" onClick={onLogin}>
             Login here
           </button>
