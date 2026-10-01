@@ -182,3 +182,36 @@
   border-bottom: 1px solid var(--soft-border);
   color: var(--text-dark);
 }
+
+[data-theme="dark"] .analytics-deadline-row {
+  background-color: #252e37 !important;
+  border-left-color: #e56e70 !important;
+}
+
+[data-theme="dark"] .analytics-deadline-title,
+[data-theme="dark"] .analytics-health-name {
+  color: var(--text-dark) !important;
+}
+
+[data-theme="dark"] .analytics-deadline-assignee {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .analytics-due-soon {
+  background-color: #3b272b !important;
+  color: #ffb4b4 !important;
+}
+
+[data-theme="dark"] .analytics-health-status.on-track {
+  background-color: #1c352b !important;
+  color: #8bd3aa !important;
+}
+
+[data-theme="dark"] .analytics-health-status.at-risk {
+  background-color: #3b311e !important;
+  color: #f1c77a !important;
+}
+
+[data-theme="dark"] .analytics-health-track {
+  background-color: #303a44 !important;
+}

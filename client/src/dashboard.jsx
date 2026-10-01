@@ -35,6 +35,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
   const [projects, setProjects] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [toastAlert, setToastAlert] = useState(null);
+  const [notificationToOpen, setNotificationToOpen] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -88,12 +89,8 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
       setProjects(fetchedProjects);
       setNotifications(fetchedNotifications);
 
-      const unreadTaskNotice = fetchedNotifications.find(
-        (n) => !n.read && n.type === "task",
-      );
-      if (unreadTaskNotice) {
-        setToastAlert(unreadTaskNotice);
-      }
+      const unreadNotification = fetchedNotifications.find((item) => !item.read);
+      setToastAlert(unreadNotification || null);
     } catch (err) {
       setError(err.message || "Unable to load dashboard data.");
     } finally {
@@ -116,6 +113,13 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
       }
     }
     setToastAlert(null);
+  }
+
+  function openToastNotification() {
+    if (!toastAlert) return;
+    setNotificationToOpen(toastAlert);
+    setToastAlert(null);
+    setActiveTab("Notifications");
   }
 
   const dashboard = useMemo(() => {
@@ -213,26 +217,33 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
       {toastAlert && (
         <div className="toast-container">
           <div className="toast-card">
-            <div className="toast-icon">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
-            </div>
-            <div className="toast-content">
-              <strong>{toastAlert.title || "New Task Assigned!"}</strong>
-              <p>{toastAlert.message || "An Admin assigned a task to you."}</p>
-            </div>
-            <button className="toast-close" onClick={closeToast}>
+            <button
+              className="toast-open-button"
+              type="button"
+              onClick={openToastNotification}
+              aria-label={`Open notification: ${toastAlert.title || toastAlert.message || "Workspace update"}`}
+            >
+              <span className="toast-icon" aria-hidden="true">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+              </span>
+              <span className="toast-content">
+                <strong>{toastAlert.title || "Workspace update"}</strong>
+                <span>{toastAlert.message}</span>
+              </span>
+            </button>
+            <button className="toast-close" type="button" onClick={closeToast} aria-label="Dismiss notification">
               ✕
             </button>
           </div>
@@ -755,9 +766,13 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
             />
           )}
           {activeTab === "Notifications" && (
-            <Notification onUnreadChange={() => {}} />
+            <Notification
+              onUnreadChange={() => {}}
+              notificationToOpen={notificationToOpen}
+              onNotificationOpened={() => setNotificationToOpen(null)}
+            />
           )}
-          <Chatbot />
+          <Chatbot tasks={tasks} projects={projects} loading={loading} />
         </main>
       </div>
     </div>

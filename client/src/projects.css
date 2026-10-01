@@ -148,7 +148,7 @@
 
 .project-board-grid {
 	display: grid;
-	grid-template-columns: 1.7fr 1fr 1fr .9fr 1fr 1.05fr .85fr .85fr;
+	grid-template-columns: minmax(180px, 1.8fr) minmax(120px, 1fr) minmax(110px, 1fr) minmax(90px, .8fr) minmax(110px, 1fr) minmax(190px, 1.2fr);
 	align-items: center;
 	gap: 10px;
 	min-width: 900px;

@@ -151,6 +151,7 @@ function Reports({ userRole = "User" }) {
                 }}
               >
                 <li
+                  className="report-summary-row"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -165,6 +166,7 @@ function Reports({ userRole = "User" }) {
                   </strong>
                 </li>
                 <li
+                  className="report-summary-row"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -180,6 +182,7 @@ function Reports({ userRole = "User" }) {
                   </strong>
                 </li>
                 <li
+                  className="report-summary-row"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -208,6 +211,7 @@ function Reports({ userRole = "User" }) {
                 }}
               >
                 <li
+                  className="report-summary-row"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -220,6 +224,7 @@ function Reports({ userRole = "User" }) {
                   <strong>{users.length} members</strong>
                 </li>
                 <li
+                  className="report-summary-row"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -232,6 +237,7 @@ function Reports({ userRole = "User" }) {
                   <strong>{totalTasks} tasks</strong>
                 </li>
                 <li
+                  className="report-summary-row"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",

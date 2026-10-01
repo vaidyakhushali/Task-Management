@@ -412,3 +412,63 @@
   background: #ffffff;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
+
+[data-theme="dark"] .notification-modal {
+  border-color: #303a44 !important;
+  background: #1a2128 !important;
+  color: #edf1f5;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .notification-modal-heading {
+  border-color: #303a44;
+}
+
+[data-theme="dark"] .notification-modal-heading h2,
+[data-theme="dark"] .notification-chat h3 {
+  color: #edf1f5 !important;
+}
+
+[data-theme="dark"] .notification-close-button {
+  border-color: #3a4651;
+  background: #252e37;
+  color: #cbd5df;
+}
+
+[data-theme="dark"] .notification-detail-list div {
+  border-color: #303a44;
+  background: #222b34;
+}
+
+[data-theme="dark"] .notification-detail-list dt {
+  color: #a4afba;
+}
+
+[data-theme="dark"] .notification-detail-list dd {
+  color: #edf1f5;
+}
+
+[data-theme="dark"] .notification-chat {
+  border-color: #303a44;
+  background: #1d252d;
+}
+
+[data-theme="dark"] .notification-chat-message {
+  border: 1px solid #35414c;
+  background: #252e37;
+  color: #d8e0e8;
+}
+
+[data-theme="dark"] .notification-chat-message strong {
+  color: #edb28c !important;
+}
+
+[data-theme="dark"] .notification-chat-form input {
+  border-color: #3a4651;
+  background: #11161b;
+  color: #edf1f5;
+}
+
+[data-theme="dark"] .notification-chat-form input::placeholder {
+  color: #8e9aa6;
+}

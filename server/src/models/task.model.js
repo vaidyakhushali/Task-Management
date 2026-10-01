@@ -51,6 +51,10 @@ const taskSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    startDate: {
+      type: Date,
+      default: null,
+    },
     dueDate: {
       type: Date,
       default: null,

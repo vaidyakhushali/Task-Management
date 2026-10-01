@@ -6,34 +6,37 @@ function sendError(res, status, message) {
 }
 
 export async function listProjects(req, res) {
-  let projectFilter = {};
-
-  if (req.user.role !== "Admin") {
-    const assignedProjectIds = await Task.distinct("project", {
-      $or: [
-        { owner: req.user._id },
-        { assignedUser: req.user._id },
-        { creator: req.user._id },
-      ],
-      project: { $ne: null },
-    });
-
-    projectFilter = {
-      $or: [
-        { owner: req.user._id },
-        { members: req.user._id },
-        { _id: { $in: assignedProjectIds } },
-      ],
-    };
-  }
-
-  const projects = await Project.find(projectFilter)
+  const projects = await Project.find({})
     .populate("owner", "fullname username")
     .populate("members", "fullname username role")
-    .sort({ updatedAt: -1 });
+    .sort({ updatedAt: -1 })
+    .lean();
+  const projectTasks = projects.length
+    ? await Task.find({ project: { $in: projects.map((project) => project._id) } })
+        .select("project assignedUser")
+        .populate("assignedUser", "fullname username")
+        .lean()
+    : [];
+  const assigneesByProject = new Map();
+
+  projectTasks.forEach((task) => {
+    const assignee = task.assignedUser;
+    if (!assignee) return;
+
+    const projectId = String(task.project);
+    const assignees = assigneesByProject.get(projectId) || new Map();
+    assignees.set(String(assignee._id), assignee);
+    assigneesByProject.set(projectId, assignees);
+  });
+
   return res.status(200).json({
     success: true,
-    data: projects,
+    data: projects.map((project) => ({
+      ...project,
+      assignees: Array.from(
+        assigneesByProject.get(String(project._id))?.values() || [],
+      ),
+    })),
   });
 }
 

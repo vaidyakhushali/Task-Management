@@ -769,3 +769,30 @@
     padding: 12px 16px;
   }
 }
+/* =========================================================
+   ADMIN DELETE TASK BUTTON
+========================================================= */
+
+.btn-delete-task {
+  border: 1px solid #f1c4c4;
+  background: #fff5f5;
+  color: #d64545;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.btn-delete-task:hover {
+  background: #d64545;
+  color: #ffffff;
+  border-color: #d64545;
+  transform: translateY(-1px);
+}
+
+.btn-delete-task:active {
+  transform: translateY(0);
+}

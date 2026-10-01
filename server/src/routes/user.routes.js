@@ -1,5 +1,17 @@
 import { Router } from 'express';
-import { changePassword, getWorkspaceSettings, listAdminChat, listAdminUsers, listAssignableUsers, listChat, loginUser, logoutUser, registerUser, sendAdminChat, sendChat, updateProfile, updateWorkspaceSettings } from '../controllers/users.controllers.js';
+import { changePassword, 
+         getWorkspaceSettings, 
+         listAdminChat, 
+         listAdminUsers, 
+         listAssignableUsers, 
+         listChat, 
+         loginUser, 
+         logoutUser, 
+         registerUser, 
+         sendAdminChat, 
+         sendChat, 
+         updateProfile, 
+         updateWorkspaceSettings } from '../controllers/users.controllers.js';
 import { verifyAccessToken } from '../middlewares/auth.middleware.js';
 
 const router = Router();

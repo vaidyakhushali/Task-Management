@@ -8,7 +8,11 @@ import {
 } from "./api";
 import "./notification.css";
 
-function Notification({ onUnreadChange }) {
+function Notification({
+  onUnreadChange,
+  notificationToOpen,
+  onNotificationOpened,
+}) {
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -39,6 +43,27 @@ function Notification({ onUnreadChange }) {
     const notificationRefresh = setInterval(loadNotifications, 10000);
     return () => clearInterval(notificationRefresh);
   }, [onUnreadChange]);
+
+  useEffect(() => {
+    if (!notificationToOpen || isLoading) return;
+
+    setActiveNotification(notificationToOpen);
+    onNotificationOpened?.();
+
+    if (!notificationToOpen.read && notificationToOpen._id) {
+      markNotificationRead(notificationToOpen._id)
+        .then(() => {
+          setNotifications((currentNotifications) =>
+            currentNotifications.map((notification) =>
+              notification._id === notificationToOpen._id
+                ? { ...notification, read: true }
+                : notification,
+            ),
+          );
+        })
+        .catch((readError) => setError(readError.message));
+    }
+  }, [notificationToOpen, isLoading, onNotificationOpened]);
 
   useEffect(() => {
     if (!activeNotification?.actor?._id) return;

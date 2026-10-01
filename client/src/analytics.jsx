@@ -354,6 +354,7 @@ function Analytics({
           >
             {tasks.slice(0, 3).map((task, idx) => (
               <div
+                className="analytics-deadline-row"
                 key={task._id || idx}
                 style={{
                   display: "flex",
@@ -367,6 +368,7 @@ function Analytics({
               >
                 <div>
                   <strong
+                    className="analytics-deadline-title"
                     style={{
                       fontSize: "13px",
                       display: "block",
@@ -375,7 +377,10 @@ function Analytics({
                   >
                     {task.title || "Task Submission"}
                   </strong>
-                  <small style={{ color: "#64748b", fontSize: "11px" }}>
+                  <small
+                    className="analytics-deadline-assignee"
+                    style={{ color: "#64748b", fontSize: "11px" }}
+                  >
                     Assigned to:{" "}
                     {task.assignedUser?.fullname ||
                       task.assignedUser?.username ||
@@ -383,6 +388,7 @@ function Analytics({
                   </small>
                 </div>
                 <span
+                  className="analytics-due-soon"
                   style={{
                     fontSize: "11px",
                     fontWeight: "600",
@@ -426,6 +432,7 @@ function Analytics({
             {projects.length > 0 ? (
               projects.slice(0, 3).map((proj, idx) => (
                 <div
+                  className="analytics-health-row"
                   key={proj._id || idx}
                   style={{
                     display: "flex",
@@ -441,10 +448,11 @@ function Analytics({
                       fontWeight: "600",
                     }}
                   >
-                    <span style={{ color: "#1e293b" }}>
-                      {proj.title || `Project #${idx + 1}`}
+                    <span className="analytics-health-name" style={{ color: "#1e293b" }}>
+                      {proj.name || proj.title || `Project #${idx + 1}`}
                     </span>
                     <span
+                      className={`analytics-health-status ${idx % 2 === 0 ? "on-track" : "at-risk"}`}
                       style={{
                         fontSize: "11px",
                         padding: "2px 8px",
@@ -457,6 +465,7 @@ function Analytics({
                     </span>
                   </div>
                   <div
+                    className="analytics-health-track"
                     style={{
                       width: "100%",
                       height: "8px",

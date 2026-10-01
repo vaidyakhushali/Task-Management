@@ -9,6 +9,19 @@ import {
 } from "./api";
 import "./projects.css";
 
+const timelineDateFormatter = new Intl.DateTimeFormat("en-GB", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+function formatTimelineDate(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : timelineDateFormatter.format(date);
+}
+
 function Projects({ search = "", userRole }) {
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -142,6 +155,13 @@ function Projects({ search = "", userRole }) {
         <div className="project-board-shell">
           {visibleProjects.map((project, projectIndex) => {
             const memberCount = project.members?.length || 0;
+            const ownerName =
+              project.owner?.fullname || project.owner?.username || "Unassigned";
+            const teamNames = Array.from(
+              new Set([...(project.members || []), ...(project.assignees || [])]
+              .map((member) => member.fullname || member.username)
+              .filter(Boolean)),
+            );
             const boardTasks = tasks.filter(
               (task) =>
                 String(task.project?._id || task.project) ===
@@ -157,7 +177,15 @@ function Projects({ search = "", userRole }) {
                 <div className="project-board-header">
                   <div className="project-board-title-wrap">
                     <span className="project-board-bullet" aria-hidden="true" />
-                    <h3>{project.name}</h3>
+                    <div className="project-board-title-content">
+                      <h3>{project.name}</h3>
+                      <p className="project-board-assignees">
+                        Owner: {ownerName} | Team:{" "}
+                        {teamNames.length
+                          ? teamNames.join(", ")
+                          : "No users assigned"}
+                      </p>
+                    </div>
                   </div>
                   <span className="project-board-count">{memberCount}</span>
                 </div>
@@ -172,16 +200,18 @@ function Projects({ search = "", userRole }) {
                 </div>
 
                 {boardTasks.map((task, idx) => {
-                  const startText = task.startDate
-                    ? new Date(task.startDate).toLocaleDateString()
-                    : null;
-                  const dueText = task.dueDate
-                    ? new Date(task.dueDate).toLocaleDateString()
-                    : null;
+                  const startText = formatTimelineDate(task.startDate);
+                  const dueText = formatTimelineDate(task.dueDate);
+                  const statusLabels = {
+                    pending: "Pending",
+                    "in-progress": "In Progress",
+                    completed: "Completed",
+                  };
+                  const status = task.status || "pending";
                   const timelineText =
                     startText && dueText
                       ? `${startText} - ${dueText}`
-                      : dueText || startText || "No dates";
+                      : dueText || startText || "No dates set";
 
                   return (
                     <div
@@ -206,9 +236,9 @@ function Projects({ search = "", userRole }) {
                       </div>
                       <div className="project-cell project-status">
                         <span
-                          className={`project-pill project-pill-${task.status}`}
+                          className={`project-pill project-pill-${status}`}
                         >
-                          {task.status}
+                          {statusLabels[status] || status}
                         </span>
                       </div>
                       <div className="project-cell project-date">
@@ -288,6 +318,21 @@ function Projects({ search = "", userRole }) {
                       <option value="low">Low</option>
                       <option value="medium">Medium</option>
                       <option value="high">High</option>
+                    </select>
+                    <select
+                      value={draft.status || "pending"}
+                      onChange={(event) =>
+                        updateTaskDraft(
+                          project._id,
+                          "status",
+                          event.target.value,
+                        )
+                      }
+                      aria-label={`Status for ${project.name}`}
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="in-progress">In Progress</option>
+                      <option value="completed">Completed</option>
                     </select>
                     <input
                       type="date"
