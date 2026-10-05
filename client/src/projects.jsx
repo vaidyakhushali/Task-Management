@@ -176,7 +176,7 @@ function Projects({ search = "", userRole }) {
               >
                 <div className="project-board-header">
                   <div className="project-board-title-wrap">
-                    <span className="project-board-bullet" aria-hidden="true" />
+                    <span className="project-board-bullet" aria-  hidden="true" />
                     <div className="project-board-title-content">
                       <h3>{project.name}</h3>
                       <p className="project-board-assignees">
