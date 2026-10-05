@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import {
-  getChat,
   getNotifications,
   markAllNotificationsRead,
   markNotificationRead,
-  sendChat,
 } from "./api";
 import "./notification.css";
 
@@ -17,9 +15,6 @@ function Notification({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeNotification, setActiveNotification] = useState(null);
-  const [chatMessages, setChatMessages] = useState([]);
-  const [chatInput, setChatInput] = useState("");
-  const [chatError, setChatError] = useState("");
 
   useEffect(() => {
     async function loadNotifications() {
@@ -65,16 +60,6 @@ function Notification({
     }
   }, [notificationToOpen, isLoading, onNotificationOpened]);
 
-  useEffect(() => {
-    if (!activeNotification?.actor?._id) return;
-    setChatError("");
-    getChat(activeNotification.actor._id)
-      .then((response) =>
-        setChatMessages(Array.isArray(response?.data) ? response.data : []),
-      )
-      .catch((loadError) => setChatError(loadError.message));
-  }, [activeNotification]);
-
   function updateNotifications(nextNotifications) {
     setNotifications(nextNotifications);
     if (typeof onUnreadChange === "function") {
@@ -113,18 +98,6 @@ function Notification({
   async function openNotification(notification) {
     if (!notification.read) await markAsRead(notification._id);
     setActiveNotification(notification);
-  }
-
-  async function sendMessage(event) {
-    event.preventDefault();
-    if (!chatInput.trim() || !activeNotification?.actor?._id) return;
-    try {
-      const response = await sendChat(activeNotification.actor._id, chatInput);
-      setChatMessages((currentMessages) => [...currentMessages, response.data]);
-      setChatInput("");
-    } catch (sendError) {
-      setChatError(sendError.message);
-    }
   }
 
   return (
@@ -244,40 +217,6 @@ function Notification({
                 </dd>
               </div>
             </dl>
-            <div className="notification-chat">
-              <h3>
-                Chat with {activeNotification.actor?.fullname || "the assigner"}
-              </h3>
-              <div className="notification-chat-messages">
-                {chatMessages.length === 0 && !chatError && (
-                  <p className="notification-empty">No messages yet.</p>
-                )}
-                {chatMessages.map((chatMessage) => (
-                  <p
-                    className="notification-chat-message"
-                    key={chatMessage._id}
-                  >
-                    <strong>{chatMessage.sender?.fullname || "User"}</strong>
-                    <span>{chatMessage.message}</span>
-                  </p>
-                ))}
-              </div>
-              {chatError && (
-                <p className="chat-error" role="alert">
-                  {chatError}
-                </p>
-              )}
-              <form className="notification-chat-form" onSubmit={sendMessage}>
-                <input
-                  value={chatInput}
-                  onChange={(event) => setChatInput(event.target.value)}
-                  placeholder="Write a message..."
-                  aria-label="Write a message"
-                  maxLength="1000"
-                />
-                <button type="submit">Send</button>
-              </form>
-            </div>
           </section>
         </div>
       )}

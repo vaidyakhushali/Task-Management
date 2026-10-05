@@ -2,16 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   getAdminTasks,
   getAdminUsers,
-  getAssignableUsers,
   getProjects,
-  getTasks,
 } from "./api";
 import "./analytics.css";
 
 function Analytics({
   stats = { total: 0, completed: 0, remaining: 0 },
-  userRole = "Admin",
+  userRole = "User",
 }) {
+  const isAdmin = userRole === "Admin";
   const [search, setSearch] = useState("");
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -36,16 +35,18 @@ function Analytics({
 
   useEffect(() => {
     let isMounted = true;
+    if (!isAdmin) {
+      setLoading(false);
+      return () => {
+        isMounted = false;
+      };
+    }
+
     setLoading(true);
     Promise.all([
       getProjects().catch(() => ({ data: [] })),
-      (userRole === "Admin" ? getAdminTasks() : getTasks()).catch(() => ({
-        data: [],
-      })),
-      (userRole === "Admin"
-        ? getAdminUsers()
-        : Promise.resolve({ data: [] })
-      ).catch(() => ({ data: [] })),
+      getAdminTasks().catch(() => ({ data: [] })),
+      getAdminUsers().catch(() => ({ data: [] })),
     ])
       .then(([projRes, taskRes, userRes]) => {
         if (!isMounted) return;
@@ -63,7 +64,7 @@ function Analytics({
     return () => {
       isMounted = false;
     };
-  }, [userRole]);
+  }, [isAdmin]);
 
   // Dynamic Metrics Calculation
   const totalProjectCount =
@@ -259,6 +260,17 @@ function Analytics({
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
+
+  if (!isAdmin) {
+    return (
+      <section className="panel">
+        <div className="panel-heading">
+          <h2>Analytics unavailable</h2>
+          <p>Analytics are available only to administrators.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <div className="analytics-page">

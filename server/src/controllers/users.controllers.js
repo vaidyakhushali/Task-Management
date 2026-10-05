@@ -207,12 +207,15 @@ export async function changePassword(req, res) {
     if (!currentPassword || !newPassword) return sendError(res, 400, 'Current and new passwords are required');
     if (newPassword.length < 6) return sendError(res, 400, 'New password must be at least 6 characters');
     const account = await User.findById(req.user._id);
-    if (!account || !(await bcrypt.compare(currentPassword, account.password))) return sendError(res, 401, 'Current password is incorrect');
+    if (!account || !(await bcrypt.compare(currentPassword, account.password))) 
+        return sendError(res, 401, 'Current password is incorrect');
 
     account.password = newPassword;
     account.refreshToken = null;
     await account.save();
-    return res.status(200).json({ success: true, message: 'Password changed successfully' });
+    return res
+    .status(200)
+    .json({ success: true, message: 'Password changed successfully' });
 }
 
 export async function logoutUser(req, res) {

@@ -6,8 +6,6 @@ import {
   createTask,
   updateTask,
   deleteTask,
-  getTaskComments,
-  addTaskComment,
 } from "./api";
 
 import "./task.css";
@@ -17,13 +15,9 @@ function Tasks({
   onTaskAssigned,
   initialStatusFilter = "all",
 }) {
-  // =========================================================
-  // ROLE
-  // =========================================================
 
   const isAdmin =
-    user?.role === "Admin" ||
-    user?.role === "Manager";
+    user?.role === "Admin";
 
   // =========================================================
   // TASK STATES
@@ -77,27 +71,7 @@ function Tasks({
   const [viewMode, setViewMode] =
     useState("list");
 
-  // list | kanban | grid
-
-  // =========================================================
-  // COMMENTS
-  // =========================================================
-
-  const [activeCommentTask, setActiveCommentTask] =
-    useState(null);
-
-  const [comments, setComments] =
-    useState([]);
-
-  const [commentText, setCommentText] =
-    useState("");
-
-  const [loadingComments, setLoadingComments] =
-    useState(false);
-
-  const [commentError, setCommentError] =
-    useState("");
-
+ 
   // =========================================================
   // UPDATE FILTER WHEN PROP CHANGES
   // =========================================================
@@ -154,16 +128,11 @@ function Tasks({
 
   async function fetchUsers() {
     try {
-      const res =
-        await getAssignableUsers();
+      const res = await getAssignableUsers();
 
-      const usersList =
-        Array.isArray(res?.data)
-          ? res.data
-          : [];
+      const usersList =  Array.isArray(res?.data)  ? res.data : [];
 
-      const filteredUsers =
-        usersList.filter(
+      const filteredUsers =  usersList.filter(
           (u) =>
             (u._id || u.id) !==
               (user?._id ||
@@ -406,82 +375,6 @@ function Tasks({
       setError(
         err.message ||
           "Failed to delete task."
-      );
-    }
-  }
-
-  // =========================================================
-  // OPEN COMMENTS
-  // =========================================================
-
-  async function openComments(task) {
-    setActiveCommentTask(task);
-
-    setComments([]);
-
-    setCommentError("");
-
-    setCommentText("");
-
-    setLoadingComments(true);
-
-    try {
-      const res =
-        await getTaskComments(
-          task._id
-        );
-
-      setComments(
-        Array.isArray(res?.data)
-          ? res.data
-          : []
-      );
-    } catch (err) {
-      setCommentError(
-        err.message ||
-          "Failed to load comments."
-      );
-    } finally {
-      setLoadingComments(false);
-    }
-  }
-
-  // =========================================================
-  // ADD COMMENT
-  // =========================================================
-
-  async function handleAddComment(e) {
-    e.preventDefault();
-
-    if (
-      !commentText.trim() ||
-      !activeCommentTask
-    ) {
-      return;
-    }
-
-    try {
-      const res =
-        await addTaskComment(
-          activeCommentTask._id,
-          commentText.trim()
-        );
-
-      if (
-        res?.success &&
-        res?.data
-      ) {
-        setComments((prev) => [
-          ...prev,
-          res.data,
-        ]);
-
-        setCommentText("");
-      }
-    } catch (err) {
-      setCommentError(
-        err.message ||
-          "Failed to post comment."
       );
     }
   }
@@ -1222,10 +1115,6 @@ function Tasks({
                     Update Status
                   </th>
 
-                  <th>
-                    Private Chat
-                  </th>
-
                   {/* ADMIN ONLY */}
 
                   {isAdmin && (
@@ -1428,27 +1317,6 @@ function Tasks({
                             </option>
 
                           </select>
-
-                        </td>
-
-                        {/* CHAT */}
-
-                        <td>
-
-                          <button
-                            type="button"
-                            className="btn-comments"
-                            onClick={() =>
-                              openComments(
-                                t
-                              )
-                            }
-                          >
-                            💬 Chat (
-                            {t.commentsCount ||
-                              0}
-                            )
-                          </button>
 
                         </td>
 
@@ -1754,18 +1622,6 @@ function Tasks({
 
                                     </select>
 
-                                    <button
-                                      type="button"
-                                      className="btn-comments"
-                                      onClick={() =>
-                                        openComments(
-                                          t
-                                        )
-                                      }
-                                    >
-                                      💬
-                                    </button>
-
                                     {/* ADMIN DELETE */}
 
                                     {isAdmin && (
@@ -1975,18 +1831,6 @@ function Tasks({
 
                         </select>
 
-                        <button
-                          type="button"
-                          className="btn-comments"
-                          onClick={() =>
-                            openComments(
-                              t
-                            )
-                          }
-                        >
-                          💬
-                        </button>
-
                         {/* ADMIN DELETE */}
 
                         {isAdmin && (
@@ -2019,192 +1863,6 @@ function Tasks({
         )}
 
       </section>
-
-      {/* =====================================================
-          PRIVATE CHAT MODAL
-      ====================================================== */}
-
-      {activeCommentTask && (
-
-        <div
-          className="modal-backdrop"
-          onClick={() =>
-            setActiveCommentTask(
-              null
-            )
-          }
-        >
-
-          <div
-            className="comments-modal"
-            onClick={(e) =>
-              e.stopPropagation()
-            }
-          >
-
-            <div className="modal-header">
-
-              <div>
-
-                <h3>
-                  🔒 Private Task Chat
-                </h3>
-
-                <p>
-                  Task:{" "}
-                  <strong>
-                    {
-                      activeCommentTask.title
-                    }
-                  </strong>{" "}
-                  · Private conversation
-                </p>
-
-              </div>
-
-              <button
-                type="button"
-                className="close-btn"
-                onClick={() =>
-                  setActiveCommentTask(
-                    null
-                  )
-                }
-              >
-                ✕
-              </button>
-
-            </div>
-
-            <div className="comments-body">
-
-              {loadingComments ? (
-
-                <div className="comments-loading">
-                  Loading comments...
-                </div>
-
-              ) : comments.length ===
-                0 ? (
-
-                <div className="no-comments">
-                  No comments yet.
-                  Start the
-                  conversation!
-                </div>
-
-              ) : (
-
-                <div className="comments-list">
-
-                  {comments.map(
-                    (comment) => (
-
-                      <div
-                        className="comment-bubble"
-                        key={
-                          comment._id ||
-                          comment.createdAt
-                        }
-                      >
-
-                        <div className="comment-meta">
-
-                          <strong>
-                            {comment
-                              .user
-                              ?.fullname ||
-                              comment
-                                .user
-                                ?.username ||
-                              "User"}
-                          </strong>
-
-                          <span className="comment-role">
-                            (
-                            {comment
-                              .user
-                              ?.role ||
-                              "User"}
-                            )
-                          </span>
-
-                          <small>
-                            {new Date(
-                              comment.createdAt
-                            ).toLocaleTimeString(
-                              [],
-                              {
-                                hour:
-                                  "2-digit",
-                                minute:
-                                  "2-digit",
-                              }
-                            )}
-                          </small>
-
-                        </div>
-
-                        <p className="comment-text">
-                          {
-                            comment.message
-                          }
-                        </p>
-
-                      </div>
-
-                    )
-                  )}
-
-                </div>
-
-              )}
-
-              {commentError && (
-                <div className="alert alert-error">
-                  {
-                    commentError
-                  }
-                </div>
-              )}
-
-            </div>
-
-            <form
-              onSubmit={
-                handleAddComment
-              }
-              className="comments-footer"
-            >
-
-              <input
-                type="text"
-                placeholder="Write a comment..."
-                value={
-                  commentText
-                }
-                onChange={(e) =>
-                  setCommentText(
-                    e.target.value
-                  )
-                }
-                required
-              />
-
-              <button
-                type="submit"
-                className="btn-primary"
-              >
-                Post Comment
-              </button>
-
-            </form>
-
-          </div>
-
-        </div>
-
-      )}
 
     </div>
   );

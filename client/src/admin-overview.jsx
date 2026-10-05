@@ -1,20 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  getAdminChat,
-  getAdminTasks,
-  getAdminUsers,
-  sendAdminChat,
-} from "./api";
+import { getAdminTasks, getAdminUsers } from "./api";
 import "./admin-overview.css";
 
 function AdminOverview({ search = "" }) {
   const [users, setUsers] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState("");
-  const [activeChat, setActiveChat] = useState(null);
-  const [chatMessages, setChatMessages] = useState([]);
-  const [chatInput, setChatInput] = useState("");
-  const [chatError, setChatError] = useState("");
 
   useEffect(() => {
     Promise.all([getAdminUsers(), getAdminTasks()])
@@ -24,26 +15,6 @@ function AdminOverview({ search = "" }) {
       })
       .catch((loadError) => setError(loadError.message));
   }, []);
-
-  useEffect(() => {
-    if (!activeChat) return;
-    setChatError("");
-    getAdminChat(activeChat._id)
-      .then((response) => setChatMessages(response.data))
-      .catch((loadError) => setChatError(loadError.message));
-  }, [activeChat]);
-
-  async function sendMessage(event) {
-    event.preventDefault();
-    if (!chatInput.trim() || !activeChat) return;
-    try {
-      const response = await sendAdminChat(activeChat._id, chatInput);
-      setChatMessages((currentMessages) => [...currentMessages, response.data]);
-      setChatInput("");
-    } catch (sendError) {
-      setChatError(sendError.message);
-    }
-  }
 
   const visibleUsers = useMemo(
     () =>
@@ -106,13 +77,6 @@ function AdminOverview({ search = "" }) {
                   <span className="user-task-count">
                     {userTasks.length} task{userTasks.length === 1 ? "" : "s"}
                   </span>
-                  <button
-                    className="chat-button"
-                    type="button"
-                    onClick={() => setActiveChat(user)}
-                  >
-                    {activeChat?._id === user._id ? "Close chat" : "Chat"}
-                  </button>
                 </div>
                 <div className="admin-task-list">
                   {userTasks.length === 0 ? (
@@ -136,45 +100,6 @@ function AdminOverview({ search = "" }) {
                     ))
                   )}
                 </div>
-                {activeChat?._id === user._id && (
-                  <div className="admin-chat-panel">
-                    <div className="admin-chat-messages">
-                      {chatMessages.length === 0 && !chatError && (
-                        <p className="admin-empty">
-                          Start a conversation with {user.fullname}.
-                        </p>
-                      )}
-                      {chatMessages.map((chatMessage) => (
-                        <p
-                          className={`admin-chat-message ${chatMessage.sender?._id === user._id ? "received" : "sent"}`}
-                          key={chatMessage._id}
-                        >
-                          <span>{chatMessage.message}</span>
-                          <small>
-                            {chatMessage.sender?._id === user._id
-                              ? user.fullname
-                              : "You"}
-                          </small>
-                        </p>
-                      ))}
-                    </div>
-                    {chatError && (
-                      <p className="chat-error" role="alert">
-                        {chatError}
-                      </p>
-                    )}
-                    <form className="admin-chat-form" onSubmit={sendMessage}>
-                      <input
-                        value={chatInput}
-                        onChange={(event) => setChatInput(event.target.value)}
-                        placeholder={`Message ${user.fullname}...`}
-                        aria-label={`Message ${user.fullname}`}
-                        maxLength="1000"
-                      />
-                      <button type="submit">Send</button>
-                    </form>
-                  </div>
-                )}
               </article>
             );
           })}

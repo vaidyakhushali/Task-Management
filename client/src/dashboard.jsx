@@ -13,7 +13,6 @@ import Analytics from "./analytics";
 import CalendarView from "./calendar";
 import TeamMembers from "./team-members";
 import Reports from "./reports";
-import Chatbot from "./chatbot";
 import Settings from "./settings";
 import Notification from "./notification";
 
@@ -23,10 +22,10 @@ const menuItems = [
   "Projects",
   "Analytics",
   "Calendar",
-  "Chatbot",
   "Team Members",
   "Reports",
 ];
+const adminOnlyTabs = ["Analytics", "Reports"];
 const generalItems = ["Settings"];
 
 function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
@@ -38,10 +37,10 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
   const [notificationToOpen, setNotificationToOpen] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [displayName, setDisplayName] = useState(userName);
   const [taskStatusFilter, setTaskStatusFilter] = useState("all");
+  const search = "";
 
   function openStatusTab(statusKey) {
     setTaskStatusFilter(statusKey);
@@ -66,6 +65,19 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
   }, [fontSize]);
 
   const isAdmin = userRole === "Admin";
+  const visibleMenuItems = useMemo(
+    () =>
+      isAdmin
+        ? menuItems
+        : menuItems.filter((item) => !adminOnlyTabs.includes(item)),
+    [isAdmin],
+  );
+
+  useEffect(() => {
+    if (!isAdmin && adminOnlyTabs.includes(activeTab)) {
+      setActiveTab("Dashboard");
+    }
+  }, [activeTab, isAdmin]);
 
   async function loadDashboard() {
     setLoading(true);
@@ -187,8 +199,8 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
     },
   ];
 
+  const query = search.trim().toLowerCase();
   const visibleTasks = useMemo(() => {
-    const query = search.trim().toLowerCase();
     if (!query) return tasks;
     return tasks.filter((task) => {
       const haystack = [
@@ -204,7 +216,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
         .toLowerCase();
       return haystack.includes(query);
     });
-  }, [search, tasks]);
+  }, [query, tasks]);
 
   const workloadRows = buildWorkloadRows(tasks, displayName);
   const unreadNotificationsCount = notifications.filter(
@@ -273,7 +285,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
 
           <nav className="side-nav" aria-label="Main navigation">
             <p>Menu</p>
-            {menuItems.map((item) => (
+            {visibleMenuItems.map((item) => (
               <button
                 className={`nav-item ${activeTab === item ? "active" : ""}`}
                 type="button"
@@ -358,29 +370,6 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
                 <p>Here is what is happening with your team today</p>
               </div>
             </div>
-
-            <label className="search-box">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search here..."
-                type="search"
-              />
-            </label>
-
             <div className="topbar-appearance-controls">
               <button
                 className="topbar-theme-btn"
@@ -499,7 +488,8 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
 
           {error && <div className="dashboard-alert">{error}</div>}
 
-          {activeTab === "Dashboard" && (
+          <div className="dashboard-view" key={activeTab}>
+            {activeTab === "Dashboard" && (
             <>
               <section className="metric-grid">
                 <MetricCard
@@ -732,7 +722,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
             <Projects search={search} userRole={userRole} />
           )}
 
-          {activeTab === "Analytics" && (
+          {activeTab === "Analytics" && isAdmin && (
             <Analytics
               stats={{
                 total: dashboard.totalTasks,
@@ -751,7 +741,10 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
           )}
 
           {activeTab === "Team Members" && <TeamMembers search={search} />}
-          {activeTab === "Reports" && <Reports userRole={userRole} />}
+
+          {activeTab === "Reports" && isAdmin && (
+            <Reports userRole={userRole} />
+          )}
           {activeTab === "Settings" && (
             <Settings
               user={user}
@@ -772,7 +765,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
               onNotificationOpened={() => setNotificationToOpen(null)}
             />
           )}
-          <Chatbot tasks={tasks} projects={projects} loading={loading} />
+          </div>
         </main>
       </div>
     </div>

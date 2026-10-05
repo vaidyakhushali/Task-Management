@@ -15,11 +15,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.get('/api/v1/health', (req, res) => res.json({ success: true, message: 'API is running' }));
-app.use('/api/v1/users', userRouter);
-app.use('/api/v1/tasks', taskRouter);
-app.use('/api/v1/notifications', notificationRouter);
-app.use('/api/v1/projects', projectRouter);
+app.get('/api/health', (req, res) => res.json({ success: true, message: 'API is running' }));
+app.use('/api/users', userRouter);
+app.use('/api/tasks', taskRouter);
+app.use('/api/notifications', notificationRouter);
+app.use('/api/projects', projectRouter);
 
 app.use((error, req, res, next) => {
     console.error(error);

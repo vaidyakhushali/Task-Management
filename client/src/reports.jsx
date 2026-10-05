@@ -3,12 +3,18 @@ import { getTasks, getAssignableUsers, getProjects } from "./api";
 import "./reports.css";
 
 function Reports({ userRole = "User" }) {
+  const isAdmin = userRole === "Admin";
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isAdmin) {
+      setLoading(false);
+      return;
+    }
+
     Promise.all([getTasks(), getProjects(), getAssignableUsers()])
       .then(([tRes, pRes, uRes]) => {
         setTasks(Array.isArray(tRes?.data) ? tRes.data : []);
@@ -17,7 +23,7 @@ function Reports({ userRole = "User" }) {
       })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
-  }, []);
+  }, [isAdmin]);
 
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(
@@ -35,6 +41,17 @@ function Reports({ userRole = "User" }) {
 
   function handlePrintReport() {
     window.print();
+  }
+
+  if (!isAdmin) {
+    return (
+      <section className="panel">
+        <div className="panel-heading">
+          <h2>Reports unavailable</h2>
+          <p>Reports are available only to administrators.</p>
+        </div>
+      </section>
+    );
   }
 
   return (

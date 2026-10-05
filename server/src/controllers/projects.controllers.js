@@ -41,8 +41,8 @@ export async function listProjects(req, res) {
 }
 
 export async function createProject(req, res) {
-  if (!["Manager", "Admin"].includes(req.user.role))
-    return sendError(res, 403, "Only managers and admins can create projects");
+  if (!["Admin"].includes(req.user.role))
+    return sendError(res, 403, "Only admins can create projects");
   const name = String(req.body.name || "").trim();
   const description = String(req.body.description || "").trim();
   if (!name) return sendError(res, 400, "Project name is required");

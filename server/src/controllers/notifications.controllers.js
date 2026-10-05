@@ -24,7 +24,7 @@ export async function listNotifications(req, res) {
       });
       notifications = [welcomeNotice];
     } catch (e) {
-      // Fall back to empty array if seed fails
+      console.error("Error creating welcome notification:", e);
     }
   }
 

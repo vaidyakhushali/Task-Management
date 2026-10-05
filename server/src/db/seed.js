@@ -19,23 +19,23 @@ async function seedData() {
     // Create demo standard users if they don't exist
     const demoUsers = [
       {
-        fullname: "Alex Johnson",
-        username: "alex",
-        email: "user1@taskmanagement.com",
+        fullname: "abc ",
+        username: "abc",
+        email: "abc@taskmanagement.com",
         password: "user123",
         role: "User",
       },
       {
-        fullname: "Sarah Miller",
-        username: "sarah",
-        email: "sarah@taskmanagement.com",
+        fullname: "def ",
+        username: "def",
+        email: "def@taskmanagement.com",
         password: "user123",
         role: "User",
       },
       {
-        fullname: "David Chen",
-        username: "david",
-        email: "david@taskmanagement.com",
+        fullname: "ghi ",
+        username: "ghi",
+        email: "ghi@taskmanagement.com",
         password: "user123",
         role: "User",
       },
@@ -46,63 +46,14 @@ async function seedData() {
       let user = await User.findOne({ email: u.email });
       if (!user) {
         user = await User.create(u);
-        console.log(`👤 Created demo user: ${u.email}`);
+        console.log(` Created demo user: ${u.email}`);
       }
       users.push(user);
     }
 
-    // Seed sample tasks if no tasks exist
-    const existingTaskCount = await Task.countDocuments();
-    if (existingTaskCount === 0) {
-      const sampleTasks = [
-        {
-          title: "Design Task Management Landing UI",
-          description:
-            "Create responsive mockup with cream/peach theme and dashboard metrics.",
-          status: "in-progress",
-          priority: "high",
-          assignedUser: users[0]._id,
-          creator: admin._id,
-          owner: admin._id,
-          dueDate: new Date(Date.now() + 3 * 86400000),
-        },
-        {
-          title: "Setup Express & MongoDB Authentication Routes",
-          description:
-            "Implement JWT, bcryptjs, and role-based middleware for Admin and User roles.",
-          status: "completed",
-          priority: "high",
-          assignedUser: users[1]._id,
-          creator: admin._id,
-          owner: admin._id,
-          dueDate: new Date(Date.now() - 86400000),
-        },
-        {
-          title: "Integrate Task Commenting System",
-          description:
-            "Allow users to reply directly to task items and communicate with Admin.",
-          status: "pending",
-          priority: "medium",
-          assignedUser: users[0]._id,
-          creator: admin._id,
-          owner: admin._id,
-          dueDate: new Date(Date.now() + 5 * 86400000),
-        },
-        {
-          title: "Verify Toast Notification Banners",
-          description:
-            "Test in-app pop-up notifications when tasks are assigned to specific team members.",
-          status: "pending",
-          priority: "low",
-          assignedUser: users[2]._id,
-          creator: admin._id,
-          owner: admin._id,
-          dueDate: new Date(Date.now() + 7 * 86400000),
-        },
-      ];
-
+   
       const createdTasks = await Task.insertMany(sampleTasks);
-      console.log(`📋 Created ${createdTasks.length} sample tasks.`);
+      console.log(` Created ${createdTasks.length} sample tasks.`);
 
       // Create sample notifications
       for (const t of createdTasks) {
@@ -132,7 +83,6 @@ async function seedData() {
         });
         console.log(" Added initial comments for sample task.");
       }
-    }
 
     console.log(" Database seeding complete!");
     process.exit(0);

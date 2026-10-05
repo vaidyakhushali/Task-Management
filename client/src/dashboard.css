@@ -4,6 +4,47 @@
   color: var(--text-dark);
 }
 
+@keyframes pageRiseIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes softPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes barGrow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes badgePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(216, 151, 108, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(216, 151, 108, 0);
+  }
+}
+
 .dashboard-shell {
   display: flex;
   min-height: 100vh;
@@ -84,17 +125,20 @@
   width: 100%;
   text-align: left;
   cursor: pointer;
+  transform: translateX(0);
 }
 
 .nav-item:hover {
   background: var(--warm-peach-light);
   color: var(--terracotta-dark);
+  transform: translateX(3px);
 }
 
 .nav-item.active {
   background: linear-gradient(135deg, var(--warm-peach), var(--terracotta));
   color: #ffffff;
   box-shadow: 0 3px 10px rgba(216, 151, 108, 0.3);
+  transform: translateX(4px);
 }
 
 .logout-nav-item:hover {
@@ -146,6 +190,14 @@
   flex-direction: column;
   gap: 16px;
   max-width: 1440px;
+  animation: pageRiseIn 0.35s ease both;
+}
+
+.dashboard-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: pageRiseIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Header Topbar */
@@ -241,6 +293,13 @@
   position: relative;
   font-size: 0.95rem;
   cursor: pointer;
+  transition: var(--transition);
+}
+
+.notification-button:hover {
+  transform: translateY(-1px);
+  border-color: var(--warm-peach);
+  box-shadow: var(--shadow-sm);
 }
 
 .notification-button b {
@@ -256,6 +315,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: badgePulse 1.8s ease-in-out infinite;
 }
 
 .account-box {
@@ -316,6 +376,29 @@
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
+  animation: softPopIn 0.35s ease both;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--warm-peach);
+}
+
+.metric-card:nth-child(2) {
+  animation-delay: 0.04s;
+}
+
+.metric-card:nth-child(3) {
+  animation-delay: 0.08s;
+}
+
+.metric-card:nth-child(4) {
+  animation-delay: 0.12s;
 }
 
 .metric-card span {
@@ -366,6 +449,16 @@
   border-radius: var(--radius-md);
   padding: 18px;
   box-shadow: var(--shadow-sm);
+  animation: pageRiseIn 0.35s ease both;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.panel:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--warm-peach);
 }
 
 .panel-heading {
@@ -464,6 +557,7 @@
 .work-progress-card:hover {
   box-shadow: var(--shadow-sm);
   border-color: var(--warm-peach);
+  transform: translateY(-2px);
 }
 
 .work-progress-type {
@@ -490,6 +584,8 @@
   height: 100%;
   background: linear-gradient(90deg, #818cf8, #6366f1);
   border-radius: 4px;
+  transform-origin: left;
+  animation: barGrow 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .progress-bar-fill.peach-fill {
@@ -609,6 +705,8 @@
   display: block;
   height: 100%;
   border-radius: 3px;
+  transform-origin: left;
+  animation: barGrow 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .status-card.orange i { background: var(--terracotta); }
@@ -750,6 +848,15 @@
   background: var(--bg-cream);
   border-radius: var(--radius-sm);
   font-size: 0.82rem;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.task-row:hover {
+  transform: translateX(3px);
+  box-shadow: var(--shadow-sm);
 }
 
 .task-dot {
@@ -831,6 +938,16 @@
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(2px);
   z-index: 998;
+  animation: fadeBackdrop 0.2s ease both;
+}
+
+@keyframes fadeBackdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 900px) {
@@ -1011,6 +1128,29 @@
 
 .panel-more-menu button:hover {
   background-color: #f5f5f5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .nav-item,
+  .nav-item:hover,
+  .nav-item.active,
+  .metric-card:hover,
+  .panel:hover,
+  .work-progress-card:hover,
+  .status-card:hover,
+  .task-row:hover,
+  .notification-button:hover {
+    transform: none !important;
+  }
 }
 .panel-more-container {
   position: relative;
