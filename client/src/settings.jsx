@@ -34,20 +34,6 @@ function Settings({
       .catch(() => setError("Unable to load workspace settings"));
   }, []);
 
-  async function saveWorkspace(event) {
-    event.preventDefault();
-    setMessage("");
-    setError("");
-    try {
-      const response = await updateWorkspaceSettings(workspaceName);
-      setWorkspaceName(response.data.workspaceName);
-      onWorkspaceNameChange(response.data.workspaceName);
-      setMessage("Workspace name saved");
-    } catch (saveError) {
-      setError(saveError.message);
-    }
-  }
-
   async function saveProfile(event) {
     event.preventDefault();
     setMessage("");
