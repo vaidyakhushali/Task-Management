@@ -74,8 +74,8 @@ export async function registerUser(req, res) {
 }
 
 export async function loginUser(req, res) {
-    const { email, username, password, role } = req.body;
-    const identifier = (email || username || '').toLowerCase().trim();
+    const { email, password, role } = req.body;
+    const identifier = (email   || '').toLowerCase().trim();
     if (!identifier || !password) 
         return sendError(res, 400, 'Email and password are required');
 
