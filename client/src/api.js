@@ -1,4 +1,4 @@
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
 export function setAuthToken(token) {
   if (token) {
@@ -18,7 +18,7 @@ async function request(path, options = {}) {
     "Content-Type": "application/json",
     ...(options.headers || {}),
   };
-
+  
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
