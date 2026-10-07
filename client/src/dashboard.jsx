@@ -1,4 +1,4 @@
-import  { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./dashboard.css";
 import {
   getNotifications,
@@ -176,6 +176,13 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
   }, [projects, tasks]);
 
   const statusCards = [
+    {
+      label: "Pending",
+      value: dashboard.pending,
+      color: "blue",
+      percent: percentOf(dashboard.pending, dashboard.totalTasks),
+      statusKey: "pending",
+    },
     {
       label: "In Progress",
       value: dashboard.inProgress,
@@ -490,286 +497,289 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
 
           <div className="dashboard-view" key={activeTab}>
             {activeTab === "Dashboard" && (
-            <>
-              <section className="metric-grid">
-                <MetricCard
-                  title="Active Projects"
-                  value={dashboard.activeProjects}
-                  helper="Projects in workspace"
-                  tone="sand"
-                  loading={loading}
-                />
-                <MetricCard
-                  title="Utilization Rate"
-                  value={`${dashboard.utilization}%`}
-                  helper="Budget or completion usage"
-                  tone="peach"
-                  loading={loading}
-                />
-                <MetricCard
-                  title="Average Time"
-                  value={`${dashboard.averageDays}`}
-                  suffix=" Days"
-                  helper="Average days until due"
-                  tone="mint"
-                  loading={loading}
-                />
-                <MetricCard
-                  title="At Risk Projects"
-                  value={dashboard.overdue}
-                  helper="Tasks currently overdue"
-                  tone="blush"
-                  loading={loading}
-                />
-              </section>
-
-              <div className="dashboard-grid">
-                <section className="panel status-panel">
-                  <PanelHeader
-                    title="Task Status Distribution"
-                    helper="Click any card to filter tasks"
-                    hideMenu={true}
+              <>
+                <section className="metric-grid">
+                  <MetricCard
+                    title="Active Projects"
+                    value={dashboard.activeProjects}
+                    helper="Projects in workspace"
+                    tone="sand"
+                    loading={loading}
                   />
-                  <div className="status-bars">
-                    {statusCards.map((item) => (
+                  <MetricCard
+                    title="Utilization Rate"
+                    value={`${dashboard.utilization}%`}
+                    helper="Budget or completion usage"
+                    tone="peach"
+                    loading={loading}
+                  />
+                  <MetricCard
+                    title="Average Time"
+                    value={`${dashboard.averageDays}`}
+                    suffix=" Days"
+                    helper="Average days until due"
+                    tone="mint"
+                    loading={loading}
+                  />
+                  <MetricCard
+                    title="At Risk Projects"
+                    value={dashboard.overdue}
+                    helper="Tasks currently overdue"
+                    tone="blush"
+                    loading={loading}
+                  />
+                </section>
+
+                <div className="dashboard-grid">
+                  <section className="panel status-panel">
+                    <PanelHeader
+                      title="Task Status Distribution"
+                      helper="Click any card to filter tasks"
+                      hideMenu={true}
+                    />
+                    <div className="status-bars">
+                      {statusCards.map((item) => (
+                        <div
+                          className={`status-card ${item.color}`}
+                          key={item.label}
+                          onClick={() => openStatusTab(item.statusKey)}
+                          title={`Click to view all ${item.label} tasks`}
+                          role="button"
+                          tabIndex="0"
+                        >
+                          <span>{item.label}</span>
+                          <strong>{item.percent}%</strong>
+                          <div>
+                            <i style={{ width: `${item.percent}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  <section className="panel priority-panel">
+                    <PanelHeader
+                      title="Task Priority"
+                      helper="Distribution by priority level"
+                      hideMenu={true}
+                    />
+                    <PriorityDonut
+                      priority={dashboard.priority}
+                      total={dashboard.totalTasks}
+                    />
+                  </section>
+                </div>
+
+                {/* WORK PROGRESS & WORKING STATUS ROW */}
+                <div className="dashboard-grid" style={{ marginTop: "16px" }}>
+                  <section className="panel work-progress-panel">
+                    <PanelHeader
+                      title="Work Progress"
+                      action="See All"
+                      onActionClick={() => setActiveTab("Projects")}
+                    />
+                    <div className="work-progress-cards">
+                      {projects.length > 0 ? (
+                        projects.slice(0, 2).map((proj) => {
+                          const projTasks = tasks.filter(
+                            (t) =>
+                              String(t.project?._id || t.project) ===
+                              String(proj._id),
+                          );
+                          const done = projTasks.filter(
+                            (t) => t.status === "completed",
+                          ).length;
+                          const pct =
+                            projTasks.length > 0
+                              ? Math.round((done / projTasks.length) * 100)
+                              : 50;
+
+                          return (
+                            <div
+                              className="work-progress-card"
+                              key={proj._id || proj.name}
+                            >
+                              <span className="work-progress-type">
+                                Ongoing Project
+                              </span>
+                              <strong>{proj.name}</strong>
+                              <div className="progress-bar-wrap">
+                                <div
+                                  className="progress-bar-fill"
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
+                              <small>{pct}% Complete</small>
+                              <div className="work-progress-dates">
+                                <span>Start Date: 10 Jan</span>
+                                <span>End Date: 29 Jan</span>
+                              </div>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="empty-state">No ongoing projects.</div>
+                      )}
+                    </div>
+                  </section>
+
+                  <section className="panel working-status-panel">
+                    <PanelHeader
+                      title="Working Status"
+                      helper="Active team capacity"
+                      hideMenu={true}
+                    />
+                    <div className="working-status-ring-container">
                       <div
-                        className={`status-card ${item.color}`}
-                        key={item.label}
-                        onClick={() => openStatusTab(item.statusKey)}
-                        title={`Click to view all ${item.label} tasks`}
-                        role="button"
-                        tabIndex="0"
+                        className="working-status-ring"
+                        style={{
+                          background: `conic-gradient(#6366f1 0% ${dashboard.utilization}%, var(--soft-border) ${dashboard.utilization}% 100%)`,
+                        }}
                       >
-                        <span>{item.label}</span>
-                        <strong>{item.percent}%</strong>
-                        <div>
-                          <i style={{ width: `${item.percent}%` }} />
+                        <div className="working-status-center">
+                          <strong>{dashboard.utilization}%</strong>
+                          <span>Member Working</span>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </section>
+                    </div>
+                  </section>
+                </div>
 
-                <section className="panel priority-panel">
-                  <PanelHeader
-                    title="Task Priority"
-                    helper="Distribution by priority level"
-                    hideMenu={true}
-                  />
-                  <PriorityDonut
-                    priority={dashboard.priority}
-                    total={dashboard.totalTasks}
-                  />
-                </section>
-              </div>
-
-              {/* WORK PROGRESS & WORKING STATUS ROW */}
-              <div className="dashboard-grid" style={{ marginTop: "16px" }}>
-                <section className="panel work-progress-panel">
-                  <PanelHeader
-                    title="Work Progress"
-                    action="See All"
-                    onActionClick={() => setActiveTab("Projects")}
-                  />
-                  <div className="work-progress-cards">
-                    {projects.length > 0 ? (
-                      projects.slice(0, 2).map((proj) => {
-                        const projTasks = tasks.filter(
-                          (t) =>
-                            String(t.project?._id || t.project) ===
-                            String(proj._id),
-                        );
-                        const done = projTasks.filter(
-                          (t) => t.status === "completed",
-                        ).length;
-                        const pct =
-                          projTasks.length > 0
-                            ? Math.round((done / projTasks.length) * 100)
-                            : 50;
-
-                        return (
-                          <div
-                            className="work-progress-card"
-                            key={proj._id || proj.name}
-                          >
-                            <span className="work-progress-type">
-                              Ongoing Project
-                            </span>
-                            <strong>{proj.name}</strong>
-                            <div className="progress-bar-wrap">
-                              <div
-                                className="progress-bar-fill"
-                                style={{ width: `${pct}%` }}
-                              />
-                            </div>
-                            <small>{pct}% Complete</small>
-                            <div className="work-progress-dates">
-                              <span>Start Date: 10 Jan</span>
-                              <span>End Date: 29 Jan</span>
-                            </div>
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <div className="empty-state">No ongoing projects.</div>
-                    )}
-                  </div>
-                </section>
-
-                <section className="panel working-status-panel">
-                  <PanelHeader
-                    title="Working Status"
-                    helper="Active team capacity"
-                    hideMenu={true}
-                  />
-                  <div className="working-status-ring-container">
-                    <div
-                      className="working-status-ring"
-                      style={{
-                        background: `conic-gradient(#6366f1 0% ${dashboard.utilization}%, var(--soft-border) ${dashboard.utilization}% 100%)`,
-                      }}
-                    >
-                      <div className="working-status-center">
-                        <strong>{dashboard.utilization}%</strong>
-                        <span>Member Working</span>
+                {/* THIRD ROW: TEAM WORKLOAD */}
+                <div className="dashboard-grid bottom-grid">
+                  <section className="panel workload-panel full-width-panel">
+                    <PanelHeader
+                      title="Team Workload"
+                      action="See All"
+                      onActionClick={() => setActiveTab("Team Members")}
+                    />
+                    <div className="workload-table">
+                      <div className="workload-head">
+                        <span>Name</span>
+                        <span>Active work</span>
+                        <span>Overdue</span>
+                        <span>Status</span>
                       </div>
-                    </div>
-                  </div>
-                </section>
-              </div>
 
-              {/* THIRD ROW: TEAM WORKLOAD */}
-              <div className="dashboard-grid bottom-grid">
-                <section className="panel workload-panel full-width-panel">
+                      {loading ? (
+                        <LoadingRows />
+                      ) : workloadRows.length ? (
+                        workloadRows.map((row) => (
+                          <div className="workload-row" key={row.name}>
+                            <div className="person-cell">
+                              <div className="person-avatar">
+                                {getInitials(row.name)}
+                              </div>
+                              <div>
+                                <strong>{row.name}</strong>
+                                <small>{row.role}</small>
+                              </div>
+                            </div>
+                            <span data-label="Active work">{row.active}</span>
+                            <span data-label="Overdue">{row.overdue}</span>
+                            <span
+                              className={`workload-status ${row.tone}`}
+                              data-label="Status"
+                            >
+                              {row.status}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="empty-state">No workload data yet.</div>
+                      )}
+                    </div>
+                  </section>
+                </div>
+
+                {/* FOURTH ROW: RECENT TASKS PANEL */}
+                <section className="panel task-panel">
                   <PanelHeader
-                    title="Team Workload"
+                    title="Recent Tasks"
                     action="See All"
-                    onActionClick={() => setActiveTab("Team Members")}
+                    onActionClick={() => setActiveTab("Tasks")}
+                    helper="Live from your backend task list"
                   />
-                  <div className="workload-table">
-                    <div className="workload-head">
-                      <span>Name</span>
-                      <span>Active work</span>
-                      <span>Overdue</span>
-                      <span>Status</span>
-                    </div>
-
+                  <div className="task-list">
                     {loading ? (
                       <LoadingRows />
-                    ) : workloadRows.length ? (
-                      workloadRows.map((row) => (
-                        <div className="workload-row" key={row.name}>
-                          <div className="person-cell">
-                            <div className="person-avatar">
-                              {getInitials(row.name)}
-                            </div>
-                            <div>
-                              <strong>{row.name}</strong>
-                              <small>{row.role}</small>
-                            </div>
-                          </div>
-                          <span>{row.active}</span>
-                          <span>{row.overdue}</span>
-                          <span className={`workload-status ${row.tone}`}>
-                            {row.status}
-                          </span>
-                        </div>
-                      ))
+                    ) : visibleTasks.length ? (
+                      visibleTasks
+                        .slice(0, 6)
+                        .map((task) => (
+                          <TaskRow
+                            task={task}
+                            key={task._id || task.id || task.title}
+                            onStatusClick={(st) => openStatusTab(st || "all")}
+                          />
+                        ))
                     ) : (
-                      <div className="empty-state">No workload data yet.</div>
+                      <div className="empty-state">
+                        {search
+                          ? "No tasks match your search."
+                          : "No tasks found yet."}
+                      </div>
                     )}
                   </div>
                 </section>
-              </div>
+              </>
+            )}
 
-              {/* FOURTH ROW: RECENT TASKS PANEL */}
-              <section className="panel task-panel">
-                <PanelHeader
-                  title="Recent Tasks"
-                  action="See All"
-                  onActionClick={() => setActiveTab("Tasks")}
-                  helper="Live from your backend task list"
-                />
-                <div className="task-list">
-                  {loading ? (
-                    <LoadingRows />
-                  ) : visibleTasks.length ? (
-                    visibleTasks
-                      .slice(0, 6)
-                      .map((task) => (
-                        <TaskRow
-                          task={task}
-                          key={task._id || task.id || task.title}
-                          onStatusClick={(st) => openStatusTab(st || "all")}
-                        />
-                      ))
-                  ) : (
-                    <div className="empty-state">
-                      {search
-                        ? "No tasks match your search."
-                        : "No tasks found yet."}
-                    </div>
-                  )}
-                </div>
-              </section>
-            </>
-          )}
+            {activeTab === "Tasks" && (
+              <Tasks
+                user={user}
+                onTaskAssigned={loadDashboard}
+                initialStatusFilter={taskStatusFilter}
+              />
+            )}
 
-          {activeTab === "Tasks" && (
-            <Tasks
-              user={user}
-              onTaskAssigned={loadDashboard}
-              initialStatusFilter={taskStatusFilter}
-            />
-          )}
+            {activeTab === "Projects" && (
+              <Projects search={search} userRole={userRole} />
+            )}
 
-          {activeTab === "Projects" && (
-            <Projects search={search} userRole={userRole} />
-          )}
+            {activeTab === "Analytics" && isAdmin && (
+              <Analytics
+                stats={{
+                  total: dashboard.totalTasks,
+                  completed: dashboard.completed,
+                  remaining: dashboard.inProgress + dashboard.pending,
+                }}
+                userRole={userRole}
+              />
+            )}
+            {activeTab === "Calendar" && (
+              <CalendarView
+                user={user}
+                userName={displayName}
+                userRole={userRole}
+              />
+            )}
 
-          {activeTab === "Analytics" && isAdmin && (
-            <Analytics
-              stats={{
-                total: dashboard.totalTasks,
-                completed: dashboard.completed,
-                remaining: dashboard.inProgress + dashboard.pending,
-              }}
-              userRole={userRole}
-            />
-          )}
-          {activeTab === "Calendar" && (
-            <CalendarView
-              user={user}
-              userName={displayName}
-              userRole={userRole}
-            />
-          )}
+            {activeTab === "Team Members" && <TeamMembers search={search} />}
 
-          {activeTab === "Team Members" && <TeamMembers search={search} />}
-
-          {activeTab === "Reports" && isAdmin && (
-            <Reports userRole={userRole} />
-          )}
-          {activeTab === "Settings" && (
-            <Settings
-              user={user}
-              userName={displayName}
-              userRole={userRole}
-              theme={theme}
-              onThemeChange={setTheme}
-              fontSize={fontSize}
-              onFontSizeChange={setFontSize}
-              onWorkspaceNameChange={() => {}}
-              onProfileNameChange={(newName) => setDisplayName(newName)}
-            />
-          )}
-          {activeTab === "Notifications" && (
-            <Notification
-              onUnreadChange={() => {}}
-              notificationToOpen={notificationToOpen}
-              onNotificationOpened={() => setNotificationToOpen(null)}
-            />
-          )}
+            {activeTab === "Reports" && isAdmin && (
+              <Reports userRole={userRole} />
+            )}
+            {activeTab === "Settings" && (
+              <Settings
+                user={user}
+                userName={displayName}
+                userRole={userRole}
+                theme={theme}
+                onThemeChange={setTheme}
+                fontSize={fontSize}
+                onFontSizeChange={setFontSize}
+                onWorkspaceNameChange={() => { }}
+                onProfileNameChange={(newName) => setDisplayName(newName)}
+              />
+            )}
+            {activeTab === "Notifications" && (
+              <Notification
+                onUnreadChange={() => { }}
+                notificationToOpen={notificationToOpen}
+                onNotificationOpened={() => setNotificationToOpen(null)}
+              />
+            )}
           </div>
         </main>
       </div>
