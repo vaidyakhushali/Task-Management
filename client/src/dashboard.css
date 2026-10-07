@@ -620,7 +620,6 @@
   width: 140px;
   height: 140px;
   border-radius: 50%;
-  background: conic-gradient(#6366f1 0% 70%, var(--soft-border) 70% 100%);
   display: flex;
   align-items: center;
   justify-content: center;

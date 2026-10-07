@@ -623,7 +623,12 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
                     hideMenu={true}
                   />
                   <div className="working-status-ring-container">
-                    <div className="working-status-ring">
+                    <div
+                      className="working-status-ring"
+                      style={{
+                        background: `conic-gradient(#6366f1 0% ${dashboard.utilization}%, var(--soft-border) ${dashboard.utilization}% 100%)`,
+                      }}
+                    >
                       <div className="working-status-center">
                         <strong>{dashboard.utilization}%</strong>
                         <span>Member Working</span>
