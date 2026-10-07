@@ -14,7 +14,9 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
+app.get("/", (req, res) => {
+    res.send("Task Management API is running successfully!");
+});
 app.get('/api/health', (req, res) => res.json({ success: true, message: 'API is running' }));
 app.use('/api/users', userRouter);
 app.use('/api/tasks', taskRouter);
