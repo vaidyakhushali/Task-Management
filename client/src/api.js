@@ -1,5 +1,4 @@
-const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+const API_URL = "https://task-management-1-hihk.onrender.com/api";
 export function setAuthToken(token) {
   if (token) {
     localStorage.setItem("taskManagerAuthToken", token);
