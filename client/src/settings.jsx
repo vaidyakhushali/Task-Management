@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   changeAdminPassword,
-  getWorkspaceSettings,
   updateProfile,
-  updateWorkspaceSettings,
 } from "./api";
 import "./settings.css";
 
@@ -15,24 +13,16 @@ function Settings({
   onThemeChange,
   fontSize,
   onFontSizeChange,
-  onWorkspaceNameChange,
   onProfileNameChange,
 }) {
   const email = user?.email || "Not available";
   const username = user?.username || "Not available";
-  const [workspaceName, setWorkspaceName] = useState("Task Manager");
   const [profileName, setProfileName] = useState(userName);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    getWorkspaceSettings()
-      .then((response) => setWorkspaceName(response.data.workspaceName))
-      .catch(() => setError("Unable to load workspace settings"));
-  }, []);
 
   async function saveProfile(event) {
     event.preventDefault();
