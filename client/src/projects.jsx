@@ -176,13 +176,6 @@ function Projects({ search = "", userRole }) {
         <div className="project-board-shell">
           {visibleProjects.map((project, projectIndex) => {
             const memberCount = project.members?.length || 0;
-            const ownerName =
-              project.owner?.fullname ;
-            const teamNames = Array.from(
-              new Set([...(project.members || []), ...(project.assignees || [])]
-              .map((member) => member.fullname || member.username)
-              .filter(Boolean)),
-            );
             const boardTasks = tasks.filter(
               (task) =>
                 String(task.project?._id || task.project) ===
@@ -200,12 +193,6 @@ function Projects({ search = "", userRole }) {
                     <span className="project-board-bullet" />
                     <div className="project-board-title-content">
                       <h3>{project.name}</h3>
-                      <p className="project-board-assignees">
-                        Owner: {ownerName} | Team:{" "}
-                        {teamNames.length
-                          ? teamNames.join(", ")
-                          : "No users assigned"}
-                      </p>
                     </div>
                   </div>
                   <div className="project-board-actions">

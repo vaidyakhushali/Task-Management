@@ -815,6 +815,130 @@
     gap: 12px;
   }
 }
+
+@media (max-width: 640px) {
+  .tasks-page-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .role-indicator {
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .card-header h2 {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .card-header p,
+  .form-field label {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    min-width: 0;
+    min-height: 42px;
+    font-size: 16px;
+  }
+
+  .form-field textarea {
+    min-height: 76px;
+  }
+
+  .form-actions .btn-primary {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .search-filter-box {
+    width: 100%;
+  }
+
+  .status-tabs {
+    gap: 4px;
+  }
+
+  .tab-btn {
+    padding: 8px 10px;
+    font-size: 0.78rem;
+  }
+
+  .table-wrapper {
+    overflow: visible;
+  }
+
+  .image3-task-table,
+  .image3-task-table tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .image3-task-table thead {
+    display: none;
+  }
+
+  .image3-task-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 12px;
+    margin-bottom: 12px;
+    padding: 14px;
+    border: 1px solid var(--soft-border);
+    border-radius: var(--radius-md);
+    background: var(--card-bg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .image3-task-table tbody td {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    padding: 0;
+    border: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .image3-task-table tbody td::before {
+    content: attr(data-label);
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .image3-task-table tbody td.title-cell {
+    grid-column: 1 / -1;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--soft-border);
+  }
+
+  .image3-task-table tbody td.title-cell::before {
+    content: none;
+  }
+
+  .image3-task-table .title-cell strong {
+    font-size: 0.95rem;
+    overflow-wrap: anywhere;
+  }
+
+  .image3-task-table .title-cell small {
+    line-height: 1.45;
+  }
+
+  .image3-task-table .status-select,
+  .image3-task-table .btn-delete-task {
+    max-width: 100%;
+    min-height: 38px;
+    font-size: 0.78rem;
+  }
+}
 /* =========================================================
    ADMIN DELETE TASK BUTTON
 ========================================================= */

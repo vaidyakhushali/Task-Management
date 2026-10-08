@@ -192,31 +192,51 @@ function Notification({
               X
             </button>
             <div className="notification-modal-heading">
-              <p className="dashboard-label">Task assignment</p>
+              <p className="dashboard-label">
+                {activeNotification.type === "chat"
+                  ? "Chat message"
+                  : "Task assignment"}
+              </p>
               <h2 id="notification-detail-title">
                 {activeNotification.task?.title || activeNotification.title}
               </h2>
             </div>
-            <dl className="notification-detail-list">
-              <div>
-                <dt>Assigned by</dt>
-                <dd>
-                  {activeNotification.actor?.fullname || "Workspace member"} (
-                  {activeNotification.actor?.role || "User"})
-                </dd>
-              </div>
-              <div>
-                <dt>Status</dt>
-                <dd>{activeNotification.task?.status || "Assigned"}</dd>
-              </div>
-              <div>
-                <dt>Description</dt>
-                <dd>
-                  {activeNotification.task?.description ||
-                    "No description was added."}
-                </dd>
-              </div>
-            </dl>
+            {activeNotification.type === "chat" ? (
+              <dl className="notification-detail-list">
+                <div>
+                  <dt>From</dt>
+                  <dd>
+                    {activeNotification.actor?.fullname || "Workspace member"} (
+                    {activeNotification.actor?.role || "User"})
+                  </dd>
+                </div>
+                <div>
+                  <dt>Message</dt>
+                  <dd>{activeNotification.message}</dd>
+                </div>
+              </dl>
+            ) : (
+              <dl className="notification-detail-list">
+                <div>
+                  <dt>Assigned by</dt>
+                  <dd>
+                    {activeNotification.actor?.fullname || "Workspace member"} (
+                    {activeNotification.actor?.role || "User"})
+                  </dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>{activeNotification.task?.status || "Assigned"}</dd>
+                </div>
+                <div>
+                  <dt>Description</dt>
+                  <dd>
+                    {activeNotification.task?.description ||
+                      "No description was added."}
+                  </dd>
+                </div>
+              </dl>
+            )}
           </section>
         </div>
       )}

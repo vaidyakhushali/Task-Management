@@ -1092,7 +1092,7 @@ function Tasks({
 
                         {/* TITLE */}
 
-                        <td className="title-cell">
+                        <td className="title-cell" data-label="Task">
 
                           <strong>
                             {t.title}
@@ -1119,7 +1119,7 @@ function Tasks({
 
                         {/* ASSIGNEE */}
 
-                        <td>
+                        <td data-label="Assignee">
 
                           <span className="user-badge">
                             {
@@ -1131,7 +1131,7 @@ function Tasks({
 
                         {/* TYPE */}
 
-                        <td>
+                        <td data-label="Type">
 
                           <span
                             className={`pill-badge ${taskTypeClass}`}
@@ -1145,7 +1145,7 @@ function Tasks({
 
                         {/* PRIORITY */}
 
-                        <td>
+                        <td data-label="Priority">
 
                           <span
                             className={`pill-badge ${priorityClass}`}
@@ -1161,7 +1161,7 @@ function Tasks({
 
                         {/* STATUS */}
 
-                        <td>
+                        <td data-label="Status">
 
                           <span
                             className={`pill-badge ${statusClass}`}
@@ -1175,7 +1175,7 @@ function Tasks({
 
                         {/* START DATE */}
 
-                        <td>
+                        <td data-label="Start date">
 
                           <span className="pill-badge pill-timeline">
                             📅{" "}
@@ -1188,7 +1188,7 @@ function Tasks({
 
                         {/* DUE DATE */}
 
-                        <td>
+                        <td data-label="Due date">
 
                           <span className="pill-badge pill-timeline">
                             📅{" "}
@@ -1201,7 +1201,7 @@ function Tasks({
 
                         {/* UPDATE STATUS */}
 
-                        <td>
+                        <td data-label="Update status">
 
                           <select
                             className="status-select"
@@ -1240,7 +1240,7 @@ function Tasks({
                         {/* DELETE - ADMIN ONLY */}
 
                         {isAdmin && (
-                          <td>
+                          <td data-label="Actions">
 
                             <button
                               type="button"

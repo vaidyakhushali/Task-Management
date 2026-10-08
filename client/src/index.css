@@ -91,6 +91,11 @@
   color: var(--text-dark) !important;
 }
 
+[data-theme="dark"] .notification-button {
+  background: var(--card-bg) !important;
+  color: var(--warm-peach) !important;
+}
+
 [data-theme="dark"] input,
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
@@ -567,4 +572,3 @@ button {
   color: var(--terracotta-dark);
   box-shadow: var(--shadow-sm);
 }
-
