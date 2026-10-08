@@ -19,8 +19,8 @@ function Tasks({
   const isAdmin =
     user?.role === "Admin";
 
-   // TASK STATES
-  
+  // TASK STATES
+
   const [tasks, setTasks] = useState([]);
 
   const [assignableUsers, setAssignableUsers] =
@@ -36,7 +36,7 @@ function Tasks({
     useState("");
 
   // CREATE TASK FORM
-  
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -51,18 +51,18 @@ function Tasks({
     useState(false);
 
   // FILTERS
-  
+
   const [statusFilter, setStatusFilter] =
     useState(initialStatusFilter);
 
   const [searchQuery, setSearchQuery] =
     useState("");
 
-    // VIEW MODE
+  // VIEW MODE
 
   const [viewMode, setViewMode] =
     useState("list");
- 
+
   // UPDATE FILTER WHEN PROP CHANGES
 
   useEffect(() => {
@@ -88,7 +88,7 @@ function Tasks({
     } catch (err) {
       setError(
         err.message ||
-          "Failed to fetch tasks."
+        "Failed to fetch tasks."
       );
     } finally {
       setLoading(false);
@@ -101,15 +101,15 @@ function Tasks({
     try {
       const res = await getAssignableUsers();
 
-      const usersList =  Array.isArray(res?.data)  ? res.data : [];
+      const usersList = Array.isArray(res?.data) ? res.data : [];
 
-      const filteredUsers =  usersList.filter(
-          (u) =>
-            (u._id || u.id) !==
-              (user?._id ||
-                user?.id) &&
-            u.email !== user?.email
-        );
+      const filteredUsers = usersList.filter(
+        (u) =>
+          (u._id || u.id) !==
+          (user?._id ||
+            user?.id) &&
+          u.email !== user?.email
+      );
 
       setAssignableUsers(
         filteredUsers
@@ -253,13 +253,13 @@ function Tasks({
       } else {
         setError(
           res?.message ||
-            "Failed to create task."
+          "Failed to create task."
         );
       }
     } catch (err) {
       setError(
         err.message ||
-          "Failed to create task."
+        "Failed to create task."
       );
     } finally {
       setIsSubmitting(false);
@@ -281,28 +281,28 @@ function Tasks({
         prevTasks.map((task) =>
           task._id === taskId
             ? {
-                ...task,
+              ...task,
 
-                status:
-                  newStatus,
+              status:
+                newStatus,
 
-                completed:
-                  newStatus ===
-                  "completed",
-              }
+              completed:
+                newStatus ===
+                "completed",
+            }
             : task
         )
       );
     } catch (err) {
       alert(
         err.message ||
-          "Failed to update task status."
+        "Failed to update task status."
       );
     }
   }
 
   // DELETE TASK - ADMIN ONLY
-  
+
   async function handleDeleteTask(
     taskId
   ) {
@@ -344,13 +344,13 @@ function Tasks({
       } else {
         setError(
           res?.message ||
-            "Failed to delete task."
+          "Failed to delete task."
         );
       }
     } catch (err) {
       setError(
         err.message ||
-          "Failed to delete task."
+        "Failed to delete task."
       );
     }
   }
@@ -362,7 +362,7 @@ function Tasks({
       const matchesStatus =
         statusFilter === "all" ||
         task.status ===
-          statusFilter;
+        statusFilter;
 
       const query =
         searchQuery
@@ -429,8 +429,8 @@ function Tasks({
       (task.priority === "high"
         ? "Internal"
         : task.priority === "low"
-        ? "Payment"
-        : "Standard")
+          ? "Payment"
+          : "Standard")
     );
   }
 
@@ -616,11 +616,11 @@ function Tasks({
 
                 {assignableUsers.length ===
                   0 && (
-                  <option value="">
-                    No other team
-                    members found
-                  </option>
-                )}
+                    <option value="">
+                      No other team
+                      members found
+                    </option>
+                  )}
 
                 {assignableUsers.map(
                   (u) => (
@@ -807,7 +807,7 @@ function Tasks({
           className="tasks-toolbar"
           style={{
             display: "flex",
-            justifyContent:"space-between",
+            justifyContent: "space-between",
             alignItems: "center",
             flexWrap: "wrap",
             gap: "12px",
@@ -819,22 +819,21 @@ function Tasks({
           <div className="search-filter-box">
 
             <input type="text" placeholder="Search tasks or assignees..."
-              value={ searchQuery
+              value={searchQuery
               }
               onChange={
-                (e) => setSearchQuery( e.target.value)
+                (e) => setSearchQuery(e.target.value)
               }
               className="search-input"
             />
             <div className="status-tabs">
               <button
                 type="button"
-                className={`tab-btn ${
-                  statusFilter ===
+                className={`tab-btn ${statusFilter ===
                   "all"
-                    ? "active"
-                    : ""
-                }`}
+                  ? "active"
+                  : ""
+                  }`}
                 onClick={() =>
                   setStatusFilter(
                     "all"
@@ -848,15 +847,14 @@ function Tasks({
 
               <button
                 type="button"
-                className={`tab-btn ${
-                  statusFilter ===
+                className={`tab-btn ${statusFilter ===
                   "pending"
-                    ? "active"
-                    : ""
-                }`}
-                onClick={() =>  setStatusFilter(
-                    "pending"
-                  )
+                  ? "active"
+                  : ""
+                  }`}
+                onClick={() => setStatusFilter(
+                  "pending"
+                )
                 }
               >
                 Pending
@@ -864,12 +862,11 @@ function Tasks({
 
               <button
                 type="button"
-                className={`tab-btn ${
-                  statusFilter ===
+                className={`tab-btn ${statusFilter ===
                   "in-progress"
-                    ? "active"
-                    : ""
-                }`}
+                  ? "active"
+                  : ""
+                  }`}
                 onClick={() =>
                   setStatusFilter(
                     "in-progress"
@@ -881,12 +878,11 @@ function Tasks({
 
               <button
                 type="button"
-                className={`tab-btn ${
-                  statusFilter ===
+                className={`tab-btn ${statusFilter ===
                   "completed"
-                    ? "active"
-                    : ""
-                }`}
+                  ? "active"
+                  : ""
+                  }`}
                 onClick={() =>
                   setStatusFilter(
                     "completed"
@@ -906,12 +902,11 @@ function Tasks({
 
             <button
               type="button"
-              className={`view-mode-btn ${
-                viewMode ===
+              className={`view-mode-btn ${viewMode ===
                 "list"
-                  ? "active"
-                  : ""
-              }`}
+                ? "active"
+                : ""
+                }`}
               onClick={() =>
                 setViewMode(
                   "list"
@@ -923,12 +918,11 @@ function Tasks({
 
             <button
               type="button"
-              className={`view-mode-btn ${
-                viewMode ===
+              className={`view-mode-btn ${viewMode ===
                 "kanban"
-                  ? "active"
-                  : ""
-              }`}
+                ? "active"
+                : ""
+                }`}
               onClick={() =>
                 setViewMode(
                   "kanban"
@@ -940,12 +934,11 @@ function Tasks({
 
             <button
               type="button"
-              className={`view-mode-btn ${
-                viewMode ===
+              className={`view-mode-btn ${viewMode ===
                 "grid"
-                  ? "active"
-                  : ""
-              }`}
+                ? "active"
+                : ""
+                }`}
               onClick={() =>
                 setViewMode(
                   "grid"
@@ -1076,18 +1069,16 @@ function Tasks({
                       );
 
                     const priorityClass =
-                      `pill-priority-${
-                        t.priority ||
-                        "medium"
+                      `pill-priority-${t.priority ||
+                      "medium"
                       }`;
 
                     const statusClass =
-                      `pill-status-${
-                        t.status ===
+                      `pill-status-${t.status ===
                         "in-progress"
-                          ? "in-progress"
-                          : t.status ||
-                            "pending"
+                        ? "in-progress"
+                        : t.status ||
+                        "pending"
                       }`;
 
                     return (
@@ -1260,7 +1251,13 @@ function Tasks({
                                 )
                               }
                             >
-                              🗑️ Delete
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 3h6" />
+                                <path d="M4 6h16" />
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                <line x1="10" y1="11" x2="10" y2="17" />
+                                <line x1="14" y1="11" x2="14" y2="17" />
+                              </svg> Delete
                             </button>
 
                           </td>
@@ -1357,7 +1354,7 @@ function Tasks({
                     <div className="kanban-cards-list">
 
                       {colTasks.length ===
-                      0 ? (
+                        0 ? (
 
                         <div
                           className="empty-tasks-state"
@@ -1395,9 +1392,8 @@ function Tasks({
                               );
 
                             const priorityClass =
-                              `pill-priority-${
-                                t.priority ||
-                                "medium"
+                              `pill-priority-${t.priority ||
+                              "medium"
                               }`;
 
                             return (
@@ -1416,7 +1412,7 @@ function Tasks({
                                   e.dataTransfer.setData(
                                     "taskId",
                                     t._id ||
-                                      t.id
+                                    t.id
                                   );
 
                                   e.dataTransfer.effectAllowed =
@@ -1561,7 +1557,13 @@ function Tasks({
                                         }
                                         title="Delete Task"
                                       >
-                                        🗑️
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                          <path d="M9 3h6" />
+                                          <path d="M4 6h16" />
+                                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                          <line x1="10" y1="11" x2="10" y2="17" />
+                                          <line x1="14" y1="11" x2="14" y2="17" />
+                                        </svg>
                                       </button>
                                     )}
 
@@ -1616,18 +1618,16 @@ function Tasks({
                   );
 
                 const priorityClass =
-                  `pill-priority-${
-                    t.priority ||
-                    "medium"
+                  `pill-priority-${t.priority ||
+                  "medium"
                   }`;
 
                 const statusClass =
-                  `pill-status-${
-                    t.status ===
+                  `pill-status-${t.status ===
                     "in-progress"
-                      ? "in-progress"
-                      : t.status ||
-                        "pending"
+                    ? "in-progress"
+                    : t.status ||
+                    "pending"
                   }`;
 
                 return (
@@ -1770,7 +1770,13 @@ function Tasks({
                             }
                             title="Delete Task"
                           >
-                            🗑️
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M9 3h6" />
+                              <path d="M4 6h16" />
+                              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                              <line x1="10" y1="11" x2="10" y2="17" />
+                              <line x1="14" y1="11" x2="14" y2="17" />
+                            </svg>
                           </button>
                         )}
 
