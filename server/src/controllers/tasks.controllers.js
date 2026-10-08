@@ -12,6 +12,12 @@ function taskResponse(task) {
     return task.toObject ? task.toObject() : task;
 }
 
+function parseHours(value) {
+    if (value === undefined || value === null || value === "") return null;
+    const hours = Number(value);
+    return Number.isFinite(hours) && hours >= 0 ? hours : NaN;
+}
+
 export async function listTasks(req, res) {
     const query = { deletedAt: null };
     if (req.user.role !== "Admin") {
@@ -132,6 +138,11 @@ export async function createTask(req, res) {
         );
     }
 
+    const hours = parseHours(req.body.hours);
+    if (Number.isNaN(hours)) {
+        return sendError(res, 400, "Hours must be a non-negative number");
+    }
+
     let projectId = null;
     if (req.body.project) {
         if (!mongoose.isValidObjectId(req.body.project)) {
@@ -190,6 +201,8 @@ export async function createTask(req, res) {
         startDate,
 
         dueDate,
+
+        hours,
 
         creator:
             req.user._id,
@@ -252,6 +265,14 @@ export async function updateTask(req, res) {
         updates.title = req.body.title.trim();
     if (typeof req.body.description === "string")
         updates.description = req.body.description;
+
+    if (req.body.hours !== undefined) {
+        const hours = parseHours(req.body.hours);
+        if (Number.isNaN(hours)) {
+            return sendError(res, 400, "Hours must be a non-negative number");
+        }
+        updates.hours = hours;
+    }
 
     if (req.body.status) {
         const statusMap = {

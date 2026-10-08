@@ -59,6 +59,11 @@ const taskSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    hours: {
+      type: Number,
+      min: 0,
+      default: null,
+    },
     deletedAt: {
       type: Date,
       default: null,

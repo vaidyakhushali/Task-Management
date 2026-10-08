@@ -237,6 +237,7 @@
 }
 
 .project-task-name span {
+	display: block;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -283,6 +284,10 @@
 	gap: 8px;
 	padding: 14px 20px 18px;
 	overflow-x: auto;
+}
+
+.project-task-form-with-hours {
+	grid-template-columns: 1.4fr 1fr 1fr .8fr 1fr 1fr 1fr .8fr auto;
 }
 
 .project-empty,

@@ -98,6 +98,10 @@ function Projects({ search = "", userRole }) {
         cost: draft.cost || 0,
         startDate: draft.startDate || null,
         dueDate: draft.dueDate || null,
+        hours:
+          draft.startDate && draft.startDate === draft.dueDate
+            ? draft.hours || null
+            : null,
       });
       setTasks((current) => [response.data, ...current]);
       setTaskDrafts((current) => ({ ...current, [project._id]: {} }));
@@ -274,7 +278,11 @@ function Projects({ search = "", userRole }) {
                 )}
                 {userRole !== "User" && (
                   <form
-                    className="project-task-form"
+                    className={`project-task-form ${
+                      draft.startDate && draft.startDate === draft.dueDate
+                        ? "project-task-form-with-hours"
+                        : ""
+                    }`}
                     onSubmit={(event) => handleTaskSubmit(event, project)}
                   >
                     <input
@@ -358,11 +366,21 @@ function Projects({ search = "", userRole }) {
                       type="date"
                       value={draft.startDate || ""}
                       onChange={(event) =>
-                        updateTaskDraft(
-                          project._id,
-                          "startDate",
-                          event.target.value,
-                        )
+                        setTaskDrafts((current) => {
+                          const currentDraft = current[project._id] || {};
+                          const startDate = event.target.value;
+                          return {
+                            ...current,
+                            [project._id]: {
+                              ...currentDraft,
+                              startDate,
+                              hours:
+                                startDate === currentDraft.dueDate
+                                  ? currentDraft.hours
+                                  : "",
+                            },
+                          };
+                        })
                       }
                       aria-label={`Start date for ${project.name}`}
                       title="Start date"
@@ -371,15 +389,43 @@ function Projects({ search = "", userRole }) {
                       type="date"
                       value={draft.dueDate || ""}
                       onChange={(event) =>
-                        updateTaskDraft(
-                          project._id,
-                          "dueDate",
-                          event.target.value,
-                        )
+                        setTaskDrafts((current) => {
+                          const currentDraft = current[project._id] || {};
+                          const dueDate = event.target.value;
+                          return {
+                            ...current,
+                            [project._id]: {
+                              ...currentDraft,
+                              dueDate,
+                              hours:
+                                dueDate === currentDraft.startDate
+                                  ? currentDraft.hours
+                                  : "",
+                            },
+                          };
+                        })
                       }
                       aria-label={`Due date for ${project.name}`}
                       title="Due date"
                     />
+                    {draft.startDate &&
+                      draft.startDate === draft.dueDate && (
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.5"
+                          value={draft.hours || ""}
+                          onChange={(event) =>
+                            updateTaskDraft(
+                              project._id,
+                              "hours",
+                              event.target.value,
+                            )
+                          }
+                          placeholder="Hours"
+                          aria-label={`Hours for ${project.name}`}
+                        />
+                      )}
                     <button type="submit" className="project-add-task">
                       Add Task
                     </button>

@@ -45,6 +45,7 @@ function Tasks({
     status: "pending",
     startDate: "",
     dueDate: "",
+    hours: "",
   });
 
   const [isSubmitting, setIsSubmitting] =
@@ -223,6 +224,11 @@ function Tasks({
 
           dueDate:
             formData.dueDate,
+
+          hours:
+            formData.startDate === formData.dueDate
+              ? formData.hours || null
+              : null,
         });
 
       if (res?.success) {
@@ -243,6 +249,7 @@ function Tasks({
           status: "pending",
           startDate: "",
           dueDate: "",
+          hours: "",
         });
 
         await fetchTasks();
@@ -506,7 +513,10 @@ function Tasks({
           <div className="card-header">
 
             <h2>
-              ➕ Assign New Task to Team Member
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <line x1="12" y1="5" x2="12" y2="19" />
+  <line x1="5" y1="12" x2="19" y2="12" />
+</svg> Assign New Task to Team Member
             </h2>
 
             <p>
@@ -739,11 +749,14 @@ function Tasks({
                   formData.startDate
                 }
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    startDate:
-                      e.target.value,
-                  })
+                  setFormData((prev) => ({
+                    ...prev,
+                    startDate: e.target.value,
+                    hours:
+                      e.target.value === prev.dueDate
+                        ? prev.hours
+                        : "",
+                  }))
                 }
                 required
               />
@@ -769,16 +782,42 @@ function Tasks({
                   formData.dueDate
                 }
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    dueDate:
-                      e.target.value,
-                  })
+                  setFormData((prev) => ({
+                    ...prev,
+                    dueDate: e.target.value,
+                    hours:
+                      e.target.value === prev.startDate
+                        ? prev.hours
+                        : "",
+                  }))
                 }
                 required
               />
 
             </div>
+
+            {formData.startDate &&
+              formData.startDate === formData.dueDate && (
+                <div className="form-field">
+                  <label htmlFor="task-hours">
+                    Hours
+                  </label>
+                  <input
+                    id="task-hours"
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={formData.hours}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        hours: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter hours"
+                  />
+                </div>
+              )}
 
             {/* SUBMIT */}
 
