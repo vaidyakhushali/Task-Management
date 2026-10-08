@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import {
   getTasks,
@@ -71,16 +71,6 @@ function Tasks({
     }
   }, [initialStatusFilter]);
 
-  // FETCH TASKS
-
-  useEffect(() => {
-  fetchTasks();
-
-  if (isAdmin) {
-    fetchUsers();
-  }
-// eslint-disable-next-line react-hooks/exhaustive-deps
-}, [user, isAdmin]);
   // GET TASKS
 
   async function fetchTasks() {
@@ -107,7 +97,7 @@ function Tasks({
 
   // GET ASSIGNABLE USERS
 
-  async function fetchUsers() {
+  const fetchUsers = useCallback(async () => {
     try {
       const res = await getAssignableUsers();
 
@@ -125,17 +115,19 @@ function Tasks({
         filteredUsers
       );
 
-      if (
-        filteredUsers.length > 0 &&
-        !formData.assignedUser
-      ) {
-        setFormData((prev) => ({
-          ...prev,
+      if (filteredUsers.length > 0) {
+        setFormData((prev) => {
+          if (prev.assignedUser) {
+            return prev;
+          }
 
-          assignedUser:
-            filteredUsers[0]._id ||
-            filteredUsers[0].id,
-        }));
+          return {
+            ...prev,
+            assignedUser:
+              filteredUsers[0]._id ||
+              filteredUsers[0].id,
+          };
+        });
       }
     } catch (err) {
       console.error(
@@ -143,7 +135,17 @@ function Tasks({
         err
       );
     }
-  }
+  }, [user]);
+
+  // FETCH TASKS
+
+  useEffect(() => {
+    fetchTasks();
+
+    if (isAdmin) {
+      fetchUsers();
+    }
+  }, [user, isAdmin, fetchUsers]);
 
   // CREATE TASK
 
