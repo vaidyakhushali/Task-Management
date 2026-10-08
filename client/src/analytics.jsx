@@ -44,9 +44,9 @@ function Analytics({
 
     setLoading(true);
     Promise.all([
-      getProjects().catch(() => ({ data: [] })),
-      getAdminTasks().catch(() => ({ data: [] })),
-      getAdminUsers().catch(() => ({ data: [] })),
+      getProjects(),
+      getAdminTasks(),
+      getAdminUsers(),
     ])
       .then(([projRes, taskRes, userRes]) => {
         if (!isMounted) return;
@@ -67,8 +67,7 @@ function Analytics({
   }, [isAdmin]);
 
   // Dynamic Metrics Calculation
-  const totalProjectCount =
-    projects.length || (tasks.length ? Math.ceil(tasks.length / 3) : 0);
+  const totalProjectCount = projects.length;
   const completedTaskCount = tasks.filter(
     (t) => t.status === "completed" || t.completed,
   ).length;
@@ -350,7 +349,7 @@ function Analytics({
       </div>
 
       {/* MIDDLE ROW: OPTION 2 - UPCOMING DEADLINES & PROJECT HEALTH STATUS */}
-      <div className="analytics-grid" style={{ marginTop: "16px" }}>
+      <div className="analytics-grid">
         {/* Left Panel: Upcoming Deadlines */}
         <section className="panel">
           <div className="panel-heading">
@@ -441,172 +440,104 @@ function Analytics({
               marginTop: "12px",
             }}
           >
-            {projects.length > 0 ? (
-              projects.slice(0, 3).map((proj, idx) => (
-                <div
-                  className="analytics-health-row"
-                  key={proj._id || idx}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "6px",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      fontSize: "13px",
-                      fontWeight: "600",
-                    }}
-                  >
-                    <span className="analytics-health-name" style={{ color: "#1e293b" }}>
-                      {proj.name || proj.title || `Project #${idx + 1}`}
-                    </span>
-                    <span
-                      className={`analytics-health-status ${idx % 2 === 0 ? "on-track" : "at-risk"}`}
-                      style={{
-                        fontSize: "11px",
-                        padding: "2px 8px",
-                        borderRadius: "10px",
-                        backgroundColor: idx % 2 === 0 ? "#dcfce7" : "#fef3c7",
-                        color: idx % 2 === 0 ? "#166534" : "#92400e",
-                      }}
-                    >
-                      {idx % 2 === 0 ? "On Track" : "At Risk"}
-                    </span>
-                  </div>
-                  <div
-                    className="analytics-health-track"
-                    style={{
-                      width: "100%",
-                      height: "8px",
-                      backgroundColor: "#f1f5f9",
-                      borderRadius: "4px",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div
-                      style={{
-                        height: "100%",
-                        width: `${Math.min(100, (idx + 1) * 30)}%`,
-                        backgroundColor: idx % 2 === 0 ? "#10b981" : "#f59e0b",
-                        borderRadius: "4px",
-                      }}
-                    />
-                  </div>
-                </div>
-              ))
-            ) : (
-              <>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "6px",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      fontSize: "13px",
-                      fontWeight: "600",
-                    }}
-                  >
-                    <span style={{ color: "#1e293b" }}>E-Commerce Portal</span>
-                    <span
-                      style={{
-                        fontSize: "11px",
-                        padding: "2px 8px",
-                        borderRadius: "10px",
-                        backgroundColor: "#dcfce7",
-                        color: "#166534",
-                      }}
-                    >
-                      On Track
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      width: "100%",
-                      height: "8px",
-                      backgroundColor: "#f1f5f9",
-                      borderRadius: "4px",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div
-                      style={{
-                        height: "100%",
-                        width: "85%",
-                        backgroundColor: "#10b981",
-                        borderRadius: "4px",
-                      }}
-                    />
-                  </div>
-                </div>
+            {loading ? (
+              <p style={{ color: "#94a3b8", fontSize: "13px", textAlign: "center" }}>
+                Loading projects...
+              </p>
+            ) : projects.length > 0 ? (
+              projects.slice(0, 3).map((proj, idx) => {
+                const projectTasks = tasks.filter(
+                  (task) =>
+                    String(task.project?._id || task.project) ===
+                    String(proj._id),
+                );
+                const completedTasks = projectTasks.filter(
+                  (task) => task.status === "completed" || task.completed,
+                ).length;
+                const progress = projectTasks.length
+                  ? Math.round((completedTasks / projectTasks.length) * 100)
+                  : 0;
 
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "6px",
-                  }}
-                >
+                return (
                   <div
+                    className="analytics-health-row"
+                    key={proj._id || idx}
                     style={{
                       display: "flex",
-                      justifyContent: "space-between",
-                      fontSize: "13px",
-                      fontWeight: "600",
-                    }}
-                  >
-                    <span style={{ color: "#1e293b" }}>
-                      Task Management App
-                    </span>
-                    <span
-                      style={{
-                        fontSize: "11px",
-                        padding: "2px 8px",
-                        borderRadius: "10px",
-                        backgroundColor: "#fef3c7",
-                        color: "#92400e",
-                      }}
-                    >
-                      At Risk
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      width: "100%",
-                      height: "8px",
-                      backgroundColor: "#f1f5f9",
-                      borderRadius: "4px",
-                      overflow: "hidden",
+                      flexDirection: "column",
+                      gap: "6px",
                     }}
                   >
                     <div
                       style={{
-                        height: "100%",
-                        width: "45%",
-                        backgroundColor: "#f59e0b",
-                        borderRadius: "4px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        fontSize: "13px",
+                        fontWeight: "600",
                       }}
-                    />
+                    >
+                      <span
+                        className="analytics-health-name"
+                        style={{ color: "#1e293b" }}
+                      >
+                        {proj.name || proj.title || `Project #${idx + 1}`}
+                      </span>
+                      <span
+                        className="analytics-health-status"
+                        style={{
+                          fontSize: "11px",
+                          padding: "2px 8px",
+                          borderRadius: "10px",
+                          backgroundColor:
+                            progress === 100 ? "#dcfce7" : "#f1f5f9",
+                          color: progress === 100 ? "#166534" : "#475569",
+                        }}
+                      >
+                        {projectTasks.length
+                          ? `${progress}% complete`
+                          : "No tasks"}
+                      </span>
+                    </div>
+                    <div
+                      className="analytics-health-track"
+                      style={{
+                        width: "100%",
+                        height: "8px",
+                        backgroundColor: "#f1f5f9",
+                        borderRadius: "4px",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          height: "100%",
+                          width: `${progress}%`,
+                          backgroundColor:
+                            progress === 100 ? "#10b981" : "#64748b",
+                          borderRadius: "4px",
+                        }}
+                      />
+                    </div>
                   </div>
-                </div>
-              </>
+                );
+              })
+            ) : (
+              <p
+                style={{
+                  color: "#94a3b8",
+                  fontSize: "13px",
+                  textAlign: "center",
+                }}
+              >
+                No projects yet.
+              </p>
             )}
           </div>
         </section>
       </div>
       {/* BOTTOM ROW: TOTAL EMPLOYEE DATA TABLE - ADMIN ONLY */}
       {userRole === "Admin" && (
-        <section
-          className="panel"
-          style={{ marginTop: "16px", overflow: "visible" }}
-        >
+        <section className="panel">
           <div
             className="panel-heading"
             style={{ flexWrap: "wrap", gap: "12px" }}
@@ -647,10 +578,7 @@ function Analytics({
             </div>
           </div>
 
-          <div
-            className="employee-table-wrapper"
-            style={{ overflow: "visible" }}
-          >
+          <div className="employee-table-wrapper">
             <table className="employee-table">
               <thead>
                 <tr>

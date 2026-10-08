@@ -1,20 +1,26 @@
 .projects-page {
 	animation: settings-reveal .35s ease both;
-	background: #07141b;
-	color: #eff5f7;
+	background: linear-gradient(180deg, #fffaf6 0%, #fdf8f4 100%);
+	color: var(--text-dark);
+	border-radius: 20px;
+	padding: 4px 0 0;
 }
 
 .projects-heading {
 	padding-top: 8px;
+	margin-bottom: 18px;
 }
 
 .projects-heading h2 {
-	color: #f4f6f8 !important;
+	color: var(--text-dark);
+	font-size: 2rem !important;
+	line-height: 1.15;
 }
 
 .projects-heading p:last-child {
-	color: #9aa8b4 !important;
+	color: var(--text-muted);
 	font-size: 1.05rem;
+	margin-top: 4px;
 }
 
 .project-count,
@@ -29,10 +35,11 @@
 .project-count {
 	min-height: 34px;
 	padding: 0 14px;
-	background: #f3d7c2;
+	background: linear-gradient(135deg, #f6d9bf, #f0c59d);
 	color: #1f2430;
 	font-size: 0.75rem;
 	white-space: nowrap;
+	box-shadow: 0 8px 20px rgba(240, 197, 157, 0.18);
 }
 
 .project-count strong {
@@ -43,11 +50,12 @@
 .project-create-form,
 .project-board,
 .project-empty,
-.project-error {
-	border: 1px solid rgba(148, 163, 184, 0.22);
+.project-error,
+.project-success {
+	border: 1px solid var(--soft-border);
 	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.02);
-	box-shadow: 0 8px 24px rgba(2, 6, 23, 0.2);
+	background: var(--card-bg);
+	box-shadow: var(--shadow-md);
 }
 
 .project-create-form {
@@ -56,8 +64,8 @@
 	align-items: end;
 	gap: 12px;
 	margin-bottom: 20px;
-	padding: 16px;
-	background: rgba(255, 255, 255, 0.03);
+	padding: 18px 18px 16px;
+	background: #fff;
 }
 
 .project-create-form div {
@@ -66,7 +74,7 @@
 }
 
 .project-create-form label {
-	color: #c9d3dd;
+	color: var(--text-dark);
 	font-size: 0.8rem;
 	font-weight: 600;
 }
@@ -77,17 +85,17 @@
 	min-width: 0;
 	height: 48px;
 	padding: 0 12px;
-	border: 1px solid rgba(148, 163, 184, 0.18);
+	border: 1px solid var(--soft-border);
 	border-radius: 10px;
-	background: #0d171f;
-	color: #ebf3f8;
+	background: #fff;
+	color: var(--text-dark);
 	font: inherit;
 	font-size: 0.82rem;
 }
 
 .project-create-form input::placeholder,
 .project-task-form input::placeholder {
-	color: #93a3b5;
+	color: var(--text-muted);
 }
 
 .project-create-form input:focus,
@@ -96,7 +104,7 @@
 	border-color: rgba(232, 168, 124, 0.8);
 	box-shadow: 0 0 0 3px rgba(232, 168, 124, 0.18);
 	outline: 0;
-	background: #101c26;
+	background: #fff;
 }
 
 .project-create-form button,
@@ -165,6 +173,29 @@
 	color: var(--text-muted);
 	font-size: 0.82rem;
 	font-weight: 700;
+}
+
+.project-board-actions {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex: 0 0 auto;
+}
+
+.project-archive-button {
+	padding: 7px 10px;
+	border: 1px solid var(--soft-border);
+	border-radius: 8px;
+	background: var(--card-bg);
+	color: #a94e42;
+	font: inherit;
+	font-size: 0.72rem;
+	font-weight: 700;
+}
+
+.project-archive-button:hover {
+	background: #fff1ef;
+	border-color: #e8b2a9;
 }
 
 .project-board-grid {
@@ -255,7 +286,8 @@
 }
 
 .project-empty,
-.project-error {
+.project-error,
+.project-success {
 	padding: 20px;
 	color: var(--text-muted);
 	font-size: 0.85rem;
@@ -268,6 +300,55 @@
 	background: #fff1f2;
 	color: #b42318;
 	text-align: left;
+}
+
+.project-success {
+	margin: 0 0 14px;
+	border-color: #b6e4c4;
+	background: #eefaf1;
+	color: #28734a;
+	text-align: left;
+}
+
+[data-theme="dark"] .projects-page {
+	background: linear-gradient(180deg, #07141b 0%, #0c1a23 100%);
+	color: #eff5f7;
+}
+
+[data-theme="dark"] .projects-heading h2 {
+	color: #f4f6f8 !important;
+}
+
+[data-theme="dark"] .projects-heading p:last-child {
+	color: #9aa8b4 !important;
+}
+
+[data-theme="dark"] .project-create-form {
+	border-color: rgba(148, 163, 184, 0.22);
+	background: rgba(22, 32, 39, 0.8);
+}
+
+[data-theme="dark"] .project-create-form label {
+	color: #c9d3dd;
+}
+
+[data-theme="dark"] .project-create-form input,
+[data-theme="dark"] .project-task-form input,
+[data-theme="dark"] .project-task-form select {
+	border-color: rgba(148, 163, 184, 0.18);
+	background: #0d171f;
+	color: #ebf3f8;
+}
+
+[data-theme="dark"] .project-create-form input::placeholder,
+[data-theme="dark"] .project-task-form input::placeholder {
+	color: #93a3b5;
+}
+
+[data-theme="dark"] .project-create-form input:focus,
+[data-theme="dark"] .project-task-form input:focus,
+[data-theme="dark"] .project-task-form select:focus {
+	background: #101c26;
 }
 
 @media (max-width: 900px) {

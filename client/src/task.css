@@ -3,6 +3,8 @@
   flex-direction: column;
   gap: 24px;
   padding: 8px 0;
+  min-width: 0;
+  width: 100%;
 }
 
 .tasks-page-header {
@@ -330,7 +332,6 @@
   color: #22543d;
 }
 
-/* Comments Modal */
 /* Image 3 Milestone & List View Layout Styling */
 .milestone-group {
   margin-bottom: 24px;
@@ -435,7 +436,7 @@
 /* Grid View Layout */
 .tasks-grid-wrapper {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
   gap: 16px;
   margin-top: 16px;
 }
@@ -625,6 +626,10 @@
   .kanban-board-wrapper {
     grid-template-columns: 1fr;
   }
+
+  .kanban-column {
+    min-height: 0;
+  }
 }
 
 .kanban-column {
@@ -738,17 +743,45 @@
   .search-filter-box {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
   }
 
   .search-input {
     width: 100%;
     min-width: 0;
+    box-sizing: border-box;
   }
 
   .status-tabs {
+    width: 100%;
     overflow-x: auto;
     white-space: nowrap;
     justify-content: flex-start;
+  }
+
+  .view-mode-toggle {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .view-mode-btn {
+    justify-content: center;
+    padding: 7px 4px;
+    font-size: 0.7rem;
+  }
+
+  .kanban-column {
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .task-grid-meta,
+  .kanban-card-footer {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   /* Handle user info banner wrapping */
@@ -767,6 +800,19 @@
   .comments-body,
   .comments-footer {
     padding: 12px 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .tasks-page-header,
+  .task-create-card,
+  .tasks-list-card {
+    padding: 14px 12px;
+  }
+
+  .tasks-grid-wrapper {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
 }
 /* =========================================================

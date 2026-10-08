@@ -1,8 +1,7 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs'; // Change to 'bcrypt' if your project uses bcrypt
+import bcrypt from 'bcryptjs'; 
 import dotenv from 'dotenv';
 
-// Load variables from .env file
 dotenv.config();
 
 // Update this relative path if your User model file has a different name
@@ -20,7 +19,7 @@ async function seedAdmin() {
     console.log('Connected to MongoDB...');
 
     // Hash the password
-    const plainPassword = 'your_admin_password'; // Change this to your desired password
+    const plainPassword = 'admin123'; // Change this to your desired password
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     // Update or Insert the Admin user
@@ -31,7 +30,7 @@ async function seedAdmin() {
         username: 'admin',
         email: 'admin@taskmanagement.com',
         password: hashedPassword,
-        role: 'Admin', // Adjust case if your schema requires lower 'admin'
+        role: 'Admin', 
       },
       { upsert: true, new: true }
     );

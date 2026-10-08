@@ -25,6 +25,11 @@ const projectSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId, 
       ref: 'User' 
     }],
+  deletedAt: {
+    type: Date,
+    default: null,
+    index: true,
+  },
 }, { timestamps: true });
 
 export const Project = mongoose.model('Project', projectSchema);

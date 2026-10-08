@@ -1,0 +1,152 @@
+.trash-page {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+  color: var(--text-dark);
+}
+
+.trash-heading,
+.trash-section,
+.trash-item {
+  background: var(--card-bg);
+  border: 1px solid var(--soft-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.trash-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+}
+
+.trash-heading h2,
+.trash-section-heading h3 {
+  margin: 0;
+  color: var(--text-dark);
+}
+
+.trash-heading > div > p:last-child {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+}
+
+.trash-count,
+.trash-section-heading > span {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: var(--radius-full);
+  background: var(--warm-peach-light);
+  color: var(--terracotta-dark);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.trash-sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.trash-section {
+  min-width: 0;
+  padding: 16px;
+}
+
+.trash-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.trash-section-heading h3 {
+  font-size: 1rem;
+}
+
+.trash-list {
+  display: grid;
+  gap: 10px;
+}
+
+.trash-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  box-shadow: none;
+}
+
+.trash-item-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.trash-item-copy strong,
+.trash-item-copy span,
+.trash-item-copy small {
+  overflow-wrap: anywhere;
+}
+
+.trash-item-copy strong {
+  color: var(--text-dark);
+  font-size: 0.88rem;
+}
+
+.trash-item-copy span,
+.trash-item-copy small,
+.trash-empty {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+}
+
+.trash-restore {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border: 1px solid var(--soft-border);
+  border-radius: var(--radius-sm);
+  background: var(--warm-peach-light);
+  color: var(--terracotta-dark);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.trash-restore:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.trash-error {
+  margin: 0;
+  color: #b42318;
+}
+
+.trash-empty {
+  margin: 0;
+}
+
+@media (max-width: 700px) {
+  .trash-sections {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .trash-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .trash-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

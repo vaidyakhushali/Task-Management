@@ -3,12 +3,15 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  min-width: 0;
+  width: 100%;
 }
 
 .analytics-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
+  min-width: 0;
 }
 
 @media (max-width: 990px) {
@@ -19,8 +22,9 @@
 
 .analytics-cards-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+  min-width: 0;
 }
 
 .analytics-card {
@@ -33,6 +37,12 @@
   gap: 8px;
   box-shadow: var(--shadow-sm);
   position: relative;
+  min-width: 0;
+}
+
+.analytics-card small {
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .analytics-card-header {
@@ -160,10 +170,12 @@
 .employee-table-wrapper {
   margin-top: 12px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .employee-table {
   width: 100%;
+  min-width: 620px;
   border-collapse: collapse;
   font-size: 0.82rem;
 }
@@ -181,6 +193,68 @@
   padding: 12px;
   border-bottom: 1px solid var(--soft-border);
   color: var(--text-dark);
+}
+
+.analytics-deadline-row > div,
+.analytics-health-row > div:first-child {
+  min-width: 0;
+}
+
+.analytics-deadline-title,
+.analytics-deadline-assignee,
+.analytics-health-name {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .analytics-page {
+    gap: 16px;
+  }
+
+  .analytics-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .analytics-cards-grid {
+    gap: 10px;
+  }
+
+  .analytics-card {
+    padding: 13px;
+  }
+
+  .analytics-card strong {
+    font-size: 1.4rem;
+  }
+
+  .bar-chart-container {
+    gap: 4px;
+    height: 140px;
+  }
+
+  .bar-label {
+    font-size: 0.65rem;
+  }
+
+  .analytics-deadline-row {
+    gap: 8px;
+  }
+
+  .analytics-deadline-row > div {
+    flex: 1;
+  }
+
+  .employee-table th,
+  .employee-table td {
+    padding: 9px 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .analytics-cards-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 [data-theme="dark"] .analytics-deadline-row {

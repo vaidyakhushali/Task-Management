@@ -15,6 +15,7 @@ import TeamMembers from "./team-members";
 import Reports from "./reports";
 import Settings from "./settings";
 import Notification from "./notification";
+import Trash from "./trash";
 
 const menuItems = [
   "Dashboard",
@@ -24,8 +25,9 @@ const menuItems = [
   "Calendar",
   "Team Members",
   "Reports",
+  "Trash",
 ];
-const adminOnlyTabs = ["Analytics", "Reports"];
+const adminOnlyTabs = ["Analytics", "Reports", "Trash"];
 const generalItems = ["Settings"];
 
 function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
@@ -141,7 +143,6 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
       (task) => task.status === "in-progress",
     ).length;
     const pending = Math.max(totalTasks - completed - inProgress, 0);
-    const overdue = tasks.filter(isOverdue).length;
     const totalBudget = tasks.reduce(
       (sum, task) => sum + Number(task.budget || 0),
       0,
@@ -168,7 +169,6 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
       completed,
       inProgress,
       pending,
-      overdue,
       utilization: clamp(utilization, 0, 100),
       averageDays,
       priority,
@@ -196,13 +196,6 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
       color: "green",
       percent: percentOf(dashboard.completed, dashboard.totalTasks),
       statusKey: "completed",
-    },
-    {
-      label: "Overdue",
-      value: dashboard.overdue,
-      color: "red",
-      percent: percentOf(dashboard.overdue, dashboard.totalTasks),
-      statusKey: "pending",
     },
   ];
 
@@ -755,11 +748,14 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
               />
             )}
 
-            {activeTab === "Team Members" && <TeamMembers search={search} />}
+            {activeTab === "Team Members" && (
+              <TeamMembers search={search} user={user} userRole={userRole} />
+            )}
 
             {activeTab === "Reports" && isAdmin && (
               <Reports userRole={userRole} />
             )}
+            {activeTab === "Trash" && isAdmin && <Trash />}
             {activeTab === "Settings" && (
               <Settings
                 user={user}
@@ -1041,6 +1037,23 @@ function getMenuIcon(item) {
         <rect x="14" y="3" width="7" height="5" rx="1" fill="#e0e7ff" />
         <rect x="14" y="12" width="7" height="9" rx="1" fill="#e0e7ff" />
         <rect x="3" y="16" width="7" height="5" rx="1" fill="#e0e7ff" />
+      </svg>
+    ),
+    Trash: (
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#ef4444"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M3 6h18" />
+        <path d="M8 6V4h8v2" />
+        <path d="m19 6-1 14H6L5 6" />
+        <path d="M10 11v5M14 11v5" />
       </svg>
     ),
     Tasks: (

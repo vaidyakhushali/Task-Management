@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   createProject,
   createTask,
+  deleteProject,
   getAdminTasks,
   getAssignableUsers,
   getProjects,
@@ -31,6 +32,7 @@ function Projects({ search = "", userRole }) {
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     Promise.all([
@@ -104,6 +106,20 @@ function Projects({ search = "", userRole }) {
     }
   }
 
+  async function handleProjectDelete(project) {
+    setError("");
+    setSuccess("");
+    try {
+      await deleteProject(project._id);
+      setProjects((current) =>
+        current.filter((item) => item._id !== project._id),
+      );
+      setSuccess("Project moved to admin trash.");
+    } catch (deleteError) {
+      setError(deleteError.message || "Unable to move project to trash.");
+    }
+  }
+
   return (
     <section className="projects-page" aria-labelledby="projects-title">
       <div className="projects-heading">
@@ -147,6 +163,11 @@ function Projects({ search = "", userRole }) {
           {error}
         </p>
       )}
+      {success && (
+        <p className="project-success" role="status">
+          {success}
+        </p>
+      )}
       {isLoading && <p className="project-empty">Loading projects...</p>}
       {!isLoading && !error && visibleProjects.length === 0 && (
         <p className="project-empty">No projects found.</p>
@@ -156,7 +177,7 @@ function Projects({ search = "", userRole }) {
           {visibleProjects.map((project, projectIndex) => {
             const memberCount = project.members?.length || 0;
             const ownerName =
-              project.owner?.fullname || project.owner?.username || "Unassigned";
+              project.owner?.fullname ;
             const teamNames = Array.from(
               new Set([...(project.members || []), ...(project.assignees || [])]
               .map((member) => member.fullname || member.username)
@@ -187,7 +208,19 @@ function Projects({ search = "", userRole }) {
                       </p>
                     </div>
                   </div>
-                  <span className="project-board-count">{memberCount}</span>
+                  <div className="project-board-actions">
+                    <span className="project-board-count">{memberCount}</span>
+                    {userRole === "Admin" && (
+                      <button
+                        type="button"
+                        className="project-archive-button"
+                        onClick={() => handleProjectDelete(project)}
+                        aria-label={`Move ${project.name} to trash`}
+                      >
+                        Move to trash
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="project-board-grid project-board-grid-head">

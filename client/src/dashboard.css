@@ -207,12 +207,14 @@
   justify-content: space-between;
   gap: 14px;
   flex-wrap: wrap;
+  padding: 4px 0 10px;
 }
 
 .dashboard-topbar h1 {
   font-size: 1.25rem;
   font-weight: 800;
   color: var(--text-dark);
+  line-height: 1.2;
 }
 
 .dashboard-topbar p {
@@ -243,38 +245,45 @@
 .topbar-appearance-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  margin-left: auto;
 }
 
 .topbar-theme-btn {
   background: var(--card-bg);
   border: 1px solid var(--soft-border);
-  border-radius: var(--radius-sm);
-  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
   font-size: 0.8rem;
   font-weight: 700;
   color: var(--text-dark);
   transition: var(--transition);
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 6px;
+  min-width: 96px;
+  box-shadow: var(--shadow-sm);
 }
 
 .topbar-theme-btn:hover {
   background: var(--warm-peach-light);
   border-color: var(--warm-peach);
+  transform: translateY(-1px);
 }
 
 .topbar-fontsize-select {
   background: var(--card-bg);
   border: 1px solid var(--soft-border);
-  border-radius: var(--radius-sm);
-  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-dark);
   outline: none;
   cursor: pointer;
+  min-width: 124px;
+  box-shadow: var(--shadow-sm);
 }
 
 .topbar-fontsize-select:hover {
@@ -282,11 +291,11 @@
 }
 
 .notification-button {
-  background: var(--card-bg);
-  border: 1px solid var(--soft-border);
+  background: linear-gradient(135deg, #f7efe9, #f3e2d4);
+  border: 1px solid rgba(216, 151, 108, 0.18);
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -294,6 +303,8 @@
   font-size: 0.95rem;
   cursor: pointer;
   transition: var(--transition);
+  color: #2d241e;
+  box-shadow: 0 4px 12px rgba(216, 151, 108, 0.12);
 }
 
 .notification-button:hover {
@@ -321,15 +332,18 @@
 .account-box {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
+  padding: 5px 10px 5px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(216, 151, 108, 0.14);
+  background: rgba(255, 255, 255, 0.24);
   transition: var(--transition);
 }
 
 .account-box:hover {
   background: var(--warm-peach-light);
+  border-color: var(--warm-peach);
 }
 
 .user-avatar {
@@ -343,11 +357,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 12px rgba(216, 151, 108, 0.18);
 }
 
 .account-box strong {
   display: block;
   font-size: 0.82rem;
+  line-height: 1.2;
 }
 
 .account-box small {
@@ -439,7 +455,7 @@
 
 @media (max-width: 900px) {
   .dashboard-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -527,6 +543,86 @@
 .panel-more-menu button:hover {
   background: var(--warm-peach-light);
   color: var(--terracotta-dark);
+}
+
+@keyframes workspaceContentEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dashboard-view > * {
+    animation: workspaceContentEnter 0.32s ease both;
+  }
+
+  .dashboard-view > *:nth-child(2) {
+    animation-delay: 0.04s;
+  }
+
+  .dashboard-view > *:nth-child(3) {
+    animation-delay: 0.08s;
+  }
+
+  .dashboard-view .panel,
+  .dashboard-view .project-board,
+  .dashboard-view .admin-user-card,
+  .dashboard-view .trash-item,
+  .dashboard-view .analytics-card,
+  .dashboard-view .task-grid-card,
+  .dashboard-view .kanban-card {
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .dashboard-view .panel:hover,
+  .dashboard-view .project-board:hover,
+  .dashboard-view .admin-user-card:hover,
+  .dashboard-view .trash-item:hover,
+  .dashboard-view .analytics-card:hover,
+  .dashboard-view .task-grid-card:hover,
+  .dashboard-view .kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .dashboard-view button:not(:disabled) {
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease,
+      background-color 0.18s ease,
+      border-color 0.18s ease;
+  }
+
+  .dashboard-view button:not(:disabled):hover {
+    transform: translateY(-1px);
+  }
+
+  .dashboard-view input,
+  .dashboard-view select,
+  .dashboard-view textarea {
+    transition:
+      border-color 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-view *,
+  .dashboard-view *::before,
+  .dashboard-view *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Work Progress Cards (Image 1 Layout) */
@@ -659,7 +755,7 @@
 
 @media (max-width: 700px) {
   .status-bars {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -702,15 +798,32 @@
 
 .status-card i {
   display: block;
+  color:#2d241e;
   height: 100%;
   border-radius: 3px;
   transform-origin: left;
   animation: barGrow 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.status-card.orange i { background: var(--terracotta); }
-.status-card.green i { background: var(--status-completed-color); }
-.status-card.red i { background: var(--priority-high); }
+.status-card.blue i {
+  background: linear-gradient(90deg, #60a5fa, #5d88e4);
+}
+
+.status-card.blue strong {
+  color: #111827;
+}
+
+.status-card.blue:hover {
+  border-color: #60a5fa;
+}
+
+.status-card.orange i {
+  background: linear-gradient(90deg, var(--status-progress-color), var(--terracotta));
+}
+
+.status-card.green i {
+  background: linear-gradient(90deg, var(--status-completed-color), #76cfa2);
+}
 
 /* Task Priority Donut Chart */
 .priority-donut-container {
@@ -1155,7 +1268,7 @@
 
 @media (max-width: 390px) {
   .metric-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
   .dashboard-topbar {
@@ -1173,6 +1286,12 @@
 
   .account-box {
     grid-column: 3 / 4;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-chat-panel {
+    margin-left: 0;
   }
 }
 /* Prevent clipping of dropdown menus */

@@ -19,10 +19,8 @@ function Tasks({
   const isAdmin =
     user?.role === "Admin";
 
-  // =========================================================
-  // TASK STATES
-  // =========================================================
-
+   // TASK STATES
+  
   const [tasks, setTasks] = useState([]);
 
   const [assignableUsers, setAssignableUsers] =
@@ -37,10 +35,8 @@ function Tasks({
   const [successMsg, setSuccessMsg] =
     useState("");
 
-  // =========================================================
   // CREATE TASK FORM
-  // =========================================================
-
+  
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -54,27 +50,20 @@ function Tasks({
   const [isSubmitting, setIsSubmitting] =
     useState(false);
 
-  // =========================================================
   // FILTERS
-  // =========================================================
-
+  
   const [statusFilter, setStatusFilter] =
     useState(initialStatusFilter);
 
   const [searchQuery, setSearchQuery] =
     useState("");
 
-  // =========================================================
-  // VIEW MODE
-  // =========================================================
+    // VIEW MODE
 
   const [viewMode, setViewMode] =
     useState("list");
-
  
-  // =========================================================
   // UPDATE FILTER WHEN PROP CHANGES
-  // =========================================================
 
   useEffect(() => {
     if (initialStatusFilter) {
@@ -82,9 +71,7 @@ function Tasks({
     }
   }, [initialStatusFilter]);
 
-  // =========================================================
   // FETCH TASKS
-  // =========================================================
 
   useEffect(() => {
     fetchTasks();
@@ -92,13 +79,9 @@ function Tasks({
     if (isAdmin) {
       fetchUsers();
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isAdmin]);
 
-  // =========================================================
   // GET TASKS
-  // =========================================================
 
   async function fetchTasks() {
     setLoading(true);
@@ -122,9 +105,7 @@ function Tasks({
     }
   }
 
-  // =========================================================
   // GET ASSIGNABLE USERS
-  // =========================================================
 
   async function fetchUsers() {
     try {
@@ -164,9 +145,7 @@ function Tasks({
     }
   }
 
-  // =========================================================
   // CREATE TASK
-  // =========================================================
 
   async function handleCreateTask(e) {
     e.preventDefault();
@@ -285,9 +264,7 @@ function Tasks({
     }
   }
 
-  // =========================================================
   // UPDATE TASK STATUS
-  // =========================================================
 
   async function handleStatusChange(
     taskId,
@@ -322,14 +299,11 @@ function Tasks({
     }
   }
 
-  // =========================================================
   // DELETE TASK - ADMIN ONLY
-  // =========================================================
-
+  
   async function handleDeleteTask(
     taskId
   ) {
-    // Extra frontend protection
     if (!isAdmin) {
       setError(
         "Only admins can delete tasks."
@@ -339,7 +313,7 @@ function Tasks({
 
     const confirmed =
       window.confirm(
-        "Are you sure you want to delete this task?\n\nThis action cannot be undone."
+        "Move this task to the admin trash? You can restore it later."
       );
 
     if (!confirmed) {
@@ -363,7 +337,7 @@ function Tasks({
         );
 
         setSuccessMsg(
-          "Task deleted successfully."
+          "Task moved to admin trash."
         );
       } else {
         setError(
@@ -379,9 +353,7 @@ function Tasks({
     }
   }
 
-  // =========================================================
   // FILTER TASKS
-  // =========================================================
 
   const filteredTasks =
     tasks.filter((task) => {
@@ -419,9 +391,7 @@ function Tasks({
       );
     });
 
-  // =========================================================
   // FORMAT DATE
-  // =========================================================
 
   function formatDate(date) {
     if (!date) {
@@ -449,9 +419,7 @@ function Tasks({
     );
   }
 
-  // =========================================================
   // TASK TYPE
-  // =========================================================
 
   function getTaskType(task) {
     return (
@@ -464,9 +432,7 @@ function Tasks({
     );
   }
 
-  // =========================================================
   // TASK TYPE CLASS
-  // =========================================================
 
   function getTaskTypeClass(
     taskType
@@ -485,9 +451,7 @@ function Tasks({
     return "pill-type-standard";
   }
 
-  // =========================================================
   // STATUS LABEL
-  // =========================================================
 
   function getStatusLabel(status) {
     if (
@@ -507,17 +471,10 @@ function Tasks({
     );
   }
 
-  // =========================================================
   // RENDER
-  // =========================================================
 
   return (
     <div className="tasks-container">
-
-      {/* =====================================================
-          PAGE HEADER
-      ====================================================== */}
-
       <div className="tasks-page-header">
 
         <div>
@@ -538,14 +495,8 @@ function Tasks({
                 user?.fullname}
             </strong>
           </p>
-
         </div>
-
       </div>
-
-      {/* =====================================================
-          ADMIN CREATE TASK
-      ====================================================== */}
 
       {isAdmin && (
         <section className="task-create-card">
@@ -553,15 +504,11 @@ function Tasks({
           <div className="card-header">
 
             <h2>
-              ➕ Assign New Task
-              to Team Member
+              ➕ Assign New Task to Team Member
             </h2>
 
             <p>
-              Select a registered
-              user and assign a
-              task with start and
-              due dates.
+              Select a registered user and assign a task with start and due dates.
             </p>
 
           </div>
@@ -842,36 +789,25 @@ function Tasks({
                   isSubmitting
                 }
               >
-                {isSubmitting
-                  ? "Assigning Task..."
-                  : "Assign Task"}
+                {isSubmitting ? "Assigning Task..." : "Assign Task"}
               </button>
-
             </div>
-
           </form>
-
         </section>
       )}
 
       {/* =====================================================
           TASK LIST
       ====================================================== */}
-
       <section className="tasks-list-card">
-
         {/* TOOLBAR */}
-
         <div
           className="tasks-toolbar"
           style={{
             display: "flex",
-            justifyContent:
-              "space-between",
-            alignItems:
-              "center",
-            flexWrap:
-              "wrap",
+            justifyContent:"space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
             gap: "12px",
           }}
         >
@@ -880,22 +816,15 @@ function Tasks({
 
           <div className="search-filter-box">
 
-            <input
-              type="text"
-              placeholder="Search tasks or assignees..."
-              value={
-                searchQuery
+            <input type="text" placeholder="Search tasks or assignees..."
+              value={ searchQuery
               }
-              onChange={(e) =>
-                setSearchQuery(
-                  e.target.value
-                )
+              onChange={
+                (e) => setSearchQuery( e.target.value)
               }
               className="search-input"
             />
-
             <div className="status-tabs">
-
               <button
                 type="button"
                 className={`tab-btn ${
@@ -923,8 +852,7 @@ function Tasks({
                     ? "active"
                     : ""
                 }`}
-                onClick={() =>
-                  setStatusFilter(
+                onClick={() =>  setStatusFilter(
                     "pending"
                   )
                 }
@@ -1056,9 +984,7 @@ function Tasks({
 
           <div className="empty-tasks-state">
             <p>
-              No tasks found
-              matching your
-              criteria.
+              No tasks found matching your criteria.
             </p>
           </div>
 
@@ -1078,9 +1004,7 @@ function Tasks({
           >
 
             <table className="image3-task-table">
-
               <thead>
-
                 <tr>
 
                   <th>
@@ -1334,7 +1258,7 @@ function Tasks({
                                 )
                               }
                             >
-                              🗑️ Delete
+                              Move to trash
                             </button>
 
                           </td>
@@ -1633,7 +1557,7 @@ function Tasks({
                                             t._id
                                           )
                                         }
-                                        title="Delete Task"
+                                        title="Move task to trash"
                                       >
                                         🗑️
                                       </button>
@@ -1842,7 +1766,7 @@ function Tasks({
                                 t._id
                               )
                             }
-                            title="Delete Task"
+                            title="Move task to trash"
                           >
                             🗑️
                           </button>

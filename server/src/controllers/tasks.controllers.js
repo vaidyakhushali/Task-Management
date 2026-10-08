@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import { Task } from "../models/task.model.js";
 import { User } from "../models/user.model.js";
 import { Notification } from "../models/notification.model.js";
-import { Comment } from "../models/comment.model.js";
 import { Project } from "../models/project.model.js";
 
 function sendError(res, status, message) {
@@ -14,15 +13,13 @@ function taskResponse(task) {
 }
 
 export async function listTasks(req, res) {
-    let query = {};
+    const query = { deletedAt: null };
     if (req.user.role !== "Admin") {
-        query = {
-            $or: [
+        query.$or = [
                 { owner: req.user._id },
                 { assignedUser: req.user._id },
                 { creator: req.user._id },
-            ],
-        };
+            ];
     }
 
     const tasks = await Task.find(query)
@@ -37,7 +34,7 @@ export async function listTasks(req, res) {
 export async function listAllTasksForAdmin(req, res) {
     if (req.user.role !== "Admin")
         return sendError(res, 403, "Only admins can view all tasks");
-    const tasks = await Task.find({})
+    const tasks = await Task.find({ deletedAt: null })
         .populate("creator", "fullname username email role")
         .populate("assignedUser", "fullname username email role")
         .populate("project", "name")
@@ -45,59 +42,32 @@ export async function listAllTasksForAdmin(req, res) {
     return res.status(200).json({ success: true, data: tasks });
 }
 
-export async function getAdminMetrics(req, res) {
+export async function listDeletedTasks(req, res) {
     if (req.user.role !== "Admin")
-        return sendError(res, 403, "Only admins can view admin metrics");
+        return sendError(res, 403, "Only admins can view deleted tasks");
+    const tasks = await Task.find({ deletedAt: { $ne: null } })
+        .populate("creator", "fullname username email role")
+        .populate("assignedUser", "fullname username email role")
+        .populate("project", "name")
+        .sort({ deletedAt: -1 });
+    return res.status(200).json({ success: true, data: tasks });
+}
 
-    const totalTasks = await Task.countDocuments();
-    const pendingTasks = await Task.countDocuments({ status: "pending" });
-    const inProgressTasks = await Task.countDocuments({ status: "in-progress" });
-    const completedTasks = await Task.countDocuments({ status: "completed" });
-
-    // Team workload per user
-    const users = await User.find(
-        { role: "User" },
-        "fullname username email role",
+export async function restoreTask(req, res) {
+    if (!mongoose.isValidObjectId(req.params.taskId))
+        return sendError(res, 400, "Invalid task id");
+    if (req.user.role !== "Admin")
+        return sendError(res, 403, "Only admins can restore tasks");
+    const task = await Task.findOneAndUpdate(
+        { _id: req.params.taskId, deletedAt: { $ne: null } },
+        { $set: { deletedAt: null } },
+        { new: true },
     );
-    const tasks = await Task.find({}).populate(
-        "assignedUser",
-        "fullname username",
-    );
-
-    const workloadMap = new Map();
-    users.forEach((u) => {
-        workloadMap.set(String(u._id), {
-            id: u._id,
-            name: u.fullname || u.username,
-            email: u.email,
-            assignedCount: 0,
-            pendingCount: 0,
-            inProgressCount: 0,
-            completedCount: 0,
-        });
-    });
-
-    tasks.forEach((t) => {
-        if (t.assignedUser && workloadMap.has(String(t.assignedUser._id))) {
-            const userStats = workloadMap.get(String(t.assignedUser._id));
-            userStats.assignedCount += 1;
-            if (t.status === "completed") userStats.completedCount += 1;
-            else if (t.status === "in-progress") userStats.inProgressCount += 1;
-            else userStats.pendingCount += 1;
-        }
-    });
-
-    const teamWorkload = Array.from(workloadMap.values());
-
+    if (!task) return sendError(res, 404, "Deleted task not found");
     return res.status(200).json({
         success: true,
-        data: {
-            totalTasks,
-            pendingTasks,
-            inProgressTasks,
-            completedTasks,
-            teamWorkload,
-        },
+        message: "Task restored successfully",
+        data: task,
     });
 }
 
@@ -168,7 +138,10 @@ export async function createTask(req, res) {
             return sendError(res, 400, "Invalid project ID");
         }
 
-        const project = await Project.findById(req.body.project);
+        const project = await Project.findOne({
+            _id: req.body.project,
+            deletedAt: null,
+        });
         if (!project) return sendError(res, 404, "Project not found");
 
         projectId = project._id;
@@ -258,105 +231,11 @@ export async function createTask(req, res) {
     });
 }
 
-export async function listTaskComments(req, res) {
-    if (!mongoose.isValidObjectId(req.params.taskId))
-        return sendError(res, 400, "Invalid task id");
-
-    const task = await Task.findById(req.params.taskId);
-    if (!task) return sendError(res, 404, "Task not found");
-
-    const isAssignee = String(task.assignedUser) === String(req.user._id);
-    const isCreator =
-        String(task.creator) === String(req.user._id) ||
-        String(task.owner) === String(req.user._id);
-    const isAdmin = ["Admin", "Manager"].includes(req.user.role);
-
-    if (!isAdmin && !isAssignee && !isCreator) {
-        return sendError(
-            res,
-            403,
-            "Access denied: Task comments are private between assigned user and admin",
-        );
-    }
-
-    const comments = await Comment.find({ task: req.params.taskId })
-        .populate("user", "fullname username role email")
-        .sort({ createdAt: 1 });
-
-    return res.status(200).json({ success: true, data: comments });
-}
-
-export async function addTaskComment(req, res) {
-    if (!mongoose.isValidObjectId(req.params.taskId))
-        return sendError(res, 400, "Invalid task id");
-
-    const message = String(req.body.message || "").trim();
-    if (!message) return sendError(res, 400, "Comment text is required");
-
-    const task = await Task.findById(req.params.taskId);
-    if (!task) return sendError(res, 404, "Task not found");
-
-    const isAssignee = String(task.assignedUser) === String(req.user._id);
-    const isCreator =
-        String(task.creator) === String(req.user._id) ||
-        String(task.owner) === String(req.user._id);
-    const isAdmin = ["Admin", "Manager"].includes(req.user.role);
-
-    if (!isAdmin && !isAssignee && !isCreator) {
-        return sendError(
-            res,
-            403,
-            "Access denied: Task comments are private between assigned user and admin",
-        );
-    }
-
-    const comment = await Comment.create({
-        task: req.params.taskId,
-        user: req.user._id,
-        message,
-    });
-
-    await comment.populate("user", "fullname username role email");
-
-    // Notify task assignee, creator, owner, and all Admin users when someone comments
-    const recipientIds = new Set();
-    if (task.assignedUser) recipientIds.add(String(task.assignedUser));
-    if (task.creator) recipientIds.add(String(task.creator));
-    if (task.owner) recipientIds.add(String(task.owner));
-
-    // If sender is not Admin, or to ensure Admin always gets notified of user messages:
-    const admins = await User.find({ role: "Admin" }, "_id");
-    admins.forEach((adm) => recipientIds.add(String(adm._id)));
-
-    // Remove sender from recipients list
-    recipientIds.delete(String(req.user._id));
-
-    for (const recipientId of recipientIds) {
-        try {
-            await Notification.create({
-                recipient: recipientId,
-                actor: req.user._id,
-                task: task._id,
-                title: "New Comment on Task",
-                message: `${req.user.fullname || req.user.username || "User"} messaged on "${task.title}": "${message.slice(0, 50)}${message.length > 50 ? "..." : ""}"`,
-                type: "comment",
-            });
-        } catch (notifErr) {
-            console.error(
-                "Error creating task comment notification:",
-                notifErr.message,
-            );
-        }
-    }
-
-    return res.status(201).json({ success: true, data: comment });
-}
-
 export async function updateTask(req, res) {
     if (!mongoose.isValidObjectId(req.params.taskId))
         return sendError(res, 400, "Invalid task id");
 
-    let taskQuery = { _id: req.params.taskId };
+    let taskQuery = { _id: req.params.taskId, deletedAt: null };
     if (req.user.role !== "Admin") {
         taskQuery.$or = [
             { owner: req.user._id },
@@ -429,10 +308,14 @@ export async function deleteTask(req, res) {
     if (req.user.role !== "Admin")
         return sendError(res, 403, "Only admins can delete tasks");
 
-    const task = await Task.findByIdAndDelete(req.params.taskId);
+    const task = await Task.findOneAndUpdate(
+        { _id: req.params.taskId, deletedAt: null },
+        { $set: { deletedAt: new Date() } },
+    );
     if (!task) return sendError(res, 404, "Task not found");
 
-    return res
-        .status(200)
-        .json({ success: true, message: "Task deleted successfully" });
+    return res.status(200).json({
+        success: true,
+        message: "Task moved to trash successfully",
+    });
 }

@@ -30,7 +30,7 @@ function cookieOptions() {
     return {
         httpOnly: true,
         sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === 'production',  
     };
 }
 
@@ -132,6 +132,17 @@ export async function sendAdminChat(req, res) {
     if (!user) return sendError(res, 404, 'User not found');
     const chatMessage = await ChatMessage.create({ sender: req.user._id, recipient: user._id, message });
     await chatMessage.populate('sender', 'fullname role');
+    try {
+        await Notification.create({
+            recipient: user._id,
+            actor: req.user._id,
+            title: `New Message from ${req.user.fullname || req.user.username || 'Admin'}`,
+            message: `${req.user.fullname || req.user.username || 'Admin'} sent a message: "${message.slice(0, 60)}${message.length > 60 ? '...' : ''}"`,
+            type: 'chat',
+        });
+    } catch (notifErr) {
+        console.error('Error creating chat notification:', notifErr.message);
+    }
     return res.status(201).json({ success: true, data: chatMessage });
 }
 

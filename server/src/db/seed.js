@@ -1,9 +1,7 @@
 import dotenv from "dotenv";
-import mongoose from "mongoose";
 import connectDB from "./index.js";
 import { User } from "../models/user.model.js";
 import { Task } from "../models/task.model.js";
-import { Comment } from "../models/comment.model.js";
 import { Notification } from "../models/notification.model.js";
 import { ensureAdminUser } from "./ensure-admin.js";
 
@@ -67,21 +65,6 @@ async function seedData() {
             type: "task",
           });
         }
-      }
-
-      // Add sample comment
-      if (createdTasks[0]) {
-        await Comment.create({
-          task: createdTasks[0]._id,
-          user: admin._id,
-          message: "Please update status as soon as wireframes are finalized.",
-        });
-        await Comment.create({
-          task: createdTasks[0]._id,
-          user: users[0]._id,
-          message: "Sure! Working on the card layouts now.",
-        });
-        console.log(" Added initial comments for sample task.");
       }
 
     console.log(" Database seeding complete!");

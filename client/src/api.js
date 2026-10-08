@@ -1,4 +1,9 @@
-const API_URL = "https://task-management-1-hihk.onrender.com/api";
+const API_URL = (
+  process.env.REACT_APP_API_URL ||
+  (process.env.NODE_ENV === "development"
+    ? "http://localhost:8000/api"
+    : "https://task-management-1-hihk.onrender.com/api")
+).replace(/\/+$/, "");
 export function setAuthToken(token) {
   if (token) {
     localStorage.setItem("taskManagerAuthToken", token);
@@ -71,10 +76,6 @@ export function getAdminUsers() {
   return request("/users/admin-overview");
 }
 
-export function getAdminMetrics() {
-  return request("/tasks/admin-metrics");
-}
-
 export function getAdminChat(userId) {
   return request(`/users/admin-overview/${userId}/chat`);
 }
@@ -145,15 +146,12 @@ export function deleteTask(taskId) {
   return request(`/tasks/${taskId}`, { method: "DELETE" });
 }
 
-export function getTaskComments(taskId) {
-  return request(`/tasks/${taskId}/comments`);
+export function getDeletedTasks() {
+  return request("/tasks/deleted");
 }
 
-export function addTaskComment(taskId, message) {
-  return request(`/tasks/${taskId}/comments`, {
-    method: "POST",
-    body: JSON.stringify({ message }),
-  });
+export function restoreTask(taskId) {
+  return request(`/tasks/${taskId}/restore`, { method: "PATCH" });
 }
 
 export function getProjects() {
@@ -165,6 +163,18 @@ export function createProject(project) {
     method: "POST",
     body: JSON.stringify(project),
   });
+}
+
+export function deleteProject(projectId) {
+  return request(`/projects/${projectId}`, { method: "DELETE" });
+}
+
+export function getDeletedProjects() {
+  return request("/projects/deleted");
+}
+
+export function restoreProject(projectId) {
+  return request(`/projects/${projectId}/restore`, { method: "PATCH" });
 }
 
 export function getNotifications() {
