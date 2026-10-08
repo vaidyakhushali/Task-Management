@@ -74,13 +74,13 @@ function Tasks({
   // FETCH TASKS
 
   useEffect(() => {
-    fetchTasks();
+  fetchTasks();
 
-    if (isAdmin) {
-      fetchUsers();
-    }
-  }, [user, isAdmin]);
-
+  if (isAdmin) {
+    fetchUsers();
+  }
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [user, isAdmin]);
   // GET TASKS
 
   async function fetchTasks() {
@@ -313,7 +313,7 @@ function Tasks({
 
     const confirmed =
       window.confirm(
-        "Move this task to the admin trash? You can restore it later."
+        "Are you sure you want to delete this task?\n\nThis action cannot be undone."
       );
 
     if (!confirmed) {
@@ -337,7 +337,7 @@ function Tasks({
         );
 
         setSuccessMsg(
-          "Task moved to admin trash."
+          "Task deleted successfully."
         );
       } else {
         setError(
@@ -1258,7 +1258,7 @@ function Tasks({
                                 )
                               }
                             >
-                              Move to trash
+                              🗑️ Delete
                             </button>
 
                           </td>
@@ -1557,7 +1557,7 @@ function Tasks({
                                             t._id
                                           )
                                         }
-                                        title="Move task to trash"
+                                        title="Delete Task"
                                       >
                                         🗑️
                                       </button>
@@ -1766,7 +1766,7 @@ function Tasks({
                                 t._id
                               )
                             }
-                            title="Move task to trash"
+                            title="Delete Task"
                           >
                             🗑️
                           </button>
