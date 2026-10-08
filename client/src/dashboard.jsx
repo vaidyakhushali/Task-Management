@@ -1,10 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./dashboard.css";
 import {
   getNotifications,
   getProjects,
   getTasks,
   markNotificationRead,
+  getMyAttendance,
+  getTeamAttendance,
+  checkIn,
+  checkOut,
 } from "./api";
 
 import Tasks from "./task";
@@ -39,6 +43,12 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
   const [notificationToOpen, setNotificationToOpen] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [attendanceToday, setAttendanceToday] = useState(null);
+  const [attendanceHistory, setAttendanceHistory] = useState([]);
+  const [teamAttendance, setTeamAttendance] = useState(null);
+  const [attendanceLoading, setAttendanceLoading] = useState(true);
+  const [attendanceBusy, setAttendanceBusy] = useState(false);
+  const [attendanceError, setAttendanceError] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [displayName, setDisplayName] = useState(userName);
   const [taskStatusFilter, setTaskStatusFilter] = useState("all");
@@ -118,6 +128,52 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
     return () => clearInterval(interval);
   }, []);
 
+  const loadAttendance = useCallback(async () => {
+    setAttendanceError("");
+    try {
+      const [myResponse, teamResponse] = await Promise.all([
+        getMyAttendance(),
+        isAdmin ? getTeamAttendance() : Promise.resolve(null),
+      ]);
+      setAttendanceToday(myResponse.data?.today || null);
+      setAttendanceHistory(
+        Array.isArray(myResponse.data?.history) ? myResponse.data.history : [],
+      );
+      setTeamAttendance(teamResponse?.data || null);
+    } catch (attendanceLoadError) {
+      setAttendanceError(
+        attendanceLoadError.message || "Unable to load attendance.",
+      );
+    } finally {
+      setAttendanceLoading(false);
+    }
+  }, [isAdmin]);
+
+  useEffect(() => {
+    loadAttendance();
+    const interval = setInterval(loadAttendance, 30000);
+    return () => clearInterval(interval);
+  }, [loadAttendance, user?._id]);
+
+  async function handleAttendanceAction() {
+    setAttendanceBusy(true);
+    setAttendanceError("");
+    try {
+      if (attendanceToday && !attendanceToday.checkOutAt) {
+        await checkOut();
+      } else if (!attendanceToday) {
+        await checkIn();
+      }
+      await loadAttendance();
+    } catch (attendanceActionError) {
+      setAttendanceError(
+        attendanceActionError.message || "Unable to update attendance.",
+      );
+    } finally {
+      setAttendanceBusy(false);
+    }
+  }
+
   async function closeToast() {
     if (toastAlert?._id) {
       try {
@@ -143,18 +199,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
       (task) => task.status === "in-progress",
     ).length;
     const pending = Math.max(totalTasks - completed - inProgress, 0);
-    const totalBudget = tasks.reduce(
-      (sum, task) => sum + Number(task.budget || 0),
-      0,
-    );
-    const totalCost = tasks.reduce(
-      (sum, task) => sum + Number(task.cost || 0),
-      0,
-    );
-    const utilization =
-      totalBudget > 0
-        ? Math.round((totalCost / totalBudget) * 100)
-        : Math.round((completed / (totalTasks || 1)) * 100);
+    const completionRate = percentOf(completed, totalTasks);
     const averageDays = getAverageDaysToDue(tasks);
 
     const priority = {
@@ -169,7 +214,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
       completed,
       inProgress,
       pending,
-      utilization: clamp(utilization, 0, 100),
+      completionRate,
       averageDays,
       priority,
     };
@@ -223,6 +268,11 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
     (item) => !item.read,
   ).length;
   const firstName = String(displayName || "Admin").split(" ")[0];
+  const attendanceRate = isAdmin
+    ? teamAttendance?.attendanceRate || 0
+    : attendanceToday
+      ? 100
+      : 0;
 
   return (
     <div className="dashboard-page">
@@ -500,9 +550,9 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
                     loading={loading}
                   />
                   <MetricCard
-                    title="Utilization Rate"
-                    value={`${dashboard.utilization}%`}
-                    helper="Budget or completion usage"
+                    title="Task Completion Rate"
+                    value={`${dashboard.completionRate}%`}
+                    helper={`${dashboard.completed} of ${dashboard.totalTasks} tasks completed`}
                     tone="peach"
                     loading={loading}
                   />
@@ -616,24 +666,126 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
                     </div>
                   </section>
 
-                  <section className="panel working-status-panel">
+                  <section className="panel attendance-panel">
                     <PanelHeader
-                      title="Working Status"
-                      helper="Active team capacity"
+                      title="Today's Attendance"
+                      helper="Record your daily check-in and check-out"
                       hideMenu={true}
                     />
-                    <div className="working-status-ring-container">
-                      <div
-                        className="working-status-ring"
-                        style={{
-                          background: `conic-gradient(#6366f1 0% ${dashboard.utilization}%, var(--soft-border) ${dashboard.utilization}% 100%)`,
-                        }}
-                      >
-                        <div className="working-status-center">
-                          <strong>{dashboard.utilization}%</strong>
-                          <span>Member Working</span>
+                    <div className="attendance-summary">
+                      <div className="working-status-ring-container">
+                        <div
+                          className="working-status-ring"
+                          style={{
+                            background: `conic-gradient(#6366f1 0% ${attendanceRate}%, var(--soft-border) ${attendanceRate}% 100%)`,
+                          }}
+                        >
+                          <div className="working-status-center">
+                            <strong>
+                              {attendanceLoading
+                                ? "..."
+                                : `${attendanceRate}%`}
+                            </strong>
+                            <span>{isAdmin ? "Team present" : "Checked in"}</span>
+                          </div>
                         </div>
                       </div>
+                      {isAdmin && teamAttendance && (
+                        <p className="attendance-team-count">
+                          {teamAttendance.checkedIn} of{" "}
+                          {teamAttendance.totalMembers} team members checked in
+                          today
+                        </p>
+                      )}
+                    </div>
+                    {attendanceError && (
+                      <p className="attendance-error" role="alert">
+                        {attendanceError}
+                      </p>
+                    )}
+                    <p className="attendance-current-status">
+                      {attendanceLoading
+                        ? "Loading your attendance..."
+                        : !attendanceToday
+                          ? "You haven't checked in today."
+                          : attendanceToday.checkOutAt
+                            ? `Checked out at ${formatAttendanceTime(attendanceToday.checkOutAt)}`
+                            : `Checked in at ${formatAttendanceTime(attendanceToday.checkInAt)}`}
+                    </p>
+                    <button
+                      className="attendance-action-button"
+                      type="button"
+                      onClick={handleAttendanceAction}
+                      disabled={
+                        attendanceLoading ||
+                        attendanceBusy ||
+                        Boolean(attendanceToday?.checkOutAt)
+                      }
+                    >
+                      {attendanceBusy
+                        ? "Saving..."
+                        : attendanceToday?.checkOutAt
+                          ? "Attendance complete"
+                          : attendanceToday
+                            ? "Check Out"
+                            : "Check In"}
+                    </button>
+                    {isAdmin && teamAttendance?.members?.length > 0 && (
+                      <div className="attendance-team-list">
+                        <h3>Team status</h3>
+                        {teamAttendance.members.slice(0, 5).map((member) => (
+                          <div
+                            className="attendance-history-row"
+                            key={member.id}
+                          >
+                            <span>{member.fullname}</span>
+                            <strong
+                              className={
+                                member.attendance
+                                  ? member.attendance.checkOutAt
+                                    ? "checked-out"
+                                    : "checked-in"
+                                  : "not-checked-in"
+                              }
+                            >
+                              {!member.attendance
+                                ? "Not checked in"
+                                : member.attendance.checkOutAt
+                                  ? "Checked out"
+                                  : "Working"}
+                            </strong>
+                          </div>
+                        ))}
+                        {teamAttendance.members.length > 5 && (
+                          <small className="attendance-history-note">
+                            And {teamAttendance.members.length - 5} more team
+                            members
+                          </small>
+                        )}
+                      </div>
+                    )}
+                    <div className="attendance-history">
+                      <h3>Recent attendance</h3>
+                      {attendanceHistory.length ? (
+                        attendanceHistory.slice(0, 5).map((record) => (
+                          <div
+                            className="attendance-history-row"
+                            key={record._id}
+                          >
+                            <span>{formatAttendanceDate(record.dateKey)}</span>
+                            <span>
+                              In {formatAttendanceTime(record.checkInAt)}
+                              {record.checkOutAt
+                                ? ` · Out ${formatAttendanceTime(record.checkOutAt)}`
+                                : " · Still checked in"}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="attendance-history-note">
+                          No attendance history yet.
+                        </p>
+                      )}
                     </div>
                   </section>
                 </div>
@@ -994,15 +1146,29 @@ function percentOf(value, total) {
   return total ? Math.round((value / total) * 100) : 0;
 }
 
-function clamp(value, min, max) {
-  return Math.min(Math.max(value, min), max);
-}
-
 function formatDate(date) {
   if (!date) return "No due date";
   const value = new Date(date);
   if (Number.isNaN(value.getTime())) return "No due date";
   return value.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+}
+
+function formatAttendanceTime(date) {
+  if (!date) return "--";
+  const value = new Date(date);
+  if (Number.isNaN(value.getTime())) return "--";
+  return value.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+function formatAttendanceDate(dateKey) {
+  if (!dateKey) return "Unknown date";
+  const value = new Date(`${dateKey}T00:00:00`);
+  if (Number.isNaN(value.getTime())) return "Unknown date";
+  return value.toLocaleDateString([], {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 function formatStatus(status = "pending") {

@@ -94,20 +94,23 @@ function Analytics({
     "Dec",
   ];
   const monthCounts = new Array(12).fill(0);
+  const currentYear = new Date().getFullYear();
   tasks.forEach((t) => {
-    const d = t.createdAt ? new Date(t.createdAt) : new Date();
+    if (!t.createdAt) return;
+    const d = new Date(t.createdAt);
+    if (Number.isNaN(d.getTime()) || d.getFullYear() !== currentYear) return;
     const m = d.getMonth();
     if (m >= 0 && m < 12) monthCounts[m]++;
   });
-  const maxMonthCount = Math.max(...monthCounts, 1);
+  const maxMonthCount = Math.max(...monthCounts);
   const monthlyBars = months.map((m, idx) => {
     const count = monthCounts[idx];
-    const pct = Math.max(
-      15,
-      Math.min(100, Math.round((count / maxMonthCount) * 90)),
-    );
+    const pct = maxMonthCount
+      ? Math.round((count / maxMonthCount) * 90)
+      : 0;
     return {
       month: m,
+      count,
       height: `${pct}%`,
       active: idx === new Date().getMonth(),
     };
@@ -332,13 +335,17 @@ function Analytics({
 
         <section className="panel">
           <div className="panel-heading">
-            <h2>Project Analytics</h2>
+            <div>
+              <h2>Tasks Created This Year</h2>
+              <p>Monthly task count for {currentYear}</p>
+            </div>
           </div>
           <div className="bar-chart-container">
             {monthlyBars.map((bar) => (
               <div
                 className={`bar-column ${bar.active ? "active" : ""}`}
                 key={bar.month}
+                title={`${bar.count} tasks created in ${bar.month}`}
               >
                 <div className="bar-fill" style={{ height: bar.height }} />
                 <span className="bar-label">{bar.month}</span>

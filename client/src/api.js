@@ -188,3 +188,19 @@ export function markNotificationRead(notificationId) {
 export function markAllNotificationsRead() {
   return request("/notifications/read-all", { method: "PATCH" });
 }
+
+export function getMyAttendance() {
+  return request("/attendance");
+}
+
+export function getTeamAttendance() {
+  return request("/attendance/team");
+}
+
+export function checkIn() {
+  return request("/attendance/check-in", { method: "POST" });
+}
+
+export function checkOut() {
+  return request("/attendance/check-out", { method: "POST" });
+}
