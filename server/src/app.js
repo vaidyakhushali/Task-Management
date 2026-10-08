@@ -5,6 +5,7 @@ import userRouter from "./routes/user.routes.js";
 import taskRouter from "./routes/task.routes.js";
 import notificationRouter from "./routes/notification.routes.js";
 import projectRouter from "./routes/project.routes.js";
+import attendanceRouter from "./routes/attendance.routes.js";
 
 const app = express();
 app.use(cors({
@@ -22,6 +23,7 @@ app.use('/api/users', userRouter);
 app.use('/api/tasks', taskRouter);
 app.use('/api/notifications', notificationRouter);
 app.use('/api/projects', projectRouter);
+app.use('/api/attendance', attendanceRouter);
 
 app.use((error, req, res, next) => {
     console.error(error);
