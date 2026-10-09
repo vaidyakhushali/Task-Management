@@ -514,9 +514,9 @@ function Tasks({
 
             <h2>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <line x1="12" y1="5" x2="12" y2="19" />
-  <line x1="5" y1="12" x2="19" y2="12" />
-</svg> Assign New Task to Team Member
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg> Assign New Task to Team Member
             </h2>
 
             <p>
@@ -952,7 +952,13 @@ function Tasks({
                 )
               }
             >
-              📋 List View
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                <line x1="8" y1="10" x2="16" y2="10" />
+                <line x1="8" y1="14" x2="16" y2="14" />
+                <line x1="8" y1="18" x2="12" y2="18" />
+              </svg> List View
             </button>
 
             <button
@@ -968,7 +974,21 @@ function Tasks({
                 )
               }
             >
-              📊 Kanban View
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="2" y="2" width="20" height="20" rx="3" ry="3" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+  <rect x="4" y="4" width="4.5" height="16" rx="1.5" fill="#eff6ff" stroke="#93c5fd" stroke-width="1" />
+  <line x1="5.25" y1="5.5" x2="7.25" y2="5.5" stroke="#3b82f6" stroke-width="1.5" />
+  <rect x="4.75" y="8" width="3" height="2" rx="0.5" fill="#3b82f6" fill-opacity="0.2" stroke="#3b82f6" stroke-width="1" />
+  <rect x="4.75" y="11" width="3" height="2" rx="0.5" fill="#3b82f6" fill-opacity="0.2" stroke="#3b82f6" stroke-width="1" />
+  <rect x="9.75" y="4" width="4.5" height="16" rx="1.5" fill="#fff7ed" stroke="#fdba74" stroke-width="1" />
+  <line x1="11" y1="5.5" x2="13" y2="5.5" stroke="#f97316" stroke-width="1.5" />
+  <rect x="10.5" y="8" width="3" height="2" rx="0.5" fill="#f97316" fill-opacity="0.2" stroke="#f97316" stroke-width="1" />
+  <rect x="15.5" y="4" width="4.5" height="16" rx="1.5" fill="#f0fdf4" stroke="#86efac" stroke-width="1" />
+  <line x1="16.75" y1="5.5" x2="18.75" y2="5.5" stroke="#22c55e" stroke-width="1.5" />
+  <rect x="16.25" y="8" width="3" height="2" rx="0.5" fill="#22c55e" fill-opacity="0.2" stroke="#22c55e" stroke-width="1" />
+  <rect x="16.25" y="11" width="3" height="2" rx="0.5" fill="#22c55e" fill-opacity="0.2" stroke="#22c55e" stroke-width="1" />
+  <rect x="16.25" y="14" width="3" height="2" rx="0.5" fill="#22c55e" fill-opacity="0.2" stroke="#22c55e" stroke-width="1" />
+</svg> Kanban View
             </button>
 
             <button
@@ -984,7 +1004,12 @@ function Tasks({
                 )
               }
             >
-              ▦ Grid View
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1" ry="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" ry="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" ry="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" ry="1" />
+              </svg> Grid View
             </button>
 
           </div>

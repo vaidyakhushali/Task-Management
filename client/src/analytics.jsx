@@ -644,7 +644,7 @@ function Analytics({
                           style={{
                             position: "absolute",
                             right: "10px",
-                            top: "80%",
+                            top: "-60%",
                             zIndex: 100,
                             minWidth: "140px",
                             backgroundColor: "#ffffff",
