@@ -115,12 +115,19 @@ export async function listAdminChat(req, res) {
     if (req.user.role !== 'Admin' || !mongoose.isValidObjectId(req.params.userId)) return sendError(res, 403, 'Only admins can open user chats');
     const user = await User.findById(req.params.userId, '_id');
     if (!user) return sendError(res, 404, 'User not found');
+    await ChatMessage.updateMany(
+        { sender: user._id, recipient: req.user._id, seenAt: null },
+        { $set: { seenAt: new Date() } },
+    );
     const messages = await ChatMessage.find({
         $or: [
             { sender: req.user._id, recipient: user._id },
             { sender: user._id, recipient: req.user._id },
         ],
-    }).populate('sender', 'fullname role').sort({ createdAt: 1 });
+    })
+        .populate('sender', 'fullname role')
+        .populate({ path: 'replyTo', select: 'message sender', populate: { path: 'sender', select: 'fullname role' } })
+        .sort({ createdAt: 1 });
     return res.status(200).json({ success: true, data: messages });
 }
 
@@ -130,8 +137,31 @@ export async function sendAdminChat(req, res) {
     if (!message) return sendError(res, 400, 'Message is required');
     const user = await User.findById(req.params.userId, '_id');
     if (!user) return sendError(res, 404, 'User not found');
-    const chatMessage = await ChatMessage.create({ sender: req.user._id, recipient: user._id, message });
+    const replyToId = req.body.replyTo;
+    let replyTo = null;
+    if (replyToId) {
+        if (!mongoose.isValidObjectId(replyToId)) return sendError(res, 400, 'Invalid reply message');
+        replyTo = await ChatMessage.findOne({
+            _id: replyToId,
+            $or: [
+                { sender: req.user._id, recipient: user._id },
+                { sender: user._id, recipient: req.user._id },
+            ],
+        });
+        if (!replyTo) return sendError(res, 404, 'Reply message not found in this chat');
+    }
+    const chatMessage = await ChatMessage.create({
+        sender: req.user._id,
+        recipient: user._id,
+        message,
+        ...(replyTo ? { replyTo: replyTo._id } : {}),
+    });
     await chatMessage.populate('sender', 'fullname role');
+    await chatMessage.populate({
+        path: 'replyTo',
+        select: 'message sender',
+        populate: { path: 'sender', select: 'fullname role' },
+    });
     try {
         await Notification.create({
             recipient: user._id,
@@ -150,12 +180,19 @@ export async function listChat(req, res) {
     if (!mongoose.isValidObjectId(req.params.userId)) return sendError(res, 400, 'Invalid user id');
     const user = await User.findById(req.params.userId, '_id');
     if (!user) return sendError(res, 404, 'User not found');
+    await ChatMessage.updateMany(
+        { sender: user._id, recipient: req.user._id, seenAt: null },
+        { $set: { seenAt: new Date() } },
+    );
     const messages = await ChatMessage.find({
         $or: [
             { sender: req.user._id, recipient: user._id },
             { sender: user._id, recipient: req.user._id },
         ],
-    }).populate('sender', 'fullname role').sort({ createdAt: 1 });
+    })
+        .populate('sender', 'fullname role')
+        .populate({ path: 'replyTo', select: 'message sender', populate: { path: 'sender', select: 'fullname role' } })
+        .sort({ createdAt: 1 });
     return res.status(200).json({ success: true, data: messages });
 }
 
@@ -165,8 +202,31 @@ export async function sendChat(req, res) {
     if (!message) return sendError(res, 400, 'Message is required');
     const user = await User.findById(req.params.userId, '_id');
     if (!user) return sendError(res, 404, 'User not found');
-    const chatMessage = await ChatMessage.create({ sender: req.user._id, recipient: user._id, message });
+    const replyToId = req.body.replyTo;
+    let replyTo = null;
+    if (replyToId) {
+        if (!mongoose.isValidObjectId(replyToId)) return sendError(res, 400, 'Invalid reply message');
+        replyTo = await ChatMessage.findOne({
+            _id: replyToId,
+            $or: [
+                { sender: req.user._id, recipient: user._id },
+                { sender: user._id, recipient: req.user._id },
+            ],
+        });
+        if (!replyTo) return sendError(res, 404, 'Reply message not found in this chat');
+    }
+    const chatMessage = await ChatMessage.create({
+        sender: req.user._id,
+        recipient: user._id,
+        message,
+        ...(replyTo ? { replyTo: replyTo._id } : {}),
+    });
     await chatMessage.populate('sender', 'fullname role');
+    await chatMessage.populate({
+        path: 'replyTo',
+        select: 'message sender',
+        populate: { path: 'sender', select: 'fullname role' },
+    });
 
     // Send Notification to recipient
     try {

@@ -20,6 +20,15 @@ const chatMessageSchema = new mongoose.Schema(
       trim: true,
       maxlength: 1000,
     },
+    seenAt: {
+      type: Date,
+      default: null,
+    },
+    replyTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ChatMessage",
+      default: null,
+    },
   },
   { timestamps: true },
 );

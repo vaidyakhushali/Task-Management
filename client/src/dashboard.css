@@ -1275,14 +1275,6 @@
     width: 100%;
   }
 
-  .dashboard-search-input {
-    grid-column: 1 / -1;
-    width: 100%;
-    min-width: 0 !important;
-    max-width: none !important;
-    box-sizing: border-box;
-  }
-
   .topbar-theme-btn,
   .topbar-fontsize-select {
     min-height: 38px;
