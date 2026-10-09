@@ -6,6 +6,17 @@ import {
 } from "./api";
 import "./analytics.css";
 
+function escapeHtml(value) {
+  const entities = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  return String(value).replace(/[&<>"']/g, (character) => entities[character]);
+}
+
 function Analytics({
   stats = { total: 0, completed: 0, remaining: 0 },
   userRole = "User",
@@ -181,15 +192,16 @@ function Analytics({
     const taskRows =
       empTasks.length > 0
         ? empTasks
-            .map(
-              (t, i) => `
+            .map((t, i) => {
+              const status = t.status || "pending";
+              return `
           <tr>
             <td>${i + 1}</td>
-            <td><strong>${t.title || "Untitled"}</strong></td>
-            <td><span class="badge status-${(t.status || "pending").toLowerCase()}">${t.status || "pending"}</span></td>
+            <td><strong>${escapeHtml(t.title || "Untitled")}</strong></td>
+            <td><span class="badge status-${escapeHtml(status.toLowerCase())}">${escapeHtml(status)}</span></td>
           </tr>
-        `,
-            )
+        `;
+            })
             .join("")
         : `<tr><td colspan="3" class="empty">No tasks currently assigned.</td></tr>`;
 
@@ -198,7 +210,7 @@ function Analytics({
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Employee Report - ${emp.name}</title>
+  <title>Employee Report - ${escapeHtml(emp.name)}</title>
   <style>
     body 
     { 
@@ -209,6 +221,8 @@ function Analytics({
     .emp-info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 28px; }
     .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
     .stat-box { background: #ffffff; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px; text-align: center; }
+    .stat-box strong, .stat-box span { display: block; }
+    .stat-box span { margin-top: 4px; }
     table { width: 100%; border-collapse: collapse; }
     th { text-align: left; font-size: 12px; color: #64748b; padding: 10px 12px; border-bottom: 2px solid #f1f5f9; background: #f8fafc; }
     td { padding: 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
@@ -228,10 +242,10 @@ function Analytics({
       <div>Generated: ${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</div>
     </div>
     <div class="emp-info">
-      <div><label>Full Name</label>: ${emp.name}</div>
-      <div><label>Employee ID</label>: ${emp.id}</div>
-      <div><label>Email Address</label>: ${emp.email}</div>
-      <div><label>Department / Role</label>: ${emp.dept}</div>
+      <div><label>Full Name</label>: ${escapeHtml(emp.name)}</div>
+      <div><label>Employee ID</label>: ${escapeHtml(emp.id)}</div>
+      <div><label>Email Address</label>: ${escapeHtml(emp.email)}</div>
+      <div><label>Department / Role</label>: ${escapeHtml(emp.dept)}</div>
     </div>
     <div class="stats-grid">
       <div class="stat-box"><strong>${empTasks.length}</strong><span>Total Assigned</span></div>
