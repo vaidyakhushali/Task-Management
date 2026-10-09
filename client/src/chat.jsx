@@ -14,6 +14,24 @@ import {
 } from "./api";
 import "./chat.css";
 
+function formatSeenDelay(createdAt, seenAt) {
+  const delay = new Date(seenAt).getTime() - new Date(createdAt).getTime();
+  if (!Number.isFinite(delay)) return "Seen";
+
+  const minutes = Math.max(0, Math.floor(delay / 60000));
+  if (minutes < 1) return "Seen just after sending";
+  if (minutes < 60) return `Seen ${minutes} min later`;
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  if (hours < 24) {
+    return `Seen ${hours} hr${hours === 1 ? "" : "s"}${remainingMinutes ? ` ${remainingMinutes} min` : ""} later`;
+  }
+
+  const days = Math.floor(hours / 24);
+  return `Seen ${days} day${days === 1 ? "" : "s"} later`;
+}
+
 function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
   const currentUserId = currentUser?._id || currentUser?.id;
   const isAdmin = currentUser?.role === "Admin";
@@ -27,8 +45,12 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  const [replyTo, setReplyTo] = useState(null);
+  const [openMessageMenuId, setOpenMessageMenuId] = useState("");
+  const [messageMenuPlacement, setMessageMenuPlacement] = useState("below");
 
   const messagesEndRef = useRef(null);
+  const messageInputRef = useRef(null);
 
   // Auto-scroll to bottom of messages
   const scrollToBottom = () => {
@@ -92,7 +114,26 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
 
   const handleSelectUser = (u) => {
     setActiveChatUser(u);
+    setReplyTo(null);
+    setOpenMessageMenuId("");
+    setError("");
     onChatUserSelected?.(u);
+  };
+
+  const handleReply = (message) => {
+    setReplyTo(message);
+    setOpenMessageMenuId("");
+    messageInputRef.current?.focus();
+  };
+
+  const handleCopyMessage = async (message) => {
+    try {
+      await navigator.clipboard.writeText(message.message);
+      setOpenMessageMenuId("");
+      setError("");
+    } catch {
+      setError("Unable to copy this message. Check your browser clipboard permissions.");
+    }
   };
 
   const handleSendMessage = async (e) => {
@@ -105,13 +146,15 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
 
     try {
       const res = isAdmin
-        ? await sendAdminChat(userId, text)
-        : await sendChat(userId, text);
+        ? await sendAdminChat(userId, text, replyTo?._id)
+        : await sendChat(userId, text, replyTo?._id);
 
       if (res?.data) {
         setMessages((prev) => [...prev, res.data]);
       }
       setMessageInput("");
+      setReplyTo(null);
+      setError("");
     } catch (err) {
       setError(err.message || "Failed to send message.");
     } finally {
@@ -215,8 +258,13 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
                   <button
                     type="button"
                     className="chat-back-btn"
-                    onClick={() => setActiveChatUser(null)}
+                    onClick={() => {
+                      setActiveChatUser(null);
+                      setReplyTo(null);
+                      setOpenMessageMenuId("");
+                    }}
                     title="Back to conversation list"
+                    aria-label="Back to conversation list"
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="19" y1="12" x2="5" y2="12" />
@@ -265,14 +313,79 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
                   messages.map((msg) => {
                     const isSent = String(msg.sender?._id || msg.sender) === String(currentUserId);
                     const timeStr = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+                    const messageId = msg._id || `${msg.createdAt}-${msg.message}`;
+                    const replySender = msg.replyTo?.sender?.fullname || "Message";
 
                     return (
                       <div
-                        key={msg._id || Math.random()}
-                        className={`chat-bubble-row ${isSent ? "sent" : "received"}`}
+                        key={messageId}
+                        className={`chat-bubble-row ${isSent ? "sent" : "received"} ${openMessageMenuId === messageId ? "menu-open" : ""}`}
                       >
-                        <div className="chat-bubble">{msg.message}</div>
+                        {!isSent && (
+                          <div className="chat-message-actions">
+                            <button
+                              type="button"
+                              className="chat-message-menu-button"
+                              aria-label={`Actions for message from ${activeChatUser.fullname || activeChatUser.username || "team member"}`}
+                              aria-expanded={openMessageMenuId === messageId}
+                              onClick={(event) => {
+                                if (openMessageMenuId === messageId) {
+                                  setOpenMessageMenuId("");
+                                  return;
+                                }
+
+                                const viewport = event.currentTarget
+                                  .closest(".chat-messages-container")
+                                  ?.getBoundingClientRect();
+                                const button = event.currentTarget.getBoundingClientRect();
+                                const spaceAbove = viewport
+                                  ? button.top - viewport.top
+                                  : button.top;
+                                const spaceBelow = viewport
+                                  ? viewport.bottom - button.bottom
+                                  : window.innerHeight - button.bottom;
+                                setMessageMenuPlacement(
+                                  spaceBelow >= 112 || spaceBelow >= spaceAbove
+                                    ? "below"
+                                    : "above",
+                                );
+                                setOpenMessageMenuId(messageId);
+                              }}
+                            >
+                              <span aria-hidden="true">⋯</span>
+                            </button>
+                            {openMessageMenuId === messageId && (
+                              <div
+                                className={`chat-message-menu ${messageMenuPlacement}`}
+                              >
+                                <button type="button" onClick={() => handleReply(msg)}>
+                                  Reply
+                                </button>
+                                <button type="button" onClick={() => handleCopyMessage(msg)}>
+                                  Copy
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        <div className="chat-bubble">
+                          {msg.replyTo && (
+                            <div className="chat-reply-quote">
+                              <strong>{replySender}</strong>
+                              <span>{msg.replyTo.message}</span>
+                            </div>
+                          )}
+                          {msg.message}
+                        </div>
                         {timeStr && <span className="chat-bubble-time">{timeStr}</span>}
+                        {isSent && msg.seenAt && (
+                          <span
+                            className="chat-bubble-seen"
+                            title={`Seen at ${new Date(msg.seenAt).toLocaleString()}`}
+                          >
+                            {formatSeenDelay(msg.createdAt, msg.seenAt)}
+                          </span>
+                        )}
                       </div>
                     );
                   })}
@@ -280,8 +393,32 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
               </div>
 
               {/* INPUT BAR */}
-              <form className="chat-input-bar" onSubmit={handleSendMessage}>
+              <form
+                className="chat-input-bar"
+                onSubmit={handleSendMessage}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape" && replyTo) setReplyTo(null);
+                }}
+              >
+                {replyTo && (
+                  <div className="chat-reply-composer">
+                    <div>
+                      <strong>
+                        Replying to {replyTo.sender?.fullname || activeChatUser.fullname || "message"}
+                      </strong>
+                      <span>{replyTo.message}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setReplyTo(null)}
+                      aria-label="Cancel reply"
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
                 <input
+                  ref={messageInputRef}
                   type="text"
                   className="chat-input-field"
                   placeholder={`Message ${activeChatUser.fullname || activeChatUser.username || "member"}...`}

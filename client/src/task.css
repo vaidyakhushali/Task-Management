@@ -160,6 +160,11 @@
 }
 
 .tasks-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 20px;
 }
 
@@ -721,13 +726,24 @@
   /* Reduce container and card padding for smaller viewports */
   .tasks-container {
     padding: 4px 0;
-    gap: 16px;
+    gap: 14px;
+    min-width: 0;
   }
 
   .tasks-page-header,
   .task-create-card,
   .tasks-list-card {
     padding: 16px;
+    min-width: 0;
+    border-radius: 16px;
+  }
+
+  .tasks-page-header {
+    padding: 18px 16px;
+  }
+
+  .role-indicator {
+    overflow-wrap: anywhere;
   }
 
   /* Collapse 2-column form grids to a single column */
@@ -752,11 +768,27 @@
     box-sizing: border-box;
   }
 
+  .tasks-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .search-filter-box {
+    min-width: 0;
+  }
+
   .status-tabs {
     width: 100%;
     overflow-x: auto;
     white-space: nowrap;
     justify-content: flex-start;
+    scrollbar-width: thin;
+  }
+
+  .tab-btn {
+    flex: 0 0 auto;
   }
 
   .view-mode-toggle {
@@ -767,9 +799,21 @@
   }
 
   .view-mode-btn {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 4px;
     justify-content: center;
-    padding: 7px 4px;
-    font-size: 0.7rem;
+    min-width: 0;
+    min-height: 58px;
+    padding: 7px 3px;
+    font-size: 0.68rem;
+    line-height: 1.2;
+  }
+
+  .view-mode-btn svg {
+    width: 20px;
+    height: 20px;
   }
 
   .kanban-column {
@@ -810,9 +854,29 @@
     padding: 14px 12px;
   }
 
+  .tasks-page-header {
+    padding: 16px 14px;
+  }
+
   .tasks-grid-wrapper {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
+  }
+
+  .image3-task-table tbody tr {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px 10px;
+    padding: 14px 12px;
+  }
+
+  .image3-task-table tbody td[data-label="Update status"],
+  .image3-task-table tbody td[data-label="Actions"] {
+    grid-column: 1 / -1;
+  }
+
+  .image3-task-table .status-select,
+  .image3-task-table .btn-delete-task {
+    width: 100%;
   }
 }
 

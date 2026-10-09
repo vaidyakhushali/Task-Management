@@ -846,16 +846,7 @@ function Tasks({
       ====================================================== */}
       <section className="tasks-list-card">
         {/* TOOLBAR */}
-        <div
-          className="tasks-toolbar"
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "12px",
-          }}
-        >
+        <div className="tasks-toolbar">
 
           {/* SEARCH + FILTER */}
 

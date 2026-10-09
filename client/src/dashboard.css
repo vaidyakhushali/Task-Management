@@ -210,6 +210,12 @@
   padding: 4px 0 10px;
 }
 
+.topbar-user-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .dashboard-topbar h1 {
   font-size: 1.25rem;
   font-weight: 800;
@@ -1224,17 +1230,29 @@
 
   .dashboard-topbar {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: 10px;
   }
 
   .dashboard-topbar > div:first-child {
-    grid-column: 1 / -1;
+    grid-column: 1;
+    grid-row: 1;
     min-width: 0;
     display: flex;
     align-items: center;
     gap: 10px;
+  }
+
+  .dashboard-topbar > div:first-child > div {
+    min-width: 0;
+  }
+
+  .topbar-user-actions {
+    grid-column: 2;
+    grid-row: 1;
+    gap: 8px;
+    justify-self: end;
   }
 
   .dashboard-topbar h1 {
@@ -1248,11 +1266,21 @@
   }
 
   .topbar-appearance-controls {
-    grid-column: 1 / 2;
-    justify-content: flex-start;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
     min-width: 0;
     width: 100%;
+  }
+
+  .dashboard-search-input {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0 !important;
+    max-width: none !important;
+    box-sizing: border-box;
   }
 
   .topbar-theme-btn,
@@ -1264,13 +1292,10 @@
   }
 
   .notification-button {
-    grid-column: 2 / 3;
-    justify-self: end;
+    flex: 0 0 auto;
   }
 
   .account-box {
-    grid-column: 3 / 4;
-    justify-self: end;
     gap: 6px;
     padding: 3px 4px;
   }
@@ -1363,20 +1388,37 @@
   }
 
   .dashboard-topbar {
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .dashboard-topbar > div:first-child {
+    grid-column: 1;
+    min-width: 0;
+  }
+
+  .dashboard-topbar > div:first-child > div {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .dashboard-topbar h1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .topbar-user-actions {
+    grid-column: 2;
+    max-width: 100%;
+    gap: 6px;
+  }
+
+  .account-box strong {
+    max-width: 54px;
   }
 
   .topbar-appearance-controls {
-    grid-column: 1 / -1;
-    width: 100%;
-  }
-
-  .notification-button {
-    grid-column: 2 / 3;
-  }
-
-  .account-box {
-    grid-column: 3 / 4;
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 }
 

@@ -80,10 +80,10 @@ export function getAdminChat(userId) {
   return request(`/users/admin-overview/${userId}/chat`);
 }
 
-export function sendAdminChat(userId, message) {
+export function sendAdminChat(userId, message, replyTo) {
   return request(`/users/admin-overview/${userId}/chat`, {
     method: "POST",
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({ message, ...(replyTo ? { replyTo } : {}) }),
   });
 }
 
@@ -91,10 +91,10 @@ export function getChat(userId) {
   return request(`/users/${userId}/chat`);
 }
 
-export function sendChat(userId, message) {
+export function sendChat(userId, message, replyTo) {
   return request(`/users/${userId}/chat`, {
     method: "POST",
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({ message, ...(replyTo ? { replyTo } : {}) }),
   });
 }
 
