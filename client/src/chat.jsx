@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   getAdminChat,
   getAssignableUsers,
@@ -54,15 +60,16 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
   }, [initialChatUser]);
 
   // Fetch messages for active user
-  const fetchMessages = () => {
+  const fetchMessages = useCallback(async () => {
     if (!activeChatUser) return;
     const userId = activeChatUser._id || activeChatUser.id;
-    (isAdmin ? getAdminChat(userId) : getChat(userId))
-      .then((res) => {
-        setMessages(Array.isArray(res?.data) ? res.data : []);
-      })
-      .catch((err) => setError(err.message));
-  };
+    try {
+      const res = await (isAdmin ? getAdminChat(userId) : getChat(userId));
+      setMessages(Array.isArray(res?.data) ? res.data : []);
+    } catch (err) {
+      setError(err.message);
+    }
+  }, [activeChatUser, isAdmin]);
 
   useEffect(() => {
     if (!activeChatUser) {
@@ -70,19 +77,14 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
       return;
     }
 
+    setError("");
     setLoadingMessages(true);
-    const userId = activeChatUser._id || activeChatUser.id;
-    (isAdmin ? getAdminChat(userId) : getChat(userId))
-      .then((res) => {
-        setMessages(Array.isArray(res?.data) ? res.data : []);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoadingMessages(false));
+    fetchMessages().finally(() => setLoadingMessages(false));
 
     // Poll every 3.5 seconds for fresh messages
     const pollInterval = setInterval(fetchMessages, 3500);
     return () => clearInterval(pollInterval);
-  }, [activeChatUser, isAdmin]);
+  }, [activeChatUser, fetchMessages]);
 
   useEffect(() => {
     scrollToBottom();
@@ -200,6 +202,11 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
 
         {/* RIGHT MAIN: ACTIVE CONVERSATION */}
         <main className={`chat-main ${!activeChatUser ? "mobile-hide" : ""}`}>
+          {error && (
+            <p className="chat-error" role="alert">
+              {error}
+            </p>
+          )}
           {activeChatUser ? (
             <>
               {/* CHAT HEADER */}
@@ -313,4 +320,3 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
 }
 
 export default Chat;
-

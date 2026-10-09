@@ -234,6 +234,16 @@
   margin-top: 0.15rem;
 }
 
+.chat-error {
+  margin: 0.75rem 1.25rem 0;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #fecdd3;
+  border-radius: 10px;
+  background: #fff1f2;
+  color: #b42318;
+  font-size: 0.82rem;
+}
+
 .chat-messages-container {
   flex: 1;
   overflow-y: auto;
@@ -455,6 +465,10 @@
 
   .chat-header {
     padding: 0.7rem 0.85rem;
+  }
+
+  .chat-error {
+    margin: 0.6rem 0.85rem 0;
   }
 
   .chat-header-user > div:last-child {
