@@ -335,6 +335,31 @@ export async function deleteTask(req, res) {
     );
     if (!task) return sendError(res, 404, "Task not found");
 
+    const recipientIds = new Set();
+    recipientIds.add(String(req.user._id));
+    if (task.assignedUser) recipientIds.add(String(task.assignedUser));
+    if (task.creator) recipientIds.add(String(task.creator));
+    if (task.owner) recipientIds.add(String(task.owner));
+
+    const actorName = req.user.fullname || req.user.username || "Admin";
+    for (const recipientId of recipientIds) {
+        try {
+            await Notification.create({
+                recipient: recipientId,
+                actor: req.user._id,
+                task: task._id,
+                title: "Task Deleted",
+                message:
+                    String(recipientId) === String(req.user._id)
+                        ? `You moved "${task.title}" to trash.`
+                        : `"${task.title}" was deleted by ${actorName}.`,
+                type: "task",
+            });
+        } catch (notifErr) {
+            console.error("Error creating task deletion notification:", notifErr.message);
+        }
+    }
+
     return res.status(200).json({
         success: true,
         message: "Task moved to trash successfully",

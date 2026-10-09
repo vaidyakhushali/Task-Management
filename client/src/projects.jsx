@@ -23,7 +23,7 @@ function formatTimelineDate(value) {
   return Number.isNaN(date.getTime()) ? null : timelineDateFormatter.format(date);
 }
 
-function Projects({ search = "", userRole }) {
+function Projects({ search = "", userRole, onProjectsChanged }) {
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [assignableUsers, setAssignableUsers] = useState([]);
@@ -72,6 +72,9 @@ function Projects({ search = "", userRole }) {
       setProjects((currentProjects) => [response.data, ...currentProjects]);
       setProjectName("");
       setDescription("");
+      if (typeof onProjectsChanged === "function") {
+        onProjectsChanged();
+      }
     } catch (submitError) {
       setError(submitError.message);
     }
@@ -105,6 +108,9 @@ function Projects({ search = "", userRole }) {
       });
       setTasks((current) => [response.data, ...current]);
       setTaskDrafts((current) => ({ ...current, [project._id]: {} }));
+      if (typeof onProjectsChanged === "function") {
+        onProjectsChanged();
+      }
     } catch (submitError) {
       setError(submitError.message);
     }
@@ -119,6 +125,9 @@ function Projects({ search = "", userRole }) {
         current.filter((item) => item._id !== project._id),
       );
       setSuccess("Project moved to admin trash.");
+      if (typeof onProjectsChanged === "function") {
+        onProjectsChanged();
+      }
     } catch (deleteError) {
       setError(deleteError.message || "Unable to move project to trash.");
     }

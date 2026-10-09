@@ -14,6 +14,7 @@ function Settings({
   fontSize,
   onFontSizeChange,
   onProfileNameChange,
+  onPasswordChanged,
 }) {
   const email = user?.email || "Not available";
   const username = user?.username || "Not available";
@@ -60,6 +61,9 @@ function Settings({
       setNewPassword("");
       setConfirmPassword("");
       setMessage("Password changed successfully");
+      if (typeof onPasswordChanged === "function") {
+        onPasswordChanged();
+      }
     } catch (passwordError) {
       setError(passwordError.message);
     }

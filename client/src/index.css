@@ -360,48 +360,92 @@ button {
 /* Toast Notifications Container */
 .toast-container {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 9999;
+  top: 24px;
+  right: 24px;
+  z-index: 99999;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-width: 320px;
-  width: calc(100% - 40px);
+  gap: 12px;
+  max-width: 380px;
+  width: calc(100% - 48px);
+  pointer-events: none;
 }
 
 .toast-card {
-  background: var(--card-bg);
-  border: 1px solid var(--warm-peach);
-  border-left: 4px solid var(--terracotta);
-  border-radius: var(--radius-md);
-  padding: 10px 14px;
-  box-shadow: var(--shadow-lg);
+  pointer-events: auto;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--soft-border, #f0e6dd);
+  border-radius: var(--radius-md, 14px);
+  padding: 14px 16px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
 }
 
-.toast-icon {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--warm-peach-light);
-  color: var(--terracotta-dark);
+.toast-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+}
+
+.toast-card.toast-task {
+  border-left: 4px solid #f97316;
+}
+.toast-card.toast-project {
+  border-left: 4px solid #6366f1;
+}
+.toast-card.toast-security {
+  border-left: 4px solid #10b981;
+}
+.toast-card.toast-chat {
+  border-left: 4px solid #0ea5e9;
+}
+.toast-card.toast-workspace {
+  border-left: 4px solid var(--terracotta, #d8976c);
+}
+
+.toast-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 0.78rem;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.toast-icon-task {
+  background: #ffedd5;
+  color: #c2410c;
+}
+.toast-icon-project {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+.toast-icon-security {
+  background: #dcfce7;
+  color: #15803d;
+}
+.toast-icon-chat {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+.toast-icon-workspace {
+  background: var(--warm-peach-light, #fae8dc);
+  color: var(--terracotta-dark, #c07a4e);
 }
 
 .toast-open-button {
   display: flex;
   align-items: flex-start;
   flex: 1;
-  gap: 10px;
+  gap: 12px;
   min-width: 0;
   padding: 0;
   border: 0;
@@ -409,49 +453,128 @@ button {
   color: inherit;
   font: inherit;
   text-align: left;
-}
-
-.toast-open-button:focus-visible {
-  outline: 2px solid var(--warm-peach);
-  outline-offset: 3px;
+  cursor: pointer;
 }
 
 .toast-content {
-  display: block;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
+  flex: 1;
 }
 
-.toast-content strong {
-  display: block;
-  font-size: 0.82rem;
-  color: var(--text-dark);
+.toast-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 3px;
 }
 
-.toast-content span {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--text-muted);
+.toast-badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.toast-badge-task {
+  background: #ffedd5;
+  color: #9a3412;
+}
+.toast-badge-project {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+.toast-badge-security {
+  background: #dcfce7;
+  color: #166534;
+}
+.toast-badge-chat {
+  background: #e0f2fe;
+  color: #075985;
+}
+.toast-badge-workspace {
+  background: var(--warm-peach-light, #fae8dc);
+  color: var(--terracotta-dark, #c07a4e);
+}
+
+.toast-time {
+  font-size: 11px;
+  color: var(--text-muted, #8a7a70);
+  font-weight: 500;
+}
+
+.toast-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-dark, #2d241e);
+  line-height: 1.3;
   margin-top: 2px;
 }
 
-.toast-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  margin-left: auto;
-  line-height: 1;
+.toast-message {
+  font-size: 12.5px;
+  color: var(--text-muted, #8a7a70);
+  margin-top: 4px;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-@keyframes slideIn {
+.toast-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #8a7a70);
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.toast-close:hover {
+  background: var(--warm-peach-light, #fae8dc);
+  color: var(--text-dark, #2d241e);
+}
+
+@keyframes toastSlideIn {
   from {
-    transform: translateX(100%);
+    transform: translateX(110%) scale(0.95);
     opacity: 0;
   }
   to {
-    transform: translateX(0);
+    transform: translateX(0) scale(1);
     opacity: 1;
   }
+}
+
+[data-theme="dark"] .toast-card {
+  background: #1e2630 !important;
+  border-color: #303a44 !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .toast-title {
+  color: #edf1f5 !important;
+}
+
+[data-theme="dark"] .toast-message,
+[data-theme="dark"] .toast-time {
+  color: #a4afba !important;
+}
+
+[data-theme="dark"] .toast-close:hover {
+  background: #2a3440 !important;
+  color: #edf1f5 !important;
 }
 
 /* Aesthetic Soft Pastel Pill Badges */

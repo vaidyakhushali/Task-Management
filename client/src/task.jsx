@@ -348,6 +348,10 @@ function Tasks({
         setSuccessMsg(
           "Task deleted successfully."
         );
+
+        if (typeof onTaskAssigned === "function") {
+          onTaskAssigned();
+        }
       } else {
         setError(
           res?.message ||

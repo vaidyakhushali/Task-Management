@@ -224,6 +224,19 @@ export async function changePassword(req, res) {
     account.password = newPassword;
     account.refreshToken = null;
     await account.save();
+
+    try {
+        await Notification.create({
+            recipient: req.user._id,
+            actor: req.user._id,
+            title: "Password Changed",
+            message: "Your account password has been updated successfully.",
+            type: "workspace",
+        });
+    } catch (notifErr) {
+        console.error("Error creating password change notification:", notifErr.message);
+    }
+
     return res
     .status(200)
     .json({ success: true, message: 'Password changed successfully' });

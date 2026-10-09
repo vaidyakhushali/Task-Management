@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Project } from "../models/project.model.js";
 import { Task } from "../models/task.model.js";
+import { Notification } from "../models/notification.model.js";
 
 function sendError(res, status, message) {
   return res.status(status).json({ success: false, message });
@@ -64,6 +65,44 @@ export async function deleteProject(req, res) {
     { $set: { deletedAt: new Date() } },
   );
   if (!project) return sendError(res, 404, "Project not found");
+
+  const recipientIds = new Set();
+  recipientIds.add(String(req.user._id));
+  if (project.owner) recipientIds.add(String(project.owner));
+  if (Array.isArray(project.members)) {
+    project.members.forEach((m) => {
+      if (m) recipientIds.add(String(m._id || m));
+    });
+  }
+
+  try {
+    const projectTasks = await Task.find({ project: project._id, deletedAt: null }).select("assignedUser creator");
+    projectTasks.forEach((t) => {
+      if (t.assignedUser) recipientIds.add(String(t.assignedUser));
+      if (t.creator) recipientIds.add(String(t.creator));
+    });
+  } catch (err) {
+    console.error("Error finding project tasks for deletion notification:", err.message);
+  }
+
+  const actorName = req.user.fullname || req.user.username || "Admin";
+  for (const recipientId of recipientIds) {
+    try {
+      await Notification.create({
+        recipient: recipientId,
+        actor: req.user._id,
+        title: "Project Deleted",
+        message:
+          String(recipientId) === String(req.user._id)
+            ? `You moved project "${project.name}" to trash.`
+            : `Project "${project.name}" was deleted by ${actorName}.`,
+        type: "workspace",
+      });
+    } catch (notifErr) {
+      console.error("Error creating project deletion notification:", notifErr.message);
+    }
+  }
+
   return res.status(200).json({
     success: true,
     message: "Project moved to trash successfully",
