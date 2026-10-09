@@ -20,11 +20,13 @@ import Reports from "./reports";
 import Settings from "./settings";
 import Notification from "./notification";
 import Trash from "./trash";
+import Chat from "./chat";
 
 const menuItems = [
   "Dashboard",
   "Tasks",
   "Projects",
+  "Chat",
   "Analytics",
   "Calendar",
   "Team Members",
@@ -96,12 +98,18 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
   const [attendanceError, setAttendanceError] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [displayName, setDisplayName] = useState(userName);
+  const [searchQuery, setSearchQuery] = useState("");
   const [taskStatusFilter, setTaskStatusFilter] = useState("all");
-  const search = "";
+  const [selectedChatUser, setSelectedChatUser] = useState(null);
 
   function openStatusTab(statusKey) {
     setTaskStatusFilter(statusKey);
     setActiveTab("Tasks");
+  }
+
+  function handleStartChat(chatUser) {
+    setSelectedChatUser(chatUser);
+    setActiveTab("Chat");
   }
 
   const [theme, setTheme] = useState(
@@ -289,7 +297,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
     },
   ];
 
-  const query = search.trim().toLowerCase();
+  const query = searchQuery.trim().toLowerCase();
   const visibleTasks = useMemo(() => {
     if (!query) return tasks;
     return tasks.filter((task) => {
@@ -501,6 +509,23 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
               </div>
             </div>
             <div className="topbar-appearance-controls">
+              <input
+                type="text"
+                className="dashboard-search-input"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search tasks, people, projects"
+                aria-label="Search dashboard data"
+                style={{
+                  minWidth: "180px",
+                  maxWidth: "260px",
+                  padding: "0.5rem 0.75rem",
+                  borderRadius: "999px",
+                  border: "1px solid rgba(148, 163, 184, 0.4)",
+                  background: "rgba(15, 23, 42, 0.02)",
+                  color: "inherit",
+                }}
+              />
               <button
                 className="topbar-theme-btn"
                 type="button"
@@ -940,7 +965,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
                         ))
                     ) : (
                       <div className="empty-state">
-                        {search
+                        {searchQuery
                           ? "No tasks match your search."
                           : "No tasks found yet."}
                       </div>
@@ -960,7 +985,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
 
             {activeTab === "Projects" && (
               <Projects
-                search={search}
+                search={searchQuery}
                 userRole={userRole}
                 onProjectsChanged={loadDashboard}
               />
@@ -976,6 +1001,14 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
                 userRole={userRole}
               />
             )}
+            {activeTab === "Chat" && (
+              <Chat
+                user={user}
+                initialChatUser={selectedChatUser}
+                onChatUserSelected={setSelectedChatUser}
+              />
+            )}
+
             {activeTab === "Calendar" && (
               <CalendarView
                 user={user}
@@ -985,7 +1018,12 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
             )}
 
             {activeTab === "Team Members" && (
-              <TeamMembers search={search} user={user} userRole={userRole} />
+              <TeamMembers
+                search={searchQuery || ""}
+                user={user}
+                userRole={userRole}
+                onStartChat={handleStartChat}
+              />
             )}
 
             {activeTab === "Reports" && isAdmin && (
@@ -1338,6 +1376,20 @@ function getMenuIcon(item) {
           d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
           fill="#fef3c7"
         />
+      </svg>
+    ),
+    Chat: (
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#0ea5e9"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="#e0f2fe" />
       </svg>
     ),
     Analytics: (

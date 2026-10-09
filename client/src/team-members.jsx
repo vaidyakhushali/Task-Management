@@ -8,7 +8,7 @@ import {
 } from "./api";
 import "./admin-overview.css";
 
-function TeamMembers({ search = "", user: currentUser, userRole }) {
+function TeamMembers({ search = "", user: currentUser, userRole, onStartChat }) {
   const currentUserId = currentUser?._id || currentUser?.id;
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
@@ -132,14 +132,18 @@ function TeamMembers({ search = "", user: currentUser, userRole }) {
                   <button
                     type="button"
                     className="chat-button"
-                    onClick={() =>
-                      setActiveChatUser((current) =>
-                        current?._id === user._id ? null : user,
-                      )
-                    }
-                    aria-expanded={activeChatUser?._id === user._id}
+                    onClick={() => {
+                      if (typeof onStartChat === "function") {
+                        onStartChat(user);
+                      } else {
+                        setActiveChatUser((current) =>
+                          current?._id === user._id ? null : user,
+                        );
+                      }
+                    }}
+                    title={`Open direct chat with ${user.fullname || user.username}`}
                   >
-                    {activeChatUser?._id === user._id ? "Close chat" : "Chat"}
+                    Chat
                   </button>
                 )}
               </div>

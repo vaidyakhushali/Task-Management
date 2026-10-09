@@ -252,15 +252,27 @@ function Projects({ search = "", userRole, onProjectsChanged }) {
                       key={`${project._id || projectIndex}-${idx}`}
                     >
                       <div className="project-task-name">
+                        <span className="project-mobile-label" aria-hidden="true">
+                          Task
+                        </span>
                         <span>{task.title}</span>
                       </div>
                       <div className="project-cell project-assignee">
+                        <span className="project-mobile-label" aria-hidden="true">
+                          Assignee
+                        </span>
                         {task.assignedUser?.fullname || "Unassigned"}
                       </div>
                       <div className="project-cell project-type">
+                        <span className="project-mobile-label" aria-hidden="true">
+                          Task type
+                        </span>
                         {task.taskType || "Standard"}
                       </div>
                       <div className="project-cell project-priority">
+                        <span className="project-mobile-label" aria-hidden="true">
+                          Priority
+                        </span>
                         <span
                           className={`project-pill project-pill-${task.priority}`}
                         >
@@ -268,6 +280,9 @@ function Projects({ search = "", userRole, onProjectsChanged }) {
                         </span>
                       </div>
                       <div className="project-cell project-status">
+                        <span className="project-mobile-label" aria-hidden="true">
+                          Status
+                        </span>
                         <span
                           className={`project-pill project-pill-${status}`}
                         >
@@ -275,6 +290,9 @@ function Projects({ search = "", userRole, onProjectsChanged }) {
                         </span>
                       </div>
                       <div className="project-cell project-date">
+                        <span className="project-mobile-label" aria-hidden="true">
+                          Timeline
+                        </span>
                         {timelineText}
                       </div>
                     </div>
