@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import ReactDOM from "react-dom";
 import {
   getNotifications,
   markAllNotificationsRead,
@@ -212,6 +213,22 @@ function Notification({
         .catch((readError) => setError(readError.message));
     }
   }, [notificationToOpen, isLoading, onNotificationOpened]);
+
+  useEffect(() => {
+    if (activeNotification) {
+      document.body.style.overflow = "hidden";
+      const handleKeyDown = (e) => {
+        if (e.key === "Escape") {
+          setActiveNotification(null);
+        }
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.body.style.overflow = "";
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+  }, [activeNotification]);
 
   function updateNotifications(nextNotifications) {
     setNotifications(nextNotifications);
@@ -570,80 +587,82 @@ function Notification({
           })}
       </div>
 
-      {/* DETAIL MODAL */}
-      {activeNotification && (
-        <div
-          className="notification-modal-backdrop"
-          role="presentation"
-          onClick={() => setActiveNotification(null)}
-        >
-          <section
-            className="notification-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="notification-detail-title"
-            onClick={(event) => event.stopPropagation()}
+      {/* DETAIL MODAL (Rendered via Portal directly into document.body to ensure true full-viewport centering on mobile & desktop) */}
+      {activeNotification &&
+        ReactDOM.createPortal(
+          <div
+            className="notification-modal-backdrop"
+            role="presentation"
+            onClick={() => setActiveNotification(null)}
           >
-            <button
-              className="notification-close-button"
-              type="button"
-              onClick={() => setActiveNotification(null)}
-              aria-label="Close notification details"
+            <section
+              className="notification-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="notification-detail-title"
+              onClick={(event) => event.stopPropagation()}
             >
-              ✕
-            </button>
+              <button
+                className="notification-close-button"
+                type="button"
+                onClick={() => setActiveNotification(null)}
+                aria-label="Close notification details"
+              >
+                ✕
+              </button>
 
-            <div className="notification-modal-heading">
-              <span className={`notif-category-pill cat-${getNotificationCategory(activeNotification)}`}>
-                {getCategoryLabel(getNotificationCategory(activeNotification))}
-              </span>
-              <h2 id="notification-detail-title">
-                {activeNotification.title || "Notification Details"}
-              </h2>
-            </div>
-
-            <div className="notif-modal-message-box">
-              {activeNotification.message}
-            </div>
-
-            <dl className="notification-detail-list">
-              <div>
-                <dt>Initiated By</dt>
-                <dd>
-                  {activeNotification.actor?.fullname || "Workspace member"}{" "}
-                  ({activeNotification.actor?.role || "User"})
-                </dd>
+              <div className="notification-modal-heading">
+                <span className={`notif-category-pill cat-${getNotificationCategory(activeNotification)}`}>
+                  {getCategoryLabel(getNotificationCategory(activeNotification))}
+                </span>
+                <h2 id="notification-detail-title">
+                  {activeNotification.title || "Notification Details"}
+                </h2>
               </div>
 
-              <div>
-                <dt>Date & Time</dt>
-                <dd>{new Date(activeNotification.createdAt).toLocaleString()}</dd>
+              <div className="notif-modal-message-box">
+                {activeNotification.message}
               </div>
 
-              {activeNotification.task?.status && (
+              <dl className="notification-detail-list">
                 <div>
-                  <dt>Task Status</dt>
-                  <dd style={{ textTransform: "capitalize" }}>{activeNotification.task.status}</dd>
+                  <dt>Initiated By</dt>
+                  <dd>
+                    {activeNotification.actor?.fullname || "Workspace member"}{" "}
+                    ({activeNotification.actor?.role || "User"})
+                  </dd>
                 </div>
-              )}
 
-              {activeNotification.task?.priority && (
                 <div>
-                  <dt>Task Priority</dt>
-                  <dd style={{ textTransform: "capitalize" }}>{activeNotification.task.priority}</dd>
+                  <dt>Date & Time</dt>
+                  <dd>{new Date(activeNotification.createdAt).toLocaleString()}</dd>
                 </div>
-              )}
 
-              {activeNotification.task?.description && (
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <dt>Task Description</dt>
-                  <dd>{activeNotification.task.description}</dd>
-                </div>
-              )}
-            </dl>
-          </section>
-        </div>
-      )}
+                {activeNotification.task?.status && (
+                  <div>
+                    <dt>Task Status</dt>
+                    <dd style={{ textTransform: "capitalize" }}>{activeNotification.task.status}</dd>
+                  </div>
+                )}
+
+                {activeNotification.task?.priority && (
+                  <div>
+                    <dt>Task Priority</dt>
+                    <dd style={{ textTransform: "capitalize" }}>{activeNotification.task.priority}</dd>
+                  </div>
+                )}
+
+                {activeNotification.task?.description && (
+                  <div style={{ gridColumn: "1 / -1" }}>
+                    <dt>Task Description</dt>
+                    <dd>{activeNotification.task.description}</dd>
+                  </div>
+                )}
+              </dl>
+            </section>
+          </div>,
+          document.body,
+        )}
     </section>
   );
 }
