@@ -20,6 +20,7 @@ import Reports from "./reports";
 import Settings from "./settings";
 import Notification from "./notification";
 import Trash from "./trash";
+import Chat from "./chat";
 
 const menuItems = [
   "Dashboard",
@@ -28,6 +29,7 @@ const menuItems = [
   "Analytics",
   "Calendar",
   "Team Members",
+  "Chat",
   "Reports",
   "Trash",
 ];
@@ -51,11 +53,17 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
   const [attendanceError, setAttendanceError] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [displayName, setDisplayName] = useState(userName);
+  const [selectedChatUser, setSelectedChatUser] = useState(null);
   const [taskStatusFilter, setTaskStatusFilter] = useState("all");  
 
   function openStatusTab(statusKey) {
     setTaskStatusFilter(statusKey);
     setActiveTab("Tasks");
+  }
+
+  function handleStartChat(chatUser) {
+    setSelectedChatUser(chatUser);
+    setActiveTab("Chat");
   }
 
   const [theme, setTheme] = useState(
@@ -854,7 +862,26 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
               />
             )}
 
-            
+            {activeTab === "Projects" && (
+              <Projects
+                userRole={userRole}
+                onProjectsChanged={loadDashboard}
+              />
+            )}
+            {activeTab === "Team Members" && (
+              <TeamMembers
+                user={user}
+                userRole={userRole}
+                onStartChat={handleStartChat}
+              />
+            )}
+            {activeTab === "Chat" && (
+              <Chat
+                user={user}
+                initialChatUser={selectedChatUser}
+                onChatUserSelected={setSelectedChatUser}
+              />
+            )}
 
             {activeTab === "Analytics" && isAdmin && (
               <Analytics
@@ -1273,6 +1300,20 @@ function getMenuIcon(item) {
         <circle cx="9" cy="7" r="4" fill="#ede9fe" />
         <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
         <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    ),
+    Chat: (
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#0ea5e9"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-4 3V6a2 2 0 0 1 2-2Z" />
       </svg>
     ),
     Reports: (
