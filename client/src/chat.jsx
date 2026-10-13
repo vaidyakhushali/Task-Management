@@ -66,7 +66,11 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
         setUsers(list);
         // If no active chat user selected and we have members, default or wait
         if (initialChatUser) {
-          const found = list.find((u) => String(u._id) === String(initialChatUser._id || initialChatUser.id));
+          const found = list.find(
+            (u) =>
+              String(u._id) ===
+              String(initialChatUser._id || initialChatUser.id),
+          );
           if (found) setActiveChatUser(found);
         }
       })
@@ -132,7 +136,9 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
       setOpenMessageMenuId("");
       setError("");
     } catch {
-      setError("Unable to copy this message. Check your browser clipboard permissions.");
+      setError(
+        "Unable to copy this message. Check your browser clipboard permissions.",
+      );
     }
   };
 
@@ -180,16 +186,34 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
     <section className="chat-page" aria-label="Team Chat">
       <div className="chat-container">
         {/* LEFT SIDEBAR: CONTACT LIST */}
-        <aside className={`chat-sidebar ${activeChatUser ? "mobile-hide" : ""}`}>
+        <aside
+          className={`chat-sidebar ${activeChatUser ? "mobile-hide" : ""}`}
+        >
           <div className="chat-sidebar-header">
             <h2>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
               Direct Messages
             </h2>
             <div className="chat-search-input-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
@@ -205,20 +229,31 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
 
           <div className="chat-contacts-list">
             {loadingUsers && (
-              <p className="admin-empty" style={{ padding: "1.5rem", textAlign: "center" }}>
+              <p
+                className="admin-empty"
+                style={{ padding: "1.5rem", textAlign: "center" }}
+              >
                 Loading team members...
               </p>
             )}
 
             {!loadingUsers && filteredUsers.length === 0 && (
-              <p className="admin-empty" style={{ padding: "1.5rem", textAlign: "center" }}>
-                {searchQuery ? "No members found." : "No team members available."}
+              <p
+                className="admin-empty"
+                style={{ padding: "1.5rem", textAlign: "center" }}
+              >
+                {searchQuery
+                  ? "No members found."
+                  : "No team members available."}
               </p>
             )}
 
             {!loadingUsers &&
               filteredUsers.map((u) => {
-                const isSelected = activeChatUser && String(activeChatUser._id || activeChatUser.id) === String(u._id || u.id);
+                const isSelected =
+                  activeChatUser &&
+                  String(activeChatUser._id || activeChatUser.id) ===
+                    String(u._id || u.id);
                 const name = u.fullname || u.username || "Team Member";
                 const initial = name.charAt(0).toUpperCase();
 
@@ -233,9 +268,13 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
                     <div className="chat-contact-info">
                       <div className="chat-contact-top">
                         <span className="chat-contact-name">{name}</span>
-                        <span className="chat-contact-role">{u.role || "User"}</span>
+                        <span className="chat-contact-role">
+                          {u.role || "User"}
+                        </span>
                       </div>
-                      <div className="chat-contact-sub">{u.email || `@${u.username}`}</div>
+                      <div className="chat-contact-sub">
+                        {u.email || `@${u.username}`}
+                      </div>
                     </div>
                   </button>
                 );
@@ -266,24 +305,46 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
                     title="Back to conversation list"
                     aria-label="Back to conversation list"
                   >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <line x1="19" y1="12" x2="5" y2="12" />
                       <polyline points="12 19 5 12 12 5" />
                     </svg>
                   </button>
 
-                  <div className="chat-contact-avatar" style={{ width: "2.3rem", height: "2.3rem", fontSize: "0.85rem" }}>
-                    {(activeChatUser.fullname || activeChatUser.username || "U").charAt(0).toUpperCase()}
+                  <div
+                    className="chat-contact-avatar"
+                    style={{
+                      width: "2.3rem",
+                      height: "2.3rem",
+                      fontSize: "0.85rem",
+                    }}
+                  >
+                    {(activeChatUser.fullname || activeChatUser.username || "U")
+                      .charAt(0)
+                      .toUpperCase()}
                   </div>
 
                   <div>
                     <h3 className="chat-header-name">
-                      {activeChatUser.fullname || activeChatUser.username || "Team Member"}
+                      {activeChatUser.fullname ||
+                        activeChatUser.username ||
+                        "Team Member"}
                     </h3>
                     <div className="chat-header-status">
                       <span>{activeChatUser.role || "User"}</span>
                       <span>·</span>
-                      <span>{activeChatUser.email || `@${activeChatUser.username}`}</span>
+                      <span>
+                        {activeChatUser.email || `@${activeChatUser.username}`}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -300,7 +361,14 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
                 {!loadingMessages && messages.length === 0 && (
                   <div className="chat-empty-state">
                     <div className="chat-empty-icon">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                       </svg>
                     </div>
@@ -311,10 +379,19 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
 
                 {!loadingMessages &&
                   messages.map((msg) => {
-                    const isSent = String(msg.sender?._id || msg.sender) === String(currentUserId);
-                    const timeStr = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
-                    const messageId = msg._id || `${msg.createdAt}-${msg.message}`;
-                    const replySender = msg.replyTo?.sender?.fullname || "Message";
+                    const isSent =
+                      String(msg.sender?._id || msg.sender) ===
+                      String(currentUserId);
+                    const timeStr = msg.createdAt
+                      ? new Date(msg.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "";
+                    const messageId =
+                      msg._id || `${msg.createdAt}-${msg.message}`;
+                    const replySender =
+                      msg.replyTo?.sender?.fullname || "Message";
 
                     return (
                       <div
@@ -337,7 +414,8 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
                                 const viewport = event.currentTarget
                                   .closest(".chat-messages-container")
                                   ?.getBoundingClientRect();
-                                const button = event.currentTarget.getBoundingClientRect();
+                                const button =
+                                  event.currentTarget.getBoundingClientRect();
                                 const spaceAbove = viewport
                                   ? button.top - viewport.top
                                   : button.top;
@@ -358,10 +436,16 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
                               <div
                                 className={`chat-message-menu ${messageMenuPlacement}`}
                               >
-                                <button type="button" onClick={() => handleReply(msg)}>
+                                <button
+                                  type="button"
+                                  onClick={() => handleReply(msg)}
+                                >
                                   Reply
                                 </button>
-                                <button type="button" onClick={() => handleCopyMessage(msg)}>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyMessage(msg)}
+                                >
                                   Copy
                                 </button>
                               </div>
@@ -377,7 +461,9 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
                           )}
                           {msg.message}
                         </div>
-                        {timeStr && <span className="chat-bubble-time">{timeStr}</span>}
+                        {timeStr && (
+                          <span className="chat-bubble-time">{timeStr}</span>
+                        )}
                         {isSent && msg.seenAt && (
                           <span
                             className="chat-bubble-seen"
@@ -404,7 +490,10 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
                   <div className="chat-reply-composer">
                     <div>
                       <strong>
-                        Replying to {replyTo.sender?.fullname || activeChatUser.fullname || "message"}
+                        Replying to{" "}
+                        {replyTo.sender?.fullname ||
+                          activeChatUser.fullname ||
+                          "message"}
                       </strong>
                       <span>{replyTo.message}</span>
                     </div>
@@ -432,7 +521,16 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
                   disabled={!messageInput.trim() || sending}
                 >
                   <span>{sending ? "..." : "Send"}</span>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <line x1="22" y1="2" x2="11" y2="13" />
                     <polygon points="22 2 15 22 11 13 2 9 22 2" />
                   </svg>
@@ -442,7 +540,14 @@ function Chat({ user: currentUser, initialChatUser, onChatUserSelected }) {
           ) : (
             <div className="chat-empty-state">
               <div className="chat-empty-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
               </div>

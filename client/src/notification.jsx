@@ -315,14 +315,24 @@ function Notification({
       <div className="notification-heading">
         <div>
           <span className="dashboard-label">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
               <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
             Workspace Activity
           </span>
           <h2 id="notification-title">Notifications & Activity Feed</h2>
-          <p>Real-time alerts for project milestones, task updates, team chats, and security.</p>
+          <p>
+            Real-time alerts for project milestones, task updates, team chats,
+            and security.
+          </p>
         </div>
         <div className="notification-header-actions">
           <button
@@ -332,7 +342,14 @@ function Notification({
             disabled={counts.unread === 0}
             title="Mark all notifications as read"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
               <polyline points="20 6 9 17 4 12" />
             </svg>
             Mark all as read
@@ -349,7 +366,14 @@ function Notification({
           tabIndex="0"
         >
           <div className="notif-stat-icon all">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -368,7 +392,14 @@ function Notification({
           tabIndex="0"
         >
           <div className="notif-stat-icon unread">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
               <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
@@ -428,7 +459,14 @@ function Notification({
       {/* SEARCH AND FILTER CHIPS */}
       <div className="notification-toolbar">
         <div className="notif-search-box">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
@@ -497,7 +535,14 @@ function Notification({
         {!isLoading && !error && filteredNotifications.length === 0 && (
           <div className="notification-empty-state">
             <div className="notif-empty-icon-wrap">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                 <path d="M13.73 21a2 2 0 0 1-3.46 0" />
               </svg>
@@ -528,7 +573,10 @@ function Notification({
                 role="button"
               >
                 {/* Left Category Icon */}
-                <div className={`notification-type-badge cat-${category}`} aria-hidden="true">
+                <div
+                  className={`notification-type-badge cat-${category}`}
+                  aria-hidden="true"
+                >
                   <CategoryIcon category={category} />
                 </div>
 
@@ -539,7 +587,14 @@ function Notification({
                       {getCategoryLabel(category)}
                     </span>
                     <span className="notif-timestamp-tag">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
                         <circle cx="12" cy="12" r="10" />
                         <polyline points="12 6 12 12 16 14" />
                       </svg>
@@ -555,13 +610,18 @@ function Notification({
                       <span className="notif-actor-avatar">{actorInitial}</span>
                       <span>{actorName}</span>
                       {notification.actor?.role && (
-                        <span className="notif-role-badge">{notification.actor.role}</span>
+                        <span className="notif-role-badge">
+                          {notification.actor.role}
+                        </span>
                       )}
                     </div>
 
                     <div className="notif-card-actions">
                       {!notification.read && (
-                        <span className="notification-unread-dot" title="Unread notification" />
+                        <span
+                          className="notification-unread-dot"
+                          title="Unread notification"
+                        />
                       )}
                       {!notification.read && (
                         <button
@@ -573,7 +633,14 @@ function Notification({
                           }}
                           title="Mark as read"
                         >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
                             <polyline points="20 6 9 17 4 12" />
                           </svg>
                           Mark read
@@ -612,8 +679,12 @@ function Notification({
               </button>
 
               <div className="notification-modal-heading">
-                <span className={`notif-category-pill cat-${getNotificationCategory(activeNotification)}`}>
-                  {getCategoryLabel(getNotificationCategory(activeNotification))}
+                <span
+                  className={`notif-category-pill cat-${getNotificationCategory(activeNotification)}`}
+                >
+                  {getCategoryLabel(
+                    getNotificationCategory(activeNotification),
+                  )}
                 </span>
                 <h2 id="notification-detail-title">
                   {activeNotification.title || "Notification Details"}
@@ -628,27 +699,33 @@ function Notification({
                 <div>
                   <dt>Initiated By</dt>
                   <dd>
-                    {activeNotification.actor?.fullname || "Workspace member"}{" "}
-                    ({activeNotification.actor?.role || "User"})
+                    {activeNotification.actor?.fullname || "Workspace member"} (
+                    {activeNotification.actor?.role || "User"})
                   </dd>
                 </div>
 
                 <div>
                   <dt>Date & Time</dt>
-                  <dd>{new Date(activeNotification.createdAt).toLocaleString()}</dd>
+                  <dd>
+                    {new Date(activeNotification.createdAt).toLocaleString()}
+                  </dd>
                 </div>
 
                 {activeNotification.task?.status && (
                   <div>
                     <dt>Task Status</dt>
-                    <dd style={{ textTransform: "capitalize" }}>{activeNotification.task.status}</dd>
+                    <dd style={{ textTransform: "capitalize" }}>
+                      {activeNotification.task.status}
+                    </dd>
                   </div>
                 )}
 
                 {activeNotification.task?.priority && (
                   <div>
                     <dt>Task Priority</dt>
-                    <dd style={{ textTransform: "capitalize" }}>{activeNotification.task.priority}</dd>
+                    <dd style={{ textTransform: "capitalize" }}>
+                      {activeNotification.task.priority}
+                    </dd>
                   </div>
                 )}
 

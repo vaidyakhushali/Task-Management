@@ -10,30 +10,20 @@ import {
 
 import "./task.css";
 
-function Tasks({
-  user,
-  onTaskAssigned,
-  initialStatusFilter = "all",
-}) {
-
-  const isAdmin =
-    user?.role === "Admin";
+function Tasks({ user, onTaskAssigned, initialStatusFilter = "all" }) {
+  const isAdmin = user?.role === "Admin";
 
   // TASK STATES
 
   const [tasks, setTasks] = useState([]);
 
-  const [assignableUsers, setAssignableUsers] =
-    useState([]);
+  const [assignableUsers, setAssignableUsers] = useState([]);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const [error, setError] =
-    useState("");
+  const [error, setError] = useState("");
 
-  const [successMsg, setSuccessMsg] =
-    useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   // CREATE TASK FORM
 
@@ -48,21 +38,17 @@ function Tasks({
     hours: "",
   });
 
-  const [isSubmitting, setIsSubmitting] =
-    useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // FILTERS
 
-  const [statusFilter, setStatusFilter] =
-    useState(initialStatusFilter);
+  const [statusFilter, setStatusFilter] = useState(initialStatusFilter);
 
-  const [searchQuery, setSearchQuery] =
-    useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // VIEW MODE
 
-  const [viewMode, setViewMode] =
-    useState("list");
+  const [viewMode, setViewMode] = useState("list");
 
   // UPDATE FILTER WHEN PROP CHANGES
 
@@ -81,16 +67,9 @@ function Tasks({
     try {
       const res = await getTasks();
 
-      setTasks(
-        Array.isArray(res?.data)
-          ? res.data
-          : []
-      );
+      setTasks(Array.isArray(res?.data) ? res.data : []);
     } catch (err) {
-      setError(
-        err.message ||
-        "Failed to fetch tasks."
-      );
+      setError(err.message || "Failed to fetch tasks.");
     } finally {
       setLoading(false);
     }
@@ -106,15 +85,11 @@ function Tasks({
 
       const filteredUsers = usersList.filter(
         (u) =>
-          (u._id || u.id) !==
-          (user?._id ||
-            user?.id) &&
-          u.email !== user?.email
+          (u._id || u.id) !== (user?._id || user?.id) &&
+          u.email !== user?.email,
       );
 
-      setAssignableUsers(
-        filteredUsers
-      );
+      setAssignableUsers(filteredUsers);
 
       if (filteredUsers.length > 0) {
         setFormData((prev) => {
@@ -124,17 +99,12 @@ function Tasks({
 
           return {
             ...prev,
-            assignedUser:
-              filteredUsers[0]._id ||
-              filteredUsers[0].id,
+            assignedUser: filteredUsers[0]._id || filteredUsers[0].id,
           };
         });
       }
     } catch (err) {
-      console.error(
-        "Failed to load assignable users:",
-        err
-      );
+      console.error("Failed to load assignable users:", err);
     }
   }, [user]);
 
@@ -158,92 +128,66 @@ function Tasks({
 
     // Title validation
     if (!formData.title.trim()) {
-      setError(
-        "Task title is required."
-      );
+      setError("Task title is required.");
       return;
     }
 
     // User validation
     if (!formData.assignedUser) {
-      setError(
-        "Please select a registered team member."
-      );
+      setError("Please select a registered team member.");
       return;
     }
 
     // Start date validation
     if (!formData.startDate) {
-      setError(
-        "Start Date is required."
-      );
+      setError("Start Date is required.");
       return;
     }
 
     // Due date validation
     if (!formData.dueDate) {
-      setError(
-        "Due Date is required."
-      );
+      setError("Due Date is required.");
       return;
     }
 
     // Date comparison
-    if (
-      new Date(formData.dueDate) <
-      new Date(formData.startDate)
-    ) {
-      setError(
-        "Due Date cannot be before Start Date."
-      );
+    if (new Date(formData.dueDate) < new Date(formData.startDate)) {
+      setError("Due Date cannot be before Start Date.");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const res =
-        await createTask({
-          title:
-            formData.title.trim(),
+      const res = await createTask({
+        title: formData.title.trim(),
 
-          description:
-            formData.description.trim(),
+        description: formData.description.trim(),
 
-          assignedUser:
-            formData.assignedUser,
+        assignedUser: formData.assignedUser,
 
-          priority:
-            formData.priority,
+        priority: formData.priority,
 
-          status:
-            formData.status,
+        status: formData.status,
 
-          startDate:
-            formData.startDate,
+        startDate: formData.startDate,
 
-          dueDate:
-            formData.dueDate,
+        dueDate: formData.dueDate,
 
-          hours:
-            formData.startDate === formData.dueDate
-              ? formData.hours || null
-              : null,
-        });
+        hours:
+          formData.startDate === formData.dueDate
+            ? formData.hours || null
+            : null,
+      });
 
       if (res?.success) {
-        setSuccessMsg(
-          `Task "${formData.title}" assigned successfully!`
-        );
+        setSuccessMsg(`Task "${formData.title}" assigned successfully!`);
 
         setFormData({
           title: "",
           description: "",
 
-          assignedUser:
-            assignableUsers[0]?._id ||
-            assignableUsers[0]?.id ||
-            "",
+          assignedUser: assignableUsers[0]?._id || assignableUsers[0]?.id || "",
 
           priority: "medium",
           status: "pending",
@@ -258,16 +202,10 @@ function Tasks({
           onTaskAssigned(res.data);
         }
       } else {
-        setError(
-          res?.message ||
-          "Failed to create task."
-        );
+        setError(res?.message || "Failed to create task.");
       }
     } catch (err) {
-      setError(
-        err.message ||
-        "Failed to create task."
-      );
+      setError(err.message || "Failed to create task.");
     } finally {
       setIsSubmitting(false);
     }
@@ -275,10 +213,7 @@ function Tasks({
 
   // UPDATE TASK STATUS
 
-  async function handleStatusChange(
-    taskId,
-    newStatus
-  ) {
+  async function handleStatusChange(taskId, newStatus) {
     try {
       await updateTask(taskId, {
         status: newStatus,
@@ -288,42 +223,31 @@ function Tasks({
         prevTasks.map((task) =>
           task._id === taskId
             ? {
-              ...task,
+                ...task,
 
-              status:
-                newStatus,
+                status: newStatus,
 
-              completed:
-                newStatus ===
-                "completed",
-            }
-            : task
-        )
+                completed: newStatus === "completed",
+              }
+            : task,
+        ),
       );
     } catch (err) {
-      alert(
-        err.message ||
-        "Failed to update task status."
-      );
+      alert(err.message || "Failed to update task status.");
     }
   }
 
   // DELETE TASK - ADMIN ONLY
 
-  async function handleDeleteTask(
-    taskId
-  ) {
+  async function handleDeleteTask(taskId) {
     if (!isAdmin) {
-      setError(
-        "Only admins can delete tasks."
-      );
+      setError("Only admins can delete tasks.");
       return;
     }
 
-    const confirmed =
-      window.confirm(
-        "Are you sure you want to delete this task?\n\nThis action cannot be undone."
-      );
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this task?\n\nThis action cannot be undone.",
+    );
 
     if (!confirmed) {
       return;
@@ -333,76 +257,45 @@ function Tasks({
     setSuccessMsg("");
 
     try {
-      const res =
-        await deleteTask(taskId);
+      const res = await deleteTask(taskId);
 
       if (res?.success) {
         // Remove task immediately from UI
         setTasks((prevTasks) =>
-          prevTasks.filter(
-            (task) =>
-              task._id !== taskId
-          )
+          prevTasks.filter((task) => task._id !== taskId),
         );
 
-        setSuccessMsg(
-          "Task deleted successfully."
-        );
+        setSuccessMsg("Task deleted successfully.");
 
         if (typeof onTaskAssigned === "function") {
           onTaskAssigned();
         }
       } else {
-        setError(
-          res?.message ||
-          "Failed to delete task."
-        );
+        setError(res?.message || "Failed to delete task.");
       }
     } catch (err) {
-      setError(
-        err.message ||
-        "Failed to delete task."
-      );
+      setError(err.message || "Failed to delete task.");
     }
   }
 
   // FILTER TASKS
 
-  const filteredTasks =
-    tasks.filter((task) => {
-      const matchesStatus =
-        statusFilter === "all" ||
-        task.status ===
-        statusFilter;
+  const filteredTasks = tasks.filter((task) => {
+    const matchesStatus =
+      statusFilter === "all" || task.status === statusFilter;
 
-      const query =
-        searchQuery
-          .toLowerCase()
-          .trim();
+    const query = searchQuery.toLowerCase().trim();
 
-      const matchesQuery =
-        !query ||
-        task.title
-          ?.toLowerCase()
-          .includes(query) ||
-        task.description
-          ?.toLowerCase()
-          .includes(query) ||
-        task.assignedUser?.fullname
-          ?.toLowerCase()
-          .includes(query) ||
-        task.assignedUser?.username
-          ?.toLowerCase()
-          .includes(query) ||
-        task.assignedUser?.email
-          ?.toLowerCase()
-          .includes(query);
+    const matchesQuery =
+      !query ||
+      task.title?.toLowerCase().includes(query) ||
+      task.description?.toLowerCase().includes(query) ||
+      task.assignedUser?.fullname?.toLowerCase().includes(query) ||
+      task.assignedUser?.username?.toLowerCase().includes(query) ||
+      task.assignedUser?.email?.toLowerCase().includes(query);
 
-      return (
-        matchesStatus &&
-        matchesQuery
-      );
-    });
+    return matchesStatus && matchesQuery;
+  });
 
   // FORMAT DATE
 
@@ -411,25 +304,17 @@ function Tasks({
       return "Not set";
     }
 
-    const parsedDate =
-      new Date(date);
+    const parsedDate = new Date(date);
 
-    if (
-      Number.isNaN(
-        parsedDate.getTime()
-      )
-    ) {
+    if (Number.isNaN(parsedDate.getTime())) {
       return "Not set";
     }
 
-    return parsedDate.toLocaleDateString(
-      "en-US",
-      {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }
-    );
+    return parsedDate.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
   }
 
   // TASK TYPE
@@ -447,11 +332,8 @@ function Tasks({
 
   // TASK TYPE CLASS
 
-  function getTaskTypeClass(
-    taskType
-  ) {
-    const type =
-      taskType.toLowerCase();
+  function getTaskTypeClass(taskType) {
+    const type = taskType.toLowerCase();
 
     if (type === "internal") {
       return "pill-type-internal";
@@ -467,10 +349,7 @@ function Tasks({
   // STATUS LABEL
 
   function getStatusLabel(status) {
-    if (
-      status ===
-      "in-progress"
-    ) {
+    if (status === "in-progress") {
       return "In Progress";
     }
 
@@ -478,10 +357,7 @@ function Tasks({
       return "Pending";
     }
 
-    return (
-      status.charAt(0).toUpperCase() +
-      status.slice(1)
-    );
+    return status.charAt(0).toUpperCase() + status.slice(1);
   }
 
   // RENDER
@@ -489,350 +365,235 @@ function Tasks({
   return (
     <div className="tasks-container">
       <div className="tasks-page-header">
-
         <div>
-
-          <h1>
-            Task Management
-          </h1>
+          <h1>Task Management</h1>
 
           <p className="role-indicator">
-            Role:{" "}
-            <strong>
-              {user?.role ||
-                "User"}
-            </strong>{" "}
-            | Logged in as:{" "}
-            <strong>
-              {user?.email ||
-                user?.fullname}
-            </strong>
+            Role: <strong>{user?.role || "User"}</strong> | Logged in as:{" "}
+            <strong>{user?.email || user?.fullname}</strong>
           </p>
         </div>
       </div>
 
       {isAdmin && (
         <section className="task-create-card">
-
           <div className="card-header">
-
             <h2>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
-              </svg> Assign New Task to Team Member
+              </svg>{" "}
+              Assign New Task to Team Member
             </h2>
 
             <p>
-              Select a registered user and assign a task with start and due dates.
+              Select a registered user and assign a task with start and due
+              dates.
             </p>
-
           </div>
 
           {/* ERROR */}
 
-          {error && (
-            <div className="alert alert-error">
-              {error}
-            </div>
-          )}
+          {error && <div className="alert alert-error">{error}</div>}
 
           {/* SUCCESS */}
 
           {successMsg && (
-            <div className="alert alert-success">
-              {successMsg}
-            </div>
+            <div className="alert alert-success">{successMsg}</div>
           )}
 
-          <form
-            onSubmit={
-              handleCreateTask
-            }
-            className="task-form-grid"
-          >
-
+          <form onSubmit={handleCreateTask} className="task-form-grid">
             {/* TITLE */}
 
             <div className="form-field full-width">
-
-              <label htmlFor="task-title">
-                Task Title *
-              </label>
+              <label htmlFor="task-title">Task Title *</label>
 
               <input
                 id="task-title"
                 type="text"
                 placeholder="e.g. Design homepage layout"
-                value={
-                  formData.title
-                }
+                value={formData.title}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    title:
-                      e.target.value,
+                    title: e.target.value,
                   })
                 }
                 required
               />
-
             </div>
 
             {/* DESCRIPTION */}
 
             <div className="form-field full-width">
-
-              <label htmlFor="task-desc">
-                Description
-              </label>
+              <label htmlFor="task-desc">Description</label>
 
               <textarea
                 id="task-desc"
                 rows="2"
                 placeholder="Task details and expectations..."
-                value={
-                  formData.description
-                }
+                value={formData.description}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    description:
-                      e.target.value,
+                    description: e.target.value,
                   })
                 }
               />
-
             </div>
 
             {/* ASSIGN USER */}
 
             <div className="form-field">
-
-              <label htmlFor="assign-user">
-                Assign To User *
-              </label>
+              <label htmlFor="assign-user">Assign To User *</label>
 
               <select
                 id="assign-user"
-                value={
-                  formData.assignedUser
-                }
+                value={formData.assignedUser}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    assignedUser:
-                      e.target.value,
+                    assignedUser: e.target.value,
                   })
                 }
                 required
               >
-
-                {assignableUsers.length ===
-                  0 && (
-                    <option value="">
-                      No other team
-                      members found
-                    </option>
-                  )}
-
-                {assignableUsers.map(
-                  (u) => (
-                    <option
-                      key={
-                        u._id ||
-                        u.id
-                      }
-                      value={
-                        u._id ||
-                        u.id
-                      }
-                    >
-                      {u.fullname ||
-                        u.username}{" "}
-                      (
-                      {u.email ||
-                        u.role}
-                      )
-                    </option>
-                  )
+                {assignableUsers.length === 0 && (
+                  <option value="">No other team members found</option>
                 )}
 
+                {assignableUsers.map((u) => (
+                  <option key={u._id || u.id} value={u._id || u.id}>
+                    {u.fullname || u.username} ({u.email || u.role})
+                  </option>
+                ))}
               </select>
-
             </div>
 
             {/* PRIORITY */}
 
             <div className="form-field">
-
-              <label htmlFor="task-priority">
-                Priority
-              </label>
+              <label htmlFor="task-priority">Priority</label>
 
               <select
                 id="task-priority"
-                value={
-                  formData.priority
-                }
+                value={formData.priority}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    priority:
-                      e.target.value,
+                    priority: e.target.value,
                   })
                 }
               >
+                <option value="low">Low Priority</option>
 
-                <option value="low">
-                  Low Priority
-                </option>
+                <option value="medium">Medium Priority</option>
 
-                <option value="medium">
-                  Medium Priority
-                </option>
-
-                <option value="high">
-                  High Priority
-                </option>
-
+                <option value="high">High Priority</option>
               </select>
-
             </div>
 
             {/* STATUS */}
 
             <div className="form-field">
-
-              <label htmlFor="task-status">
-                Initial Status
-              </label>
+              <label htmlFor="task-status">Initial Status</label>
 
               <select
                 id="task-status"
-                value={
-                  formData.status
-                }
+                value={formData.status}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    status:
-                      e.target.value,
+                    status: e.target.value,
                   })
                 }
               >
+                <option value="pending">Pending</option>
 
-                <option value="pending">
-                  Pending
-                </option>
+                <option value="in-progress">In Progress</option>
 
-                <option value="in-progress">
-                  In Progress
-                </option>
-
-                <option value="completed">
-                  Completed
-                </option>
-
+                <option value="completed">Completed</option>
               </select>
-
             </div>
 
             {/* START DATE */}
 
             <div className="form-field">
-
-              <label htmlFor="start-date">
-                Start Date *
-              </label>
+              <label htmlFor="start-date">Start Date *</label>
 
               <input
                 id="start-date"
                 type="date"
-                value={
-                  formData.startDate
-                }
+                value={formData.startDate}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
                     startDate: e.target.value,
-                    hours:
-                      e.target.value === prev.dueDate
-                        ? prev.hours
-                        : "",
+                    hours: e.target.value === prev.dueDate ? prev.hours : "",
                   }))
                 }
                 required
               />
-
             </div>
 
             {/* DUE DATE */}
 
             <div className="form-field">
-
-              <label htmlFor="due-date">
-                Due Date *
-              </label>
+              <label htmlFor="due-date">Due Date *</label>
 
               <input
                 id="due-date"
                 type="date"
-                min={
-                  formData.startDate ||
-                  undefined
-                }
-                value={
-                  formData.dueDate
-                }
+                min={formData.startDate || undefined}
+                value={formData.dueDate}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
                     dueDate: e.target.value,
-                    hours:
-                      e.target.value === prev.startDate
-                        ? prev.hours
-                        : "",
+                    hours: e.target.value === prev.startDate ? prev.hours : "",
                   }))
                 }
                 required
               />
-
             </div>
 
-            {formData.startDate &&
-              formData.startDate === formData.dueDate && (
-                <div className="form-field">
-                  <label htmlFor="task-hours">
-                    Hours
-                  </label>
-                  <input
-                    id="task-hours"
-                    type="number"
-                    min="0"
-                    step="0.5"
-                    value={formData.hours}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        hours: e.target.value,
-                      }))
-                    }
-                    placeholder="Enter hours"
-                  />
-                </div>
-              )}
+            {formData.startDate && formData.startDate === formData.dueDate && (
+              <div className="form-field">
+                <label htmlFor="task-hours">Hours</label>
+                <input
+                  id="task-hours"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={formData.hours}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      hours: e.target.value,
+                    }))
+                  }
+                  placeholder="Enter hours"
+                />
+              </div>
+            )}
 
             {/* SUBMIT */}
 
             <div className="form-field full-width form-actions">
-
               <button
                 type="submit"
                 className="btn-primary"
-                disabled={
-                  isSubmitting
-                }
+                disabled={isSubmitting}
               >
                 {isSubmitting ? "Assigning Task..." : "Assign Task"}
               </button>
@@ -847,204 +608,279 @@ function Tasks({
       <section className="tasks-list-card">
         {/* TOOLBAR */}
         <div className="tasks-toolbar">
-
           {/* SEARCH + FILTER */}
 
           <div className="search-filter-box">
-
-            <input type="text" placeholder="Search tasks or assignees..."
-              value={searchQuery
-              }
-              onChange={
-                (e) => setSearchQuery(e.target.value)
-              }
+            <input
+              type="text"
+              placeholder="Search tasks or assignees..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
             />
             <div className="status-tabs">
               <button
                 type="button"
-                className={`tab-btn ${statusFilter ===
-                  "all"
-                  ? "active"
-                  : ""
-                  }`}
-                onClick={() =>
-                  setStatusFilter(
-                    "all"
-                  )
-                }
+                className={`tab-btn ${statusFilter === "all" ? "active" : ""}`}
+                onClick={() => setStatusFilter("all")}
               >
-                All (
-                {tasks.length}
-                )
+                All ({tasks.length})
               </button>
 
               <button
                 type="button"
-                className={`tab-btn ${statusFilter ===
-                  "pending"
-                  ? "active"
-                  : ""
-                  }`}
-                onClick={() => setStatusFilter(
-                  "pending"
-                )
-                }
+                className={`tab-btn ${
+                  statusFilter === "pending" ? "active" : ""
+                }`}
+                onClick={() => setStatusFilter("pending")}
               >
                 Pending
               </button>
 
               <button
                 type="button"
-                className={`tab-btn ${statusFilter ===
-                  "in-progress"
-                  ? "active"
-                  : ""
-                  }`}
-                onClick={() =>
-                  setStatusFilter(
-                    "in-progress"
-                  )
-                }
+                className={`tab-btn ${
+                  statusFilter === "in-progress" ? "active" : ""
+                }`}
+                onClick={() => setStatusFilter("in-progress")}
               >
                 In Progress
               </button>
 
               <button
                 type="button"
-                className={`tab-btn ${statusFilter ===
-                  "completed"
-                  ? "active"
-                  : ""
-                  }`}
-                onClick={() =>
-                  setStatusFilter(
-                    "completed"
-                  )
-                }
+                className={`tab-btn ${
+                  statusFilter === "completed" ? "active" : ""
+                }`}
+                onClick={() => setStatusFilter("completed")}
               >
                 Completed
               </button>
-
             </div>
-
           </div>
 
           {/* VIEW TOGGLE */}
 
           <div className="view-mode-toggle">
-
             <button
               type="button"
-              className={`view-mode-btn ${viewMode ===
-                "list"
-                ? "active"
-                : ""
-                }`}
-              onClick={() =>
-                setViewMode(
-                  "list"
-                )
-              }
+              className={`view-mode-btn ${viewMode === "list" ? "active" : ""}`}
+              onClick={() => setViewMode("list")}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
                 <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
                 <line x1="8" y1="10" x2="16" y2="10" />
                 <line x1="8" y1="14" x2="16" y2="14" />
                 <line x1="8" y1="18" x2="12" y2="18" />
-              </svg> List View
+              </svg>{" "}
+              List View
             </button>
 
             <button
               type="button"
-              className={`view-mode-btn ${viewMode ===
-                "kanban"
-                ? "active"
-                : ""
-                }`}
-              onClick={() =>
-                setViewMode(
-                  "kanban"
-                )
-              }
+              className={`view-mode-btn ${
+                viewMode === "kanban" ? "active" : ""
+              }`}
+              onClick={() => setViewMode("kanban")}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="2" y="2" width="20" height="20" rx="3" ry="3" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
-  <rect x="4" y="4" width="4.5" height="16" rx="1.5" fill="#eff6ff" stroke="#93c5fd" stroke-width="1" />
-  <line x1="5.25" y1="5.5" x2="7.25" y2="5.5" stroke="#3b82f6" stroke-width="1.5" />
-  <rect x="4.75" y="8" width="3" height="2" rx="0.5" fill="#3b82f6" fill-opacity="0.2" stroke="#3b82f6" stroke-width="1" />
-  <rect x="4.75" y="11" width="3" height="2" rx="0.5" fill="#3b82f6" fill-opacity="0.2" stroke="#3b82f6" stroke-width="1" />
-  <rect x="9.75" y="4" width="4.5" height="16" rx="1.5" fill="#fff7ed" stroke="#fdba74" stroke-width="1" />
-  <line x1="11" y1="5.5" x2="13" y2="5.5" stroke="#f97316" stroke-width="1.5" />
-  <rect x="10.5" y="8" width="3" height="2" rx="0.5" fill="#f97316" fill-opacity="0.2" stroke="#f97316" stroke-width="1" />
-  <rect x="15.5" y="4" width="4.5" height="16" rx="1.5" fill="#f0fdf4" stroke="#86efac" stroke-width="1" />
-  <line x1="16.75" y1="5.5" x2="18.75" y2="5.5" stroke="#22c55e" stroke-width="1.5" />
-  <rect x="16.25" y="8" width="3" height="2" rx="0.5" fill="#22c55e" fill-opacity="0.2" stroke="#22c55e" stroke-width="1" />
-  <rect x="16.25" y="11" width="3" height="2" rx="0.5" fill="#22c55e" fill-opacity="0.2" stroke="#22c55e" stroke-width="1" />
-  <rect x="16.25" y="14" width="3" height="2" rx="0.5" fill="#22c55e" fill-opacity="0.2" stroke="#22c55e" stroke-width="1" />
-</svg> Kanban View
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect
+                  x="2"
+                  y="2"
+                  width="20"
+                  height="20"
+                  rx="3"
+                  ry="3"
+                  fill="#f8fafc"
+                  stroke="#cbd5e1"
+                  stroke-width="1.5"
+                />
+                <rect
+                  x="4"
+                  y="4"
+                  width="4.5"
+                  height="16"
+                  rx="1.5"
+                  fill="#eff6ff"
+                  stroke="#93c5fd"
+                  stroke-width="1"
+                />
+                <line
+                  x1="5.25"
+                  y1="5.5"
+                  x2="7.25"
+                  y2="5.5"
+                  stroke="#3b82f6"
+                  stroke-width="1.5"
+                />
+                <rect
+                  x="4.75"
+                  y="8"
+                  width="3"
+                  height="2"
+                  rx="0.5"
+                  fill="#3b82f6"
+                  fill-opacity="0.2"
+                  stroke="#3b82f6"
+                  stroke-width="1"
+                />
+                <rect
+                  x="4.75"
+                  y="11"
+                  width="3"
+                  height="2"
+                  rx="0.5"
+                  fill="#3b82f6"
+                  fill-opacity="0.2"
+                  stroke="#3b82f6"
+                  stroke-width="1"
+                />
+                <rect
+                  x="9.75"
+                  y="4"
+                  width="4.5"
+                  height="16"
+                  rx="1.5"
+                  fill="#fff7ed"
+                  stroke="#fdba74"
+                  stroke-width="1"
+                />
+                <line
+                  x1="11"
+                  y1="5.5"
+                  x2="13"
+                  y2="5.5"
+                  stroke="#f97316"
+                  stroke-width="1.5"
+                />
+                <rect
+                  x="10.5"
+                  y="8"
+                  width="3"
+                  height="2"
+                  rx="0.5"
+                  fill="#f97316"
+                  fill-opacity="0.2"
+                  stroke="#f97316"
+                  stroke-width="1"
+                />
+                <rect
+                  x="15.5"
+                  y="4"
+                  width="4.5"
+                  height="16"
+                  rx="1.5"
+                  fill="#f0fdf4"
+                  stroke="#86efac"
+                  stroke-width="1"
+                />
+                <line
+                  x1="16.75"
+                  y1="5.5"
+                  x2="18.75"
+                  y2="5.5"
+                  stroke="#22c55e"
+                  stroke-width="1.5"
+                />
+                <rect
+                  x="16.25"
+                  y="8"
+                  width="3"
+                  height="2"
+                  rx="0.5"
+                  fill="#22c55e"
+                  fill-opacity="0.2"
+                  stroke="#22c55e"
+                  stroke-width="1"
+                />
+                <rect
+                  x="16.25"
+                  y="11"
+                  width="3"
+                  height="2"
+                  rx="0.5"
+                  fill="#22c55e"
+                  fill-opacity="0.2"
+                  stroke="#22c55e"
+                  stroke-width="1"
+                />
+                <rect
+                  x="16.25"
+                  y="14"
+                  width="3"
+                  height="2"
+                  rx="0.5"
+                  fill="#22c55e"
+                  fill-opacity="0.2"
+                  stroke="#22c55e"
+                  stroke-width="1"
+                />
+              </svg>{" "}
+              Kanban View
             </button>
 
             <button
               type="button"
-              className={`view-mode-btn ${viewMode ===
-                "grid"
-                ? "active"
-                : ""
-                }`}
-              onClick={() =>
-                setViewMode(
-                  "grid"
-                )
-              }
+              className={`view-mode-btn ${viewMode === "grid" ? "active" : ""}`}
+              onClick={() => setViewMode("grid")}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <rect x="3" y="3" width="7" height="7" rx="1" ry="1" />
                 <rect x="14" y="3" width="7" height="7" rx="1" ry="1" />
                 <rect x="14" y="14" width="7" height="7" rx="1" ry="1" />
                 <rect x="3" y="14" width="7" height="7" rx="1" ry="1" />
-              </svg> Grid View
+              </svg>{" "}
+              Grid View
             </button>
-
           </div>
-
         </div>
 
         {/* GLOBAL MESSAGE */}
 
-        {error && (
-          <div className="alert alert-error">
-            {error}
-          </div>
-        )}
+        {error && <div className="alert alert-error">{error}</div>}
 
-        {successMsg && (
-          <div className="alert alert-success">
-            {successMsg}
-          </div>
-        )}
+        {successMsg && <div className="alert alert-success">{successMsg}</div>}
 
         {/* LOADING */}
 
         {loading ? (
-
-          <div className="tasks-loading">
-            Loading tasks list...
-          </div>
-
-        ) : filteredTasks.length ===
-          0 ? (
-
+          <div className="tasks-loading">Loading tasks list...</div>
+        ) : filteredTasks.length === 0 ? (
           <div className="empty-tasks-state">
-            <p>
-              No tasks found matching your criteria.
-            </p>
+            <p>No tasks found matching your criteria.</p>
           </div>
-
-        ) : viewMode ===
-          "list" ? (
-
+        ) : viewMode === "list" ? (
           // =================================================
           // LIST VIEW
           // =================================================
@@ -1052,809 +888,474 @@ function Tasks({
           <div
             className="table-wrapper"
             style={{
-              marginTop:
-                "14px",
+              marginTop: "14px",
             }}
           >
-
             <table className="image3-task-table">
               <thead>
                 <tr>
+                  <th>Task Title</th>
 
-                  <th>
-                    Task Title
-                  </th>
+                  <th>Assignee</th>
 
-                  <th>
-                    Assignee
-                  </th>
+                  <th>Task Type</th>
 
-                  <th>
-                    Task Type
-                  </th>
+                  <th>Priority</th>
 
-                  <th>
-                    Priority
-                  </th>
+                  <th>Status</th>
 
-                  <th>
-                    Status
-                  </th>
+                  <th>Start Date</th>
 
-                  <th>
-                    Start Date
-                  </th>
+                  <th>Due Date</th>
 
-                  <th>
-                    Due Date
-                  </th>
-
-                  <th>
-                    Update Status
-                  </th>
+                  <th>Update Status</th>
 
                   {/* ADMIN ONLY */}
 
-                  {isAdmin && (
-                    <th>
-                      Action
-                    </th>
-                  )}
-
+                  {isAdmin && <th>Action</th>}
                 </tr>
-
               </thead>
 
               <tbody>
+                {filteredTasks.map((t) => {
+                  const assigneeName =
+                    t.assignedUser?.fullname ||
+                    t.assignedUser?.username ||
+                    "Unassigned";
 
-                {filteredTasks.map(
-                  (t) => {
+                  const taskType = getTaskType(t);
 
-                    const assigneeName =
-                      t.assignedUser
-                        ?.fullname ||
-                      t.assignedUser
-                        ?.username ||
-                      "Unassigned";
+                  const taskTypeClass = getTaskTypeClass(taskType);
 
-                    const taskType =
-                      getTaskType(
-                        t
-                      );
-
-                    const taskTypeClass =
-                      getTaskTypeClass(
-                        taskType
-                      );
-
-                    const priorityClass =
-                      `pill-priority-${t.priority ||
-                      "medium"
-                      }`;
-
-                    const statusClass =
-                      `pill-status-${t.status ===
-                        "in-progress"
-                        ? "in-progress"
-                        : t.status ||
-                        "pending"
-                      }`;
-
-                    return (
-
-                      <tr
-                        key={
-                          t._id ||
-                          t.id
-                        }
-                      >
-
-                        {/* TITLE */}
-
-                        <td className="title-cell" data-label="Task">
-
-                          <strong>
-                            {t.title}
-                          </strong>
-
-                          {t.description && (
-                            <small
-                              style={{
-                                display:
-                                  "block",
-                                color:
-                                  "var(--text-muted)",
-                                marginTop:
-                                  "4px",
-                              }}
-                            >
-                              {
-                                t.description
-                              }
-                            </small>
-                          )}
-
-                        </td>
-
-                        {/* ASSIGNEE */}
-
-                        <td data-label="Assignee">
-
-                          <span className="user-badge">
-                            {
-                              assigneeName
-                            }
-                          </span>
-
-                        </td>
-
-                        {/* TYPE */}
-
-                        <td data-label="Type">
-
-                          <span
-                            className={`pill-badge ${taskTypeClass}`}
-                          >
-                            {
-                              taskType
-                            }
-                          </span>
-
-                        </td>
-
-                        {/* PRIORITY */}
-
-                        <td data-label="Priority">
-
-                          <span
-                            className={`pill-badge ${priorityClass}`}
-                          >
-                            ●{" "}
-                            {(
-                              t.priority ||
-                              "medium"
-                            ).toUpperCase()}
-                          </span>
-
-                        </td>
-
-                        {/* STATUS */}
-
-                        <td data-label="Status">
-
-                          <span
-                            className={`pill-badge ${statusClass}`}
-                          >
-                            {getStatusLabel(
-                              t.status
-                            )}
-                          </span>
-
-                        </td>
-
-                        {/* START DATE */}
-
-                        <td data-label="Start date">
-
-                          <span className="pill-badge pill-timeline">
-                            📅{" "}
-                            {formatDate(
-                              t.startDate
-                            )}
-                          </span>
-
-                        </td>
-
-                        {/* DUE DATE */}
-
-                        <td data-label="Due date">
-
-                          <span className="pill-badge pill-timeline">
-                            📅{" "}
-                            {formatDate(
-                              t.dueDate
-                            )}
-                          </span>
-
-                        </td>
-
-                        {/* UPDATE STATUS */}
-
-                        <td data-label="Update status">
-
-                          <select
-                            className="status-select"
-                            value={
-                              t.status ||
-                              "pending"
-                            }
-                            onChange={(
-                              e
-                            ) =>
-                              handleStatusChange(
-                                t._id,
-                                e
-                                  .target
-                                  .value
-                              )
-                            }
-                          >
-
-                            <option value="pending">
-                              Pending
-                            </option>
-
-                            <option value="in-progress">
-                              In Progress
-                            </option>
-
-                            <option value="completed">
-                              Completed
-                            </option>
-
-                          </select>
-
-                        </td>
-
-                        {/* DELETE - ADMIN ONLY */}
-
-                        {isAdmin && (
-                          <td data-label="Actions">
-
-                            <button
-                              type="button"
-                              className="btn-delete-task"
-                              onClick={() =>
-                                handleDeleteTask(
-                                  t._id
-                                )
-                              }
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9 3h6" />
-                                <path d="M4 6h16" />
-                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                                <line x1="10" y1="11" x2="10" y2="17" />
-                                <line x1="14" y1="11" x2="14" y2="17" />
-                              </svg> Delete
-                            </button>
-
-                          </td>
-                        )}
-
-                      </tr>
-
-                    );
-                  }
-                )}
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        ) : viewMode ===
-          "kanban" ? (
-
-          // =================================================
-          // KANBAN VIEW
-          // =================================================
-
-          <div className="kanban-board-wrapper">
-
-            {[
-              "pending",
-              "in-progress",
-              "completed",
-            ].map(
-              (colStatus) => {
-
-                const colTasks =
-                  filteredTasks.filter(
-                    (t) =>
-                      (t.status ||
-                        "pending") ===
-                      colStatus
-                  );
-
-                return (
-
-                  <div
-                    className="kanban-column"
-                    key={
-                      colStatus
-                    }
-                    onDragOver={(e) => {
-                      e.preventDefault();
-
-                      e.dataTransfer.dropEffect =
-                        "move";
-                    }}
-                    onDrop={(e) => {
-
-                      e.preventDefault();
-
-                      const taskId =
-                        e.dataTransfer.getData(
-                          "taskId"
-                        );
-
-                      if (
-                        taskId
-                      ) {
-                        handleStatusChange(
-                          taskId,
-                          colStatus
-                        );
-                      }
-
-                    }}
-                  >
-
-                    <div
-                      className={`kanban-column-header ${colStatus}`}
-                    >
-
-                      <h3>
-                        {getStatusLabel(
-                          colStatus
-                        )}
-                      </h3>
-
-                      <span className="kanban-count-badge">
-                        {
-                          colTasks.length
-                        }
-                      </span>
-
-                    </div>
-
-                    <div className="kanban-cards-list">
-
-                      {colTasks.length ===
-                        0 ? (
-
-                        <div
-                          className="empty-tasks-state"
-                          style={{
-                            padding:
-                              "20px 10px",
-                            fontSize:
-                              "0.8rem",
-                          }}
-                        >
-                          Drag & drop
-                          tasks here
-                        </div>
-
-                      ) : (
-
-                        colTasks.map(
-                          (t) => {
-
-                            const assigneeName =
-                              t.assignedUser
-                                ?.fullname ||
-                              t.assignedUser
-                                ?.username ||
-                              "Unassigned";
-
-                            const taskType =
-                              getTaskType(
-                                t
-                              );
-
-                            const taskTypeClass =
-                              getTaskTypeClass(
-                                taskType
-                              );
-
-                            const priorityClass =
-                              `pill-priority-${t.priority ||
-                              "medium"
-                              }`;
-
-                            return (
-
-                              <article
-                                className="kanban-card"
-                                key={
-                                  t._id ||
-                                  t.id
-                                }
-                                draggable
-                                onDragStart={(
-                                  e
-                                ) => {
-
-                                  e.dataTransfer.setData(
-                                    "taskId",
-                                    t._id ||
-                                    t.id
-                                  );
-
-                                  e.dataTransfer.effectAllowed =
-                                    "move";
-
-                                }}
-                              >
-
-                                <div className="kanban-card-title">
-                                  {
-                                    t.title
-                                  }
-                                </div>
-
-                                {t.description && (
-                                  <p className="task-grid-desc">
-                                    {
-                                      t.description
-                                    }
-                                  </p>
-                                )}
-
-                                <div className="kanban-card-pills">
-
-                                  <span
-                                    className={`pill-badge ${taskTypeClass}`}
-                                  >
-                                    {
-                                      taskType
-                                    }
-                                  </span>
-
-                                  <span
-                                    className={`pill-badge ${priorityClass}`}
-                                  >
-                                    ●{" "}
-                                    {(
-                                      t.priority ||
-                                      "medium"
-                                    ).toUpperCase()}
-                                  </span>
-
-                                </div>
-
-                                <div
-                                  style={{
-                                    display:
-                                      "flex",
-                                    flexDirection:
-                                      "column",
-                                    gap:
-                                      "5px",
-                                    marginTop:
-                                      "8px",
-                                  }}
-                                >
-
-                                  <span className="pill-badge pill-timeline">
-                                    📅 Start:{" "}
-                                    {formatDate(
-                                      t.startDate
-                                    )}
-                                  </span>
-
-                                  <span className="pill-badge pill-timeline">
-                                    📅 Due:{" "}
-                                    {formatDate(
-                                      t.dueDate
-                                    )}
-                                  </span>
-
-                                </div>
-
-                                <div className="kanban-card-footer">
-
-                                  <span
-                                    className="user-badge"
-                                    style={{
-                                      fontSize:
-                                        "0.76rem",
-                                    }}
-                                  >
-                                    👤{" "}
-                                    {
-                                      assigneeName
-                                    }
-                                  </span>
-
-                                  <div
-                                    style={{
-                                      display:
-                                        "flex",
-                                      gap:
-                                        "6px",
-                                      alignItems:
-                                        "center",
-                                    }}
-                                  >
-
-                                    <select
-                                      className="status-select"
-                                      value={
-                                        t.status ||
-                                        "pending"
-                                      }
-                                      onChange={(
-                                        e
-                                      ) =>
-                                        handleStatusChange(
-                                          t._id,
-                                          e
-                                            .target
-                                            .value
-                                        )
-                                      }
-                                    >
-
-                                      <option value="pending">
-                                        Pending
-                                      </option>
-
-                                      <option value="in-progress">
-                                        In Progress
-                                      </option>
-
-                                      <option value="completed">
-                                        Completed
-                                      </option>
-
-                                    </select>
-
-                                    {/* ADMIN DELETE */}
-
-                                    {isAdmin && (
-                                      <button
-                                        type="button"
-                                        className="btn-delete-task"
-                                        onClick={() =>
-                                          handleDeleteTask(
-                                            t._id
-                                          )
-                                        }
-                                        title="Delete Task"
-                                      >
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                          <path d="M9 3h6" />
-                                          <path d="M4 6h16" />
-                                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                                          <line x1="10" y1="11" x2="10" y2="17" />
-                                          <line x1="14" y1="11" x2="14" y2="17" />
-                                        </svg>
-                                      </button>
-                                    )}
-
-                                  </div>
-
-                                </div>
-
-                              </article>
-
-                            );
-                          }
-                        )
-
-                      )}
-
-                    </div>
-
-                  </div>
-
-                );
-              }
-            )}
-
-          </div>
-
-        ) : (
-
-          // =================================================
-          // GRID VIEW
-          // =================================================
-
-          <div className="tasks-grid-wrapper">
-
-            {filteredTasks.map(
-              (t) => {
-
-                const assigneeName =
-                  t.assignedUser
-                    ?.fullname ||
-                  t.assignedUser
-                    ?.username ||
-                  "Unassigned";
-
-                const taskType =
-                  getTaskType(
-                    t
-                  );
-
-                const taskTypeClass =
-                  getTaskTypeClass(
-                    taskType
-                  );
-
-                const priorityClass =
-                  `pill-priority-${t.priority ||
-                  "medium"
+                  const priorityClass = `pill-priority-${
+                    t.priority || "medium"
                   }`;
 
-                const statusClass =
-                  `pill-status-${t.status ===
-                    "in-progress"
-                    ? "in-progress"
-                    : t.status ||
-                    "pending"
+                  const statusClass = `pill-status-${
+                    t.status === "in-progress"
+                      ? "in-progress"
+                      : t.status || "pending"
                   }`;
 
-                return (
+                  return (
+                    <tr key={t._id || t.id}>
+                      {/* TITLE */}
 
-                  <article
-                    className="task-grid-card"
-                    key={
-                      t._id ||
-                      t.id
-                    }
-                  >
+                      <td className="title-cell" data-label="Task">
+                        <strong>{t.title}</strong>
 
-                    <div className="task-grid-header">
-
-                      <h3>
-                        {t.title}
-                      </h3>
-
-                      <span
-                        className={`pill-badge ${statusClass}`}
-                      >
-                        {getStatusLabel(
-                          t.status
+                        {t.description && (
+                          <small
+                            style={{
+                              display: "block",
+                              color: "var(--text-muted)",
+                              marginTop: "4px",
+                            }}
+                          >
+                            {t.description}
+                          </small>
                         )}
-                      </span>
+                      </td>
 
-                    </div>
+                      {/* ASSIGNEE */}
 
-                    {t.description && (
-                      <p className="task-grid-desc">
-                        {
-                          t.description
-                        }
-                      </p>
-                    )}
+                      <td data-label="Assignee">
+                        <span className="user-badge">{assigneeName}</span>
+                      </td>
 
-                    <div className="task-grid-pills">
+                      {/* TYPE */}
 
-                      <span
-                        className={`pill-badge ${taskTypeClass}`}
-                      >
-                        {
-                          taskType
-                        }
-                      </span>
+                      <td data-label="Type">
+                        <span className={`pill-badge ${taskTypeClass}`}>
+                          {taskType}
+                        </span>
+                      </td>
 
-                      <span
-                        className={`pill-badge ${priorityClass}`}
-                      >
-                        ●{" "}
-                        {(
-                          t.priority ||
-                          "medium"
-                        ).toUpperCase()}
-                      </span>
+                      {/* PRIORITY */}
 
-                    </div>
+                      <td data-label="Priority">
+                        <span className={`pill-badge ${priorityClass}`}>
+                          ● {(t.priority || "medium").toUpperCase()}
+                        </span>
+                      </td>
 
-                    <div
-                      style={{
-                        display:
-                          "flex",
-                        flexDirection:
-                          "column",
-                        gap: "6px",
-                        marginTop:
-                          "10px",
-                      }}
-                    >
+                      {/* STATUS */}
 
-                      <span className="pill-badge pill-timeline">
-                        📅 Start:{" "}
-                        {formatDate(
-                          t.startDate
-                        )}
-                      </span>
+                      <td data-label="Status">
+                        <span className={`pill-badge ${statusClass}`}>
+                          {getStatusLabel(t.status)}
+                        </span>
+                      </td>
 
-                      <span className="pill-badge pill-timeline">
-                        📅 Due:{" "}
-                        {formatDate(
-                          t.dueDate
-                        )}
-                      </span>
+                      {/* START DATE */}
 
-                    </div>
+                      <td data-label="Start date">
+                        <span className="pill-badge pill-timeline">
+                          📅 {formatDate(t.startDate)}
+                        </span>
+                      </td>
 
-                    <div className="task-grid-meta">
+                      {/* DUE DATE */}
 
-                      <span className="user-badge">
-                        👤{" "}
-                        {
-                          assigneeName
-                        }
-                      </span>
+                      <td data-label="Due date">
+                        <span className="pill-badge pill-timeline">
+                          📅 {formatDate(t.dueDate)}
+                        </span>
+                      </td>
 
-                      <div className="task-grid-actions">
+                      {/* UPDATE STATUS */}
 
+                      <td data-label="Update status">
                         <select
                           className="status-select"
-                          value={
-                            t.status ||
-                            "pending"
-                          }
-                          onChange={(
-                            e
-                          ) =>
-                            handleStatusChange(
-                              t._id,
-                              e
-                                .target
-                                .value
-                            )
+                          value={t.status || "pending"}
+                          onChange={(e) =>
+                            handleStatusChange(t._id, e.target.value)
                           }
                         >
+                          <option value="pending">Pending</option>
 
-                          <option value="pending">
-                            Pending
-                          </option>
+                          <option value="in-progress">In Progress</option>
 
-                          <option value="in-progress">
-                            In Progress
-                          </option>
-
-                          <option value="completed">
-                            Completed
-                          </option>
-
+                          <option value="completed">Completed</option>
                         </select>
+                      </td>
 
-                        {/* ADMIN DELETE */}
+                      {/* DELETE - ADMIN ONLY */}
 
-                        {isAdmin && (
+                      {isAdmin && (
+                        <td data-label="Actions">
                           <button
                             type="button"
                             className="btn-delete-task"
-                            onClick={() =>
-                              handleDeleteTask(
-                                t._id
-                              )
-                            }
-                            title="Delete Task"
+                            onClick={() => handleDeleteTask(t._id)}
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              width="24"
+                              height="24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
                               <path d="M9 3h6" />
                               <path d="M4 6h16" />
                               <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
                               <line x1="10" y1="11" x2="10" y2="17" />
                               <line x1="14" y1="11" x2="14" y2="17" />
-                            </svg>
+                            </svg>{" "}
+                            Delete
                           </button>
-                        )}
-
-                      </div>
-
-                    </div>
-
-                  </article>
-
-                );
-              }
-            )}
-
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
+        ) : viewMode === "kanban" ? (
+          // =================================================
+          // KANBAN VIEW
+          // =================================================
 
+          <div className="kanban-board-wrapper">
+            {["pending", "in-progress", "completed"].map((colStatus) => {
+              const colTasks = filteredTasks.filter(
+                (t) => (t.status || "pending") === colStatus,
+              );
+
+              return (
+                <div
+                  className="kanban-column"
+                  key={colStatus}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+
+                    e.dataTransfer.dropEffect = "move";
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+
+                    const taskId = e.dataTransfer.getData("taskId");
+
+                    if (taskId) {
+                      handleStatusChange(taskId, colStatus);
+                    }
+                  }}
+                >
+                  <div className={`kanban-column-header ${colStatus}`}>
+                    <h3>{getStatusLabel(colStatus)}</h3>
+
+                    <span className="kanban-count-badge">
+                      {colTasks.length}
+                    </span>
+                  </div>
+
+                  <div className="kanban-cards-list">
+                    {colTasks.length === 0 ? (
+                      <div
+                        className="empty-tasks-state"
+                        style={{
+                          padding: "20px 10px",
+                          fontSize: "0.8rem",
+                        }}
+                      >
+                        Drag & drop tasks here
+                      </div>
+                    ) : (
+                      colTasks.map((t) => {
+                        const assigneeName =
+                          t.assignedUser?.fullname ||
+                          t.assignedUser?.username ||
+                          "Unassigned";
+
+                        const taskType = getTaskType(t);
+
+                        const taskTypeClass = getTaskTypeClass(taskType);
+
+                        const priorityClass = `pill-priority-${
+                          t.priority || "medium"
+                        }`;
+
+                        return (
+                          <article
+                            className="kanban-card"
+                            key={t._id || t.id}
+                            draggable
+                            onDragStart={(e) => {
+                              e.dataTransfer.setData("taskId", t._id || t.id);
+
+                              e.dataTransfer.effectAllowed = "move";
+                            }}
+                          >
+                            <div className="kanban-card-title">{t.title}</div>
+
+                            {t.description && (
+                              <p className="task-grid-desc">{t.description}</p>
+                            )}
+
+                            <div className="kanban-card-pills">
+                              <span className={`pill-badge ${taskTypeClass}`}>
+                                {taskType}
+                              </span>
+
+                              <span className={`pill-badge ${priorityClass}`}>
+                                ● {(t.priority || "medium").toUpperCase()}
+                              </span>
+                            </div>
+
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "5px",
+                                marginTop: "8px",
+                              }}
+                            >
+                              <span className="pill-badge pill-timeline">
+                                📅 Start: {formatDate(t.startDate)}
+                              </span>
+
+                              <span className="pill-badge pill-timeline">
+                                📅 Due: {formatDate(t.dueDate)}
+                              </span>
+                            </div>
+
+                            <div className="kanban-card-footer">
+                              <span
+                                className="user-badge"
+                                style={{
+                                  fontSize: "0.76rem",
+                                }}
+                              >
+                                👤 {assigneeName}
+                              </span>
+
+                              <div
+                                style={{
+                                  display: "flex",
+                                  gap: "6px",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <select
+                                  className="status-select"
+                                  value={t.status || "pending"}
+                                  onChange={(e) =>
+                                    handleStatusChange(t._id, e.target.value)
+                                  }
+                                >
+                                  <option value="pending">Pending</option>
+
+                                  <option value="in-progress">
+                                    In Progress
+                                  </option>
+
+                                  <option value="completed">Completed</option>
+                                </select>
+
+                                {/* ADMIN DELETE */}
+
+                                {isAdmin && (
+                                  <button
+                                    type="button"
+                                    className="btn-delete-task"
+                                    onClick={() => handleDeleteTask(t._id)}
+                                    title="Delete Task"
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 24 24"
+                                      width="24"
+                                      height="24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      stroke-width="2"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    >
+                                      <path d="M9 3h6" />
+                                      <path d="M4 6h16" />
+                                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                      <line x1="10" y1="11" x2="10" y2="17" />
+                                      <line x1="14" y1="11" x2="14" y2="17" />
+                                    </svg>
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </article>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          // =================================================
+          // GRID VIEW
+          // =================================================
+
+          <div className="tasks-grid-wrapper">
+            {filteredTasks.map((t) => {
+              const assigneeName =
+                t.assignedUser?.fullname ||
+                t.assignedUser?.username ||
+                "Unassigned";
+
+              const taskType = getTaskType(t);
+
+              const taskTypeClass = getTaskTypeClass(taskType);
+
+              const priorityClass = `pill-priority-${t.priority || "medium"}`;
+
+              const statusClass = `pill-status-${
+                t.status === "in-progress"
+                  ? "in-progress"
+                  : t.status || "pending"
+              }`;
+
+              return (
+                <article className="task-grid-card" key={t._id || t.id}>
+                  <div className="task-grid-header">
+                    <h3>{t.title}</h3>
+
+                    <span className={`pill-badge ${statusClass}`}>
+                      {getStatusLabel(t.status)}
+                    </span>
+                  </div>
+
+                  {t.description && (
+                    <p className="task-grid-desc">{t.description}</p>
+                  )}
+
+                  <div className="task-grid-pills">
+                    <span className={`pill-badge ${taskTypeClass}`}>
+                      {taskType}
+                    </span>
+
+                    <span className={`pill-badge ${priorityClass}`}>
+                      ● {(t.priority || "medium").toUpperCase()}
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "6px",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <span className="pill-badge pill-timeline">
+                      📅 Start: {formatDate(t.startDate)}
+                    </span>
+
+                    <span className="pill-badge pill-timeline">
+                      📅 Due: {formatDate(t.dueDate)}
+                    </span>
+                  </div>
+
+                  <div className="task-grid-meta">
+                    <span className="user-badge">👤 {assigneeName}</span>
+
+                    <div className="task-grid-actions">
+                      <select
+                        className="status-select"
+                        value={t.status || "pending"}
+                        onChange={(e) =>
+                          handleStatusChange(t._id, e.target.value)
+                        }
+                      >
+                        <option value="pending">Pending</option>
+
+                        <option value="in-progress">In Progress</option>
+
+                        <option value="completed">Completed</option>
+                      </select>
+
+                      {/* ADMIN DELETE */}
+
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          className="btn-delete-task"
+                          onClick={() => handleDeleteTask(t._id)}
+                          title="Delete Task"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            width="24"
+                            height="24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="M9 3h6" />
+                            <path d="M4 6h16" />
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                            <line x1="10" y1="11" x2="10" y2="17" />
+                            <line x1="14" y1="11" x2="14" y2="17" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
         )}
-
       </section>
-
     </div>
   );
 }

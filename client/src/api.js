@@ -22,7 +22,7 @@ async function request(path, options = {}) {
     "Content-Type": "application/json",
     ...(options.headers || {}),
   };
-  
+
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }

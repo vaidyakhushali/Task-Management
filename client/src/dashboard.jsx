@@ -54,7 +54,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [displayName, setDisplayName] = useState(userName);
   const [selectedChatUser, setSelectedChatUser] = useState(null);
-  const [taskStatusFilter, setTaskStatusFilter] = useState("all");  
+  const [taskStatusFilter, setTaskStatusFilter] = useState("all");
 
   function openStatusTab(statusKey) {
     setTaskStatusFilter(statusKey);
@@ -120,7 +120,9 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
       setProjects(fetchedProjects);
       setNotifications(fetchedNotifications);
 
-      const unreadNotification = fetchedNotifications.find((item) => !item.read);
+      const unreadNotification = fetchedNotifications.find(
+        (item) => !item.read,
+      );
       setToastAlert(unreadNotification || null);
     } catch (err) {
       setError(err.message || "Unable to load dashboard data.");
@@ -295,7 +297,12 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
                 <span>{toastAlert.message}</span>
               </span>
             </button>
-            <button className="toast-close" type="button" onClick={closeToast} aria-label="Dismiss notification">
+            <button
+              className="toast-close"
+              type="button"
+              onClick={closeToast}
+              aria-label="Dismiss notification"
+            >
               ✕
             </button>
           </div>
@@ -672,11 +679,11 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
                         >
                           <div className="working-status-center">
                             <strong>
-                              {attendanceLoading
-                                ? "..."
-                                : `${attendanceRate}%`}
+                              {attendanceLoading ? "..." : `${attendanceRate}%`}
                             </strong>
-                            <span>{isAdmin ? "Team present" : "Checked in"}</span>
+                            <span>
+                              {isAdmin ? "Team present" : "Checked in"}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -865,10 +872,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
             )}
 
             {activeTab === "Projects" && (
-              <Projects
-                userRole={userRole}
-                onProjectsChanged={loadDashboard}
-              />
+              <Projects userRole={userRole} onProjectsChanged={loadDashboard} />
             )}
             {activeTab === "Team Members" && (
               <TeamMembers
@@ -886,9 +890,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
             )}
 
             {activeTab === "Analytics" && isAdmin && (
-              <Analytics
-                userRole={userRole}
-              />
+              <Analytics userRole={userRole} />
             )}
             {activeTab === "Calendar" && (
               <CalendarView
@@ -916,7 +918,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
             )}
             {activeTab === "Notifications" && (
               <Notification
-                onUnreadChange={() => { }}
+                onUnreadChange={() => {}}
                 notificationToOpen={notificationToOpen}
                 onNotificationOpened={() => setNotificationToOpen(null)}
               />

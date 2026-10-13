@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-  changeAdminPassword,
-  updateProfile,
-} from "./api";
+import { changeAdminPassword, updateProfile } from "./api";
 import "./settings.css";
 
 function Settings({

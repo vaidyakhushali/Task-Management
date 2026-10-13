@@ -20,7 +20,9 @@ const timelineDateFormatter = new Intl.DateTimeFormat("en-GB", {
 function formatTimelineDate(value) {
   if (!value) return null;
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : timelineDateFormatter.format(date);
+  return Number.isNaN(date.getTime())
+    ? null
+    : timelineDateFormatter.format(date);
 }
 
 function Projects({ search = "", userRole, onProjectsChanged }) {
@@ -252,25 +254,37 @@ function Projects({ search = "", userRole, onProjectsChanged }) {
                       key={`${project._id || projectIndex}-${idx}`}
                     >
                       <div className="project-task-name">
-                        <span className="project-mobile-label" aria-hidden="true">
+                        <span
+                          className="project-mobile-label"
+                          aria-hidden="true"
+                        >
                           Task
                         </span>
                         <span>{task.title}</span>
                       </div>
                       <div className="project-cell project-assignee">
-                        <span className="project-mobile-label" aria-hidden="true">
+                        <span
+                          className="project-mobile-label"
+                          aria-hidden="true"
+                        >
                           Assignee
                         </span>
                         {task.assignedUser?.fullname || "Unassigned"}
                       </div>
                       <div className="project-cell project-type">
-                        <span className="project-mobile-label" aria-hidden="true">
+                        <span
+                          className="project-mobile-label"
+                          aria-hidden="true"
+                        >
                           Task type
                         </span>
                         {task.taskType || "Standard"}
                       </div>
                       <div className="project-cell project-priority">
-                        <span className="project-mobile-label" aria-hidden="true">
+                        <span
+                          className="project-mobile-label"
+                          aria-hidden="true"
+                        >
                           Priority
                         </span>
                         <span
@@ -280,17 +294,21 @@ function Projects({ search = "", userRole, onProjectsChanged }) {
                         </span>
                       </div>
                       <div className="project-cell project-status">
-                        <span className="project-mobile-label" aria-hidden="true">
+                        <span
+                          className="project-mobile-label"
+                          aria-hidden="true"
+                        >
                           Status
                         </span>
-                        <span
-                          className={`project-pill project-pill-${status}`}
-                        >
+                        <span className={`project-pill project-pill-${status}`}>
                           {statusLabels[status] || status}
                         </span>
                       </div>
                       <div className="project-cell project-date">
-                        <span className="project-mobile-label" aria-hidden="true">
+                        <span
+                          className="project-mobile-label"
+                          aria-hidden="true"
+                        >
                           Timeline
                         </span>
                         {timelineText}
@@ -435,24 +453,23 @@ function Projects({ search = "", userRole, onProjectsChanged }) {
                       aria-label={`Due date for ${project.name}`}
                       title="Due date"
                     />
-                    {draft.startDate &&
-                      draft.startDate === draft.dueDate && (
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.5"
-                          value={draft.hours || ""}
-                          onChange={(event) =>
-                            updateTaskDraft(
-                              project._id,
-                              "hours",
-                              event.target.value,
-                            )
-                          }
-                          placeholder="Hours"
-                          aria-label={`Hours for ${project.name}`}
-                        />
-                      )}
+                    {draft.startDate && draft.startDate === draft.dueDate && (
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.5"
+                        value={draft.hours || ""}
+                        onChange={(event) =>
+                          updateTaskDraft(
+                            project._id,
+                            "hours",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="Hours"
+                        aria-label={`Hours for ${project.name}`}
+                      />
+                    )}
                     <button type="submit" className="project-add-task">
                       Add Task
                     </button>

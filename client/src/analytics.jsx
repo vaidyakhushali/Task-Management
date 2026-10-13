@@ -1,9 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  getAdminTasks,
-  getAdminUsers,
-  getProjects,
-} from "./api";
+import { getAdminTasks, getAdminUsers, getProjects } from "./api";
 import "./analytics.css";
 
 function escapeHtml(value) {
@@ -17,9 +13,7 @@ function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (character) => entities[character]);
 }
 
-function Analytics({
-  userRole = "User",
-}) {
+function Analytics({ userRole = "User" }) {
   const isAdmin = userRole === "Admin";
   const [search, setSearch] = useState("");
   const [projects, setProjects] = useState([]);
@@ -53,11 +47,7 @@ function Analytics({
     }
 
     setLoading(true);
-    Promise.all([
-      getProjects(),
-      getAdminTasks(),
-      getAdminUsers(),
-    ])
+    Promise.all([getProjects(), getAdminTasks(), getAdminUsers()])
       .then(([projRes, taskRes, userRes]) => {
         if (!isMounted) return;
         setProjects(Array.isArray(projRes?.data) ? projRes.data : []);
@@ -115,9 +105,7 @@ function Analytics({
   const maxMonthCount = Math.max(...monthCounts);
   const monthlyBars = months.map((m, idx) => {
     const count = monthCounts[idx];
-    const pct = maxMonthCount
-      ? Math.round((count / maxMonthCount) * 90)
-      : 0;
+    const pct = maxMonthCount ? Math.round((count / maxMonthCount) * 90) : 0;
     return {
       month: m,
       count,
@@ -461,7 +449,13 @@ function Analytics({
             }}
           >
             {loading ? (
-              <p style={{ color: "#94a3b8", fontSize: "13px", textAlign: "center" }}>
+              <p
+                style={{
+                  color: "#94a3b8",
+                  fontSize: "13px",
+                  textAlign: "center",
+                }}
+              >
                 Loading projects...
               </p>
             ) : projects.length > 0 ? (
