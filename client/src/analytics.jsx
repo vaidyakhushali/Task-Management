@@ -18,7 +18,6 @@ function escapeHtml(value) {
 }
 
 function Analytics({
-  stats = { total: 0, completed: 0, remaining: 0 },
   userRole = "User",
 }) {
   const isAdmin = userRole === "Admin";

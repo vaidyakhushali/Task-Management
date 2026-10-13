@@ -22,6 +22,7 @@
 .login-brand {
   display: flex;
   align-items: center;
+  
   gap: 12px;
   margin-bottom: 6px;
 }
@@ -52,42 +53,6 @@
   margin-bottom: 20px;
 }
 
-.demo-credentials-box {
-  background: var(--warm-peach-light);
-  border: 1px solid var(--soft-border);
-  border-radius: var(--radius-md);
-  padding: 12px 14px;
-  margin-bottom: 20px;
-}
-
-.demo-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--terracotta-dark);
-  margin-bottom: 8px;
-}
-
-.demo-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.demo-btn {
-  flex: 1;
-  padding: 6px 10px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--terracotta);
-  background: var(--card-bg);
-  color: var(--text-dark);
-  transition: var(--transition);
-}
-
-.demo-btn:hover {
-  background: var(--terracotta);
-  color: #ffffff;
-}
 
 .login-form {
   display: flex;
@@ -135,18 +100,18 @@
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-.toggle-password-btn {
-  background-image: none !important; 
+  background: none;
+  background-image: none !important;
+  border: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--terracotta);
+  cursor: pointer;
 }
 
 .toggle-password-btn::before,
 .toggle-password-btn::after {
   content: none !important;
-}
-  border: none;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--terracotta);
 }
 
 .form-options {

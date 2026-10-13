@@ -123,32 +123,6 @@
   cursor: not-allowed;
 }
 
-/* User Info Banner */
-.user-info-banner {
-  background: var(--warm-peach-light);
-  border: 1px solid var(--soft-border);
-  border-left: 5px solid var(--terracotta);
-  border-radius: var(--radius-md);
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.banner-icon {
-  font-size: 1.5rem;
-}
-
-.user-info-banner strong {
-  display: block;
-  font-size: 1rem;
-  color: var(--text-dark);
-}
-
-.user-info-banner p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
 
 /* Tasks Table Card */
 .tasks-list-card {
@@ -215,28 +189,6 @@
   overflow-x: auto;
 }
 
-.task-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-}
-
-.task-table th {
-  padding: 12px 16px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-  border-bottom: 2px solid var(--soft-border);
-}
-
-.task-table td {
-  padding: 14px 16px;
-  font-size: 0.9rem;
-  border-bottom: 1px solid var(--soft-border);
-  vertical-align: middle;
-}
 
 .title-cell strong {
   display: block;
@@ -287,35 +239,6 @@
   background-color: var(--bg-cream);
 }
 
-.btn-comments {
-  padding: 6px 12px;
-  background: var(--bg-cream);
-  border: 1px solid var(--soft-border);
-  border-radius: var(--radius-sm);
-  font-size: 0.82rem;
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.btn-comments:hover {
-  background: var(--warm-peach-light);
-  border-color: var(--warm-peach);
-}
-
-.btn-delete {
-  padding: 6px 12px;
-  background: #fdf2f2;
-  border: 1px solid #f8b4b4;
-  color: #9b1c1c;
-  border-radius: var(--radius-sm);
-  font-size: 0.82rem;
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.btn-delete:hover {
-  background: #f8b4b4;
-}
 
 /* Alert Boxes */
 .alert {
@@ -337,58 +260,6 @@
   color: #22543d;
 }
 
-/* Image 3 Milestone & List View Layout Styling */
-.milestone-group {
-  margin-bottom: 24px;
-}
-
-.milestone-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  background: var(--bg-cream);
-  border-radius: var(--radius-sm);
-  margin-bottom: 8px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.milestone-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.milestone-title-wrap h3 {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--terracotta-dark);
-  margin: 0;
-}
-
-.milestone-chevron {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  transition: transform 0.2s ease;
-}
-
-.milestone-chevron.collapsed {
-  transform: rotate(-90deg);
-}
-
-.subtask-connector {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  margin-left: 12px;
-}
-
-.subtask-indent {
-  padding-left: 24px !important;
-}
 
 /* Table layout adjustments matching Image 3 */
 .image3-task-table {

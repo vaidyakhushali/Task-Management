@@ -208,6 +208,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
     const pending = Math.max(totalTasks - completed - inProgress, 0);
     const completionRate = percentOf(completed, totalTasks);
     const averageDays = getAverageDaysToDue(tasks);
+    const overdue = tasks.filter(isOverdue).length;
 
     const priority = {
       high: tasks.filter((task) => task.priority === "high").length,
@@ -223,6 +224,7 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
       pending,
       completionRate,
       averageDays,
+      overdue,
       priority,
     };
   }, [projects, tasks]);
@@ -885,11 +887,6 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
 
             {activeTab === "Analytics" && isAdmin && (
               <Analytics
-                stats={{
-                  total: dashboard.totalTasks,
-                  completed: dashboard.completed,
-                  remaining: dashboard.inProgress + dashboard.pending,
-                }}
                 userRole={userRole}
               />
             )}
@@ -914,7 +911,6 @@ function Dashboard({ user, userName = "Admin", userRole = "User", onLogout }) {
                 onThemeChange={setTheme}
                 fontSize={fontSize}
                 onFontSizeChange={setFontSize}
-                onWorkspaceNameChange={() => { }}
                 onProfileNameChange={(newName) => setDisplayName(newName)}
               />
             )}
