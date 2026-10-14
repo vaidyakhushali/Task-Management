@@ -317,6 +317,23 @@ function Tasks({ user, onTaskAssigned, initialStatusFilter = "all" }) {
     });
   }
 
+  function formatHours(hours) {
+    if (hours === null || hours === undefined || hours === "") {
+      return "Not set";
+    }
+
+    const parsedHours = Number(hours);
+    if (!Number.isFinite(parsedHours)) {
+      return "Not set";
+    }
+
+    return `${parsedHours} ${parsedHours === 1 ? "hour" : "hours"}`;
+  }
+
+  function hasAssignedHours(task) {
+    return task.hours !== null && task.hours !== undefined && task.hours !== "";
+  }
+
   // TASK TYPE
 
   function getTaskType(task) {
@@ -908,6 +925,8 @@ function Tasks({ user, onTaskAssigned, initialStatusFilter = "all" }) {
 
                   <th>Due Date</th>
 
+                  <th>Hours</th>
+
                   <th>Update Status</th>
 
                   {/* ADMIN ONLY */}
@@ -1000,6 +1019,14 @@ function Tasks({ user, onTaskAssigned, initialStatusFilter = "all" }) {
                       <td data-label="Due date">
                         <span className="pill-badge pill-timeline">
                           📅 {formatDate(t.dueDate)}
+                        </span>
+                      </td>
+
+                      <td data-label="Hours">
+                        <span className="pill-badge pill-timeline">
+                          {hasAssignedHours(t)
+                            ? formatHours(t.hours)
+                            : "Not set"}
                         </span>
                       </td>
 
@@ -1163,6 +1190,11 @@ function Tasks({ user, onTaskAssigned, initialStatusFilter = "all" }) {
                               <span className="pill-badge pill-timeline">
                                 📅 Due: {formatDate(t.dueDate)}
                               </span>
+                              {hasAssignedHours(t) && (
+                                <span className="pill-badge pill-timeline">
+                                  Hours: {formatHours(t.hours)}
+                                </span>
+                              )}
                             </div>
 
                             <div className="kanban-card-footer">
@@ -1300,6 +1332,11 @@ function Tasks({ user, onTaskAssigned, initialStatusFilter = "all" }) {
                     <span className="pill-badge pill-timeline">
                       📅 Due: {formatDate(t.dueDate)}
                     </span>
+                    {hasAssignedHours(t) && (
+                      <span className="pill-badge pill-timeline">
+                        Hours: {formatHours(t.hours)}
+                      </span>
+                    )}
                   </div>
 
                   <div className="task-grid-meta">
